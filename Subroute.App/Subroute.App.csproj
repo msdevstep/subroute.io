@@ -162,6 +162,7 @@
     <Content Include="img\avatar-block.png" />
     <Content Include="img\avatar-meghan.jpg" />
     <Content Include="img\avatar.png" />
+    <Content Include="img\logo.png" />
     <Content Include="lib\ace\api\ace.html" />
     <Content Include="lib\ace\api\anchor.html" />
     <Content Include="lib\ace\api\background_tokenizer.html" />
@@ -1790,12 +1791,7 @@
     <Content Include="lib\qtip2\jquery.qtip.min.map" />
     <Content Include="lib\qtip2\README.md" />
     <Content Include="css\modal.less" />
-    <None Include="Web.Cloud.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Development.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
+    <None Include="Web.secret.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\container.css">

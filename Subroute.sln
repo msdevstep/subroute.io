@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Container", "Subro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Common", "Subroute.Common\Subroute.Common.csproj", "{E6A3BD35-9DEE-41B3-BD85-1BE073549627}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git Settings", "Git Settings", "{3B7C7280-95A1-477E-830E-A0727609AFBF}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Cloud|Any CPU = Cloud|Any CPU

@@ -357,12 +357,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <None Include="Web.Cloud.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Development.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
+    <None Include="Web.secret.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Subroute.Core\Subroute.Core.csproj">
