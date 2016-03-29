@@ -1,0 +1,13 @@
+{
+  "name": "ASP.NET",
+  "private": true,
+  "dependencies": {
+    "jquery": "2.2.0",
+    "durandal": "2.1.0",
+    "ace": "1.2.3",
+    "knockout.js": "3.1.0",
+    "knockout.validation": "1.0.2",
+    "knockout.mapping": "2.0.1",
+    "qtip2": "2.2.1"
+  }
+}

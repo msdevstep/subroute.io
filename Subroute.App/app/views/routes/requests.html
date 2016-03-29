@@ -1,0 +1,9 @@
+﻿<div id="requests">
+    <div class="toolbox-well">
+        <button data-bind="click: reloadRequests"><i class="fa" data-bind="css: { 'fa-history': !requestsLoading(), 'fa-refresh fa-spin': requestsLoading }"></i>&nbsp;&nbsp;Refresh Requests</button>
+        <ul class="fa-ul" data-bind="visible: requestsVisible, foreach: requests">
+            <li><i class="fa-li fa fa-download"></i> <a href="#" data-bind="click: $parent.showRequest"><strong data-bind="text: method"></strong> <span data-bind="text: statusCode"></span> <span data-bind="text: statusMessage"></span><strong data-bind="from: occurredOn" style="float: right;"></strong></a></li>
+        </ul>
+        <div class="no-requests" data-bind="hidden: requestsVisible() || requestsLoading()">No Requests Available</div>
+    </div>
+</div>

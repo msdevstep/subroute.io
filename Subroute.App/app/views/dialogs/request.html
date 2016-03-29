@@ -1,0 +1,24 @@
+﻿<div data-view="plugins/messageBox" class="messageBox request-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Request Details</h3>
+        </div>
+        <div class="modal-body">
+            <div id="request-loading" data-bind="visible: loading">
+                <i class="fa fa-refresh fa-spin fa-2x"></i>
+            </div>
+            <div data-bind="with: request">
+                <ul class="sub-nav">
+                    <li data-bind="css: { active: $root.activePanel().view === 'dialogs/request/details.html' }"><button data-bind="click: $root.showDetails"><i class="fa fa-info-circle fa-fw"></i>DETAILS</button></li>
+                    <li data-bind="css: { active: $root.activePanel().view === 'dialogs/request/headers.html' }"><button data-bind="click: $root.showHeaders"><i class="fa fa-envelope fa-fw"></i>HEADERS</button></li>
+                    <li data-bind="css: { active: $root.activePanel().view === 'dialogs/request/request-payload.html' }"><button data-bind="click: $root.showRequestPayload"><i class="fa fa-truck fa-fw"></i>REQUEST</button></li>
+                    <li data-bind="css: { active: $root.activePanel().view === 'dialogs/request/response-payload.html' }"><button data-bind="click: $root.showResponsePayload"><i class="fa fa-truck fa-flip-horizontal fa-fw"></i>RESPONSE</button></li>
+                </ul>
+                <div data-bind="compose: $root.activePanel"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bind="click: close">Close</button>
+        </div>
+    </div>
+</div>

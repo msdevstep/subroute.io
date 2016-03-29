@@ -1,0 +1,58 @@
+﻿<div id="client">
+    <div class="toolbox-well">
+        <h2>Request</h2>
+        <div class="horizontal-form">
+            <label>Api Uri:</label>
+            <input type="text" id="execution-uri" name="execution-uri" data-bind="value: executionUri" />
+        </div>
+        <div class="horizontal-form">
+            <label>Method:</label>
+            <select id="execution-method" name="execution-method" data-bind="value: executionMethod">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>MERGE</option>
+                <option>DELETE</option>
+            </select>
+        </div>
+        <div class="horizontal-form">
+            <label>Content-Type:</label>
+            <select id="execution-content-type" name="execution-content-type" data-bind="value: executionRequestContentType">
+                <option>application/json</option>
+                <option>application/xml</option>
+                <option>text/html</option>
+                <option>text/plain</option>
+                <option>application/x-www-form-urlencoded</option>
+                <option>multipart/form-data</option>
+            </select>
+        </div>
+        <div class="horizontal-form">
+            <label>Request Headers:</label>
+            <textarea id="execution-request-headers" name="execution-request-headers" rows="5" data-bind="value: executionHeaders"></textarea>
+        </div>
+        <div class="horizontal-form" data-bind="hidden: executionMethod() === 'GET'">
+            <label>Request Payload:</label>
+            <pre id="execution-request-payload" class="payload" data-bind="ace: { value: executionPayload, syntax: executionRequestSyntax }"></pre>
+        </div>
+        <button data-bind="click: execute, loading: { trigger: executionLoading, idle: 'fa-paper-plane', selector: '#execution-uri, #execution-method, #execution-content-type, #execution-request-headers, #execution-request-payload' }"><i class="fa fa-paper-plane"></i>&nbsp;&nbsp;Execute Request</button>
+    </div>
+
+    <!-- ko if: executionResponseVisible -->
+    <div class="toolbox-well">
+        <h2>Response</h2>
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-download"></i> <strong data-bind="text: executionStatusCode">200</strong> <span data-bind="text: executionStatusMessage">OK</span></li>
+        </ul>
+        <aside class="standalone-aside"><strong>Note:</strong> Browser may prevent some headers from showing.</aside>
+        <div class="horizontal-form">
+            <label>Response Headers:</label>
+            <textarea id="execution-response-headers" name="execution-response-headers" rows="5" readonly="readonly" data-bind="value: executionResponseHeaders"></textarea>
+        </div>
+        <div class="horizontal-form last">
+            <label>Response Payload</label>
+            <pre id="execution-response-payload" class="payload" data-bind="ace: { value: executionResponse, syntax: executionResponseSyntax, readOnly: false }"></pre>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>

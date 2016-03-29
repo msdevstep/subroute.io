@@ -1,0 +1,53 @@
+﻿<div id="scripts">
+    <div id="suggestion" data-bind="visible: showSuggestionInfo, with: defaultSuggestion">
+        <span class="suggestion-author">
+            <img class="avatar-circle" data-bind="src: picture" /> Author: <span class="suggestion-name" data-bind="text: name"></span>
+        </span>
+        <span class="suggestion-title">
+            <span class="suggestion-title-contents" data-bind="text: title, attr: { title: title }"></span>
+        </span>
+        <span class="suggestion-buttons">
+            <button class="suggestion-blank" data-bind="click: $root.useBlankDocument"><i class="fa fa-file"></i> Use Blank Document</button>
+            <button class="suggestion-show-another" data-bind="click: $root.loadRandomSuggestion, loading: { trigger: $root.suggesting, idle: 'fa-refresh' }"><i class="fa fa-refresh"></i> Show Me Another</button>
+        </span>
+    </div>
+    <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo }"></pre>
+    <div id="error-list" data-bind="css: { 'has-diagnostics': diagnosticsCount() > 0 }">
+        <button id="error-status" data-bind="toggle: diagnosticsVisible, css: statusClass"><i class="fa fa-fw" data-bind="visible: diagnosticsCount() > 0, css: { 'fa-caret-up': !diagnosticsVisible() && diagnosticsCount() !== 0, 'fa-caret-down': diagnosticsVisible() && diagnosticsCount() !== 0 }"></i> <span data-bind="text: statusMessage"></span><span class="maker">Made with <i class="fa fa-heart-o"></i> by <a href="http://dylanvester.com" target="_blank">Dylan Vester</a></span></button>
+        <div id="error-list-contents" data-bind="visible: diagnosticsVisible() && diagnosticsCount() > 0, direction: 'down'">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="icon"></th>
+                        <th class="short">Severity</th>
+                        <th class="short">Code</th>
+                        <th>Message</th>
+                        <th class="medium">Position</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: diagnostics">
+                    <tr>
+                        <td>
+                            <i class="fa fa-exclamation-triangle fa-fw diagnostic-warning" data-bind="visible: severity == 'Warning'"></i>
+                            <i class="fa fa-times-circle fa-fw diagnostic-error" data-bind="visible: severity == 'Error'"></i>
+                            <i class="fa fa-info-circle fa-fw diagnostic-message" data-bind="visible: severity == 'Message'"></i>
+                        </td>
+                        <td data-bind="text: severity"></td>
+                        <td data-bind="text: code"></td>
+                        <td data-bind="text: description"></td>
+                        <td data-bind="text: $root.formatPosition($data)"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="toolbox">
+        <ul class="sub-nav">
+            <li data-bind="css: { active: activePanel() === 'routes/properties.html' }"><button data-bind="click: showProperties"><i class="fa fa-heartbeat fa-fw"></i>STATUS</button></li>
+            <li data-bind="css: { active: activePanel() === 'routes/requests.html' }"><button data-bind="click: showRequests, enable: auth.isAuthenticated() && !isNew()"><i class="fa fa-history fa-fw"></i>REQUEST LOG</button></li>
+            <li data-bind="css: { active: activePanel() === 'routes/client.html' }"><button data-bind="click: showClient, enable: auth.isAuthenticated && !isNew()"><i class="fa fa-play fa-fw"></i>EXECUTE</button></li>
+        </ul>
+
+        <div data-bind="compose: activePanel"></div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+﻿using System;
+using System.Net;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public RouteResponse Get(RouteRequest request)
+		{
+			return NoContent();
+		}
+
+		public RouteResponse Post(RouteRequest request)
+		{
+			return NoContent();
+		}
+
+		public RouteResponse Put(RouteRequest request)
+		{
+			return NoContent();
+		}
+
+		public RouteResponse Delete(RouteRequest request)
+		{
+			return NoContent();
+		}
+	}
+}

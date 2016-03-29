@@ -1,0 +1,482 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Subroute.Core</RootNamespace>
+    <AssemblyName>Subroute.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Development|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Cloud|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Cloud\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Auth0.AuthenticationApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Auth0.AuthenticationApi.2.0.0\lib\portable45-net45+win8+wpa81\Auth0.AuthenticationApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Auth0.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Auth0.Core.2.0.0\lib\portable45-net45+win8+wpa81\Auth0.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Auth0.ManagementApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Auth0.ManagementApi.2.0.0\lib\portable45-net45+win8+wpa81\Auth0.ManagementApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=3.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.WebApi2.3.4.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JWT, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JWT.1.3.2\lib\3.5\JWT.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MailChimp, Version=1.1.82.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MailChimp.NET.1.1.82.0\lib\net35\MailChimp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.1.2.3\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.1.1\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.1.1\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Extensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Extensions.1.0.0\lib\portable45-net45+win8\Microsoft.CodeAnalysis.CSharp.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Features, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Features.1.1.1\lib\net45\Microsoft.CodeAnalysis.CSharp.Features.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Workspaces.1.1.1\lib\net45\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.EditorFeatures.Text, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.EditorFeatures.Text.1.1.1\lib\net46\Microsoft.CodeAnalysis.EditorFeatures.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Features, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Features.1.1.1\lib\net45\Microsoft.CodeAnalysis.Features.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Workspaces, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.1.1.1\lib\net45\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Workspaces.Desktop, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.1.1.1\lib\net45\Microsoft.CodeAnalysis.Workspaces.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAzure.ServiceBus.3.0.9\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.7.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=104.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Rxx, Version=1.3.4451.33754, Culture=neutral, PublicKeyToken=09aedbbcd2ef4748, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rxx.1.3.4451.33754\lib\net40\Rxx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.3.9.71\lib\net35\ServiceStack.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Composition.AttributedModel, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Composition.Convention, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.Convention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Composition.Hosting, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.Hosting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Composition.Runtime, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Composition.TypedParts, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Services" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Main.1.0.11226\lib\Net4\System.Reactive.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.1.1.0\lib\dotnet5.2\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Spatial, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Spatial.5.6.2\lib\net40\System.Spatial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.0.1\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Compiler\CompilationService.cs" />
+    <Compile Include="Compiler\CompilationResult.cs" />
+    <Compile Include="Compiler\CompletionRequest.cs" />
+    <Compile Include="Compiler\CompletionResult.cs" />
+    <Compile Include="Compiler\Diagnostic.cs" />
+    <Compile Include="Compiler\DocumentationConverter.cs" />
+    <Compile Include="Compiler\FormattingOptions.cs" />
+    <Compile Include="Compiler\Intellisense\AnnotationTable.cs" />
+    <Compile Include="Compiler\Intellisense\CommonAccessibilityUtilities.cs" />
+    <Compile Include="Compiler\Intellisense\CommonSyntaxNodeOrTokenExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\CSharpSyntaxContext.cs" />
+    <Compile Include="Compiler\Intellisense\EnumerableExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ExpressionSyntaxExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\FindTokenHelper.cs" />
+    <Compile Include="Compiler\Intellisense\IAssemblySymbolExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ICompilationExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\INamespaceOrTypeSymbolExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ISymbolExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ITypeSymbolExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordContextHandler.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AbstractKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AbstractSyntacticSingleKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AddKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AliasKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AscendingKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AsKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AssemblyKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AsyncKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\AwaitKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\BaseKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\BoolKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\BreakKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ByKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ByteKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\CaseKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\CatchKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\CharKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\CheckedKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ChecksumKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ClassKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ConstKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ContinueKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DecimalKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DefaultKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DefineKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DelegateKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DescendingKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DisableKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DoKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DoubleKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\DynamicKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ElifKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ElseKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\EndIfKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\EndRegionKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\EnumKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\EqualsKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ErrorKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\EventKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ExplicitKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ExternKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FalseKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FieldKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FinallyKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FixedKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FloatKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ForEachKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ForKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\FromKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\GetKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\GlobalKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\GotoKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\GroupKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\HiddenKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\IfKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ImplicitKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\InKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\InterfaceKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\InternalKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\IntKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\IntoKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\IsKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\JoinKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\LetKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\LineKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\LockKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\LongKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\MethodKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ModuleKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\NameOfKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\NamespaceKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\NewKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\NullKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ObjectKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\OnKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\OperatorKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\OrderByKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\OutKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\OverrideKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ParamKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ParamsKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\PartialKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\PragmaKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\PrivateKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\PropertyKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ProtectedKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\PublicKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ReadOnlyKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ReferenceKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\RefKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\RegionKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\RemoveKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\RestoreKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ReturnKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SByteKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SealedKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SelectKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SetKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ShortKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SizeOfKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\StackAllocKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\StaticKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\StringKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\StructKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\SwitchKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ThisKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ThrowKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\TrueKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\TryKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\TypeKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\TypeOfKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\TypeVarKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UIntKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\ULongKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UncheckedKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UndefKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UnsafeKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UShortKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\UsingKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\VarKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\VirtualKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\VoidKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\VolatileKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\WarningKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\WhenKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\WhereKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\WhileKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\KeywordRecommenders\YieldKeywordRecommender.cs" />
+    <Compile Include="Compiler\Intellisense\LinkedListExtension.cs" />
+    <Compile Include="Compiler\Intellisense\Matcher.cs" />
+    <Compile Include="Compiler\Intellisense\MemberDeclarationSyntaxExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\NameGenerator.cs" />
+    <Compile Include="Compiler\Intellisense\NameSyntaxExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ObjectExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ReturnTypeFormatter.cs" />
+    <Compile Include="Compiler\Intellisense\SemanticMap.cs" />
+    <Compile Include="Compiler\Intellisense\SemanticModelExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SnippetGenerator.cs" />
+    <Compile Include="Compiler\Intellisense\SourceTextExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SpecializedCollections.cs" />
+    <Compile Include="Compiler\Intellisense\StringExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SymbolExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SymbolInfoExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxKindSet.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxNodeExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxTokenExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxTreeExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\SyntaxTriviaExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\TextLineExtension.cs" />
+    <Compile Include="Compiler\Intellisense\TypeGenerator.cs" />
+    <Compile Include="Compiler\Intellisense\TypeSyntaxExtensions.cs" />
+    <Compile Include="Compiler\Intellisense\ValueTuple.cs" />
+    <Compile Include="Compiler\Intellisense\ValueTuple`2.cs" />
+    <Compile Include="Compiler\ReturnTypeFormatter.cs" />
+    <Compile Include="Compiler\SnippetGenerator.cs" />
+    <Compile Include="Data\DatabaseInitializer.cs" />
+    <Compile Include="Data\PagedCollection.cs" />
+    <Compile Include="Data\Repositories\RequestRepository.cs" />
+    <Compile Include="Data\Request.cs" />
+    <Compile Include="Data\Route.cs" />
+    <Compile Include="Data\Repositories\RouteRepository.cs" />
+    <Compile Include="Data\SubrouteContext.cs" />
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
+    <Compile Include="Exceptions\AuthenticationException.cs" />
+    <Compile Include="Exceptions\AuthorizationException.cs" />
+    <Compile Include="Exceptions\BadRequestException.cs" />
+    <Compile Include="Exceptions\CompilationException.cs" />
+    <Compile Include="Exceptions\ConflictException.cs" />
+    <Compile Include="Exceptions\InvalidTokenException.cs" />
+    <Compile Include="Exceptions\IStatusCodeException.cs" />
+    <Compile Include="Exceptions\NotFoundException.cs" />
+    <Compile Include="Exceptions\OfflineException.cs" />
+    <Compile Include="Exceptions\PaymentException.cs" />
+    <Compile Include="Exceptions\QueryException.cs" />
+    <Compile Include="Exceptions\RouteEntryPointException.cs" />
+    <Compile Include="Exceptions\RouteException.cs" />
+    <Compile Include="Exceptions\RoutePermissionException.cs" />
+    <Compile Include="Exceptions\ServiceBusException.cs" />
+    <Compile Include="Execution\ExecutionRequest.cs" />
+    <Compile Include="Execution\ExecutionResponse.cs" />
+    <Compile Include="Execution\ExecutionResult.cs" />
+    <Compile Include="Execution\ExecutionService.cs" />
+    <Compile Include="Execution\ResponsePipeline.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\PrincipalExtensions.cs" />
+    <Compile Include="Extensions\RequestExtensions.cs" />
+    <Compile Include="Compiler\SymbolExtensions.cs" />
+    <Compile Include="Marketing\Providers\MailChimpProvider.cs" />
+    <Compile Include="Models\Intellisense\AutoCompleteOptions.cs" />
+    <Compile Include="Exceptions\TriggerException.cs" />
+    <Compile Include="Exceptions\UnsupportedMediaTypeException.cs" />
+    <Compile Include="Exceptions\ValidationException.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Models\Intellisense\TextPosition.cs" />
+    <Compile Include="Models\Intellisense\Member.cs" />
+    <Compile Include="Models\Intellisense\MemberType.cs" />
+    <Compile Include="Models\Requests\Request.cs" />
+    <Compile Include="Models\Routes\RouteIdentifier.cs" />
+    <Compile Include="Models\Routes\RouteIdentifierType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceBus\TopicFactory.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Tracing\IdleTracer.cs" />
+    <Compile Include="Tracing\MessageTracer.cs" />
+    <Compile Include="Tracing\TimerTracer.cs" />
+    <Compile Include="Tracing\TraceContext.cs" />
+    <Compile Include="Tracing\TraceExtensions.cs" />
+    <Compile Include="Tracing\TracerBase.cs" />
+    <Compile Include="Tracing\TracingHandler.cs" />
+    <Compile Include="TypeConverters\RouteIdentifierTypeConverter.cs" />
+    <Compile Include="Utilities\HeaderUtility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Subroute.Common\Subroute.Common.csproj">
+      <Project>{e6a3bd35-9dee-41b3-bd85-1be073549627}</Project>
+      <Name>Subroute.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

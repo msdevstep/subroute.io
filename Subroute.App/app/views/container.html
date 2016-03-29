@@ -1,0 +1,37 @@
+﻿<div id="container">
+    <header data-bind="click: hideActiveElements">
+        <h1>
+            <span class="logo" data-bind="hidden: apiUriVisible, html: activeScriptName, click: showFullUri, clickBubble: false"></span>
+            <span data-bind="visible: apiUriVisible, html: activeApiScriptName, click: selectApiUri, clickBubble: false"></span>
+        </h1>
+        <!-- ko compose: 'viewmodels/partials/login' --><!--/ko-->
+    </header>
+    <div id="hero" data-bind="visible: heroVisible">
+        <h1>Welcome to Subroute.io</h1>
+        <p>Subroute.io is a dynamic execution environment for C# .NET code. We enable you to create routes that support any payload format, such as JSON, XML, and binary data.</p>
+        <button data-bind="click: hideHero"><i class="fa fa-angle-double-right fa-fw"></i>Get Started</button>
+    </div>
+    <ul id="sidebar" data-bind="css { expanded: expanded }">
+        <li>
+            <button class="ephasis" title="Toggle Menu" data-bind="toggle: expanded"><span class="icon"><i class="fa fa-bars" data-bind="css: { 'fa-bars': !expanded(), 'fa-close fa-lg': expanded }"></i></span></button>
+        </li>
+        <li>
+            <a href="#routes/new" title="Create Route"><span class="icon"><i class="fa fa-plus fa-lg"></i></span>Create Route</a>
+        </li>
+        <li data-bind="visible: config.enableSuggestions">
+            <a href="#routes/suggest" title="Suggest Example Route" data-bind="click: showNextSuggestion"><span class="icon"><i class="fa fa-random fa-lg"></i></span>Suggest Example Route</a>
+        </li>
+        <li>
+            <button title="My Routes" data-bind="click: showRoutes, loading: { trigger: routesLoading, idle: 'fa-th-list' }"><span class="icon"><i class="fa fa-th-list"></i></span>My Routes</button>
+        </li>
+        <li data-bind="visible: config.enableGallery">
+            <a href="#gallery" title="Gallery"><span class="icon"><i class="fa fa-map-o"></i></span>Gallery</a>
+        </li>
+    </ul>
+    <div id="dialog" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }">
+        <a href="#" class="close" data-bind="click: dialog.closeDialog"><i class="fa fa-close"></i></a>
+        <div data-bind="compose: dialog.activeDialog"></div>
+    </div>
+    <div id="dialog-overlay" data-bind="fadeVisible: dialog.overlayVisible"></div>
+    <div id="page" data-bind="router: { cacheViews:false }, click: hideActiveElements"></div>
+</div>

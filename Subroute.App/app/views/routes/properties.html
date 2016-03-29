@@ -1,0 +1,43 @@
+﻿<div id="properties">
+    <div class="toolbox-well">
+        <div class="horizontal-form">
+            <label for="route-uri">Route Uri:</label>
+            <input type="text" id="route-uri" name="route-uri" data-bind="value: uri" />
+            <aside><span data-bind="text: executionUri"></span></aside>
+        </div>
+        <div class="horizontal-form">
+            <label for="route-title">Route Title:</label>
+            <input type="text" id="route-title" name="route-title" data-bind="value: title" maxlength="300" />
+        </div>
+        <div class="horizontal-form" data-bind="visible: auth.isAdmin">
+            <label data-bind="tooltip: { title: 'Use as Suggestion (Admin Only Feature)', content: 'Setting this option will enable subroute to use this route\'s code as a default suggestion for when a user creates a new route.', options: { show: 'mouseover', hide: 'mouseout', style: { classes: 'qtip-tipsy' }, position: { my: 'right center', at: 'left center', adjust: { x: -4, y: -4, } } } }"><span class="help-icon">Use as Suggestion </span> <input type="checkbox" data-bind="checked: isDefault" /></label>
+        </div>
+    </div>
+
+    <div class="toolbox-well">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-toggle-off"></i> Status: <strong data-bind="hidden: isOnline">Offline</strong><strong data-bind="visible: isOnline">Online</strong></li>
+            <li><i class="fa-li fa fa-history"></i> Last Saved: <strong data-bind="from: updatedOn, fromDefault: 'Unsaved'"></strong></li>
+            <li><i class="fa-li fa fa-history"></i> Last Published: <strong data-bind="from: publishedOn, fromDefault: 'Unpublished'"></strong></li>
+            <li><i class="fa-li fa fa-star-o"></i> Up-to-Date: <strong data-bind="hidden: isCurrent">Staging Changes</strong><strong data-bind="visible: isCurrent">Yes</strong></li>
+            <li><i class="fa-li fa fa-tachometer"></i> Executions: <strong data-bind="text: executionCount">0</strong></li>
+        </ul>
+        <p><button class="link" data-bind="click: showHowTo, clickBubble: false">How do I execute my route externally?</button>
+        </p>
+        <!-- ko if: showSaveTooltip -->
+        <button id="save-button" data-bind="click: saveChanges, loading: { trigger: saving, idle: 'fa-floppy-o' }, tooltip: { content: $('#save-button-tooltip'), options: { show: { when: false, ready: true, effect: function() { $(this).toggle( 'bounce', { times: 3, direction: 'right', distance: 5 }, 'slow' ); } }, hide: false, style: { classes: 'qtip-tipsy save-button-qtip' }, position: { my: 'right center', at: 'left center', adjust: { x: -4, y: 0, } } } }"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save Changes</button>
+        <!-- /ko -->
+        <!-- ko ifnot: showSaveTooltip -->
+        <button id="save-button" data-bind="click: saveChanges, loading: { trigger: saving, idle: 'fa-floppy-o' }"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save Changes</button>
+        <!-- /ko -->
+        <button id="compile-button" data-bind="click: compile, loading: { trigger: compiling, idle: 'fa-upload' }"><i class="fa fa-upload"></i>&nbsp;&nbsp;Compile</button>
+        <button id="publish-button" data-bind="click: publish, enable: !isNew(), loading: { trigger: publishing() && !isNew(), idle: 'fa-cloud-upload', selector: '#compile-button, #save-button' }"><i class="fa fa-cloud-upload"></i>&nbsp;&nbsp;Publish</button>
+        <p class="step-crumbs last"><strong>Ctrl - E</strong> <i class="fa fa-keyboard-o"></i> Save <i class="fa fa-angle-right"></i> Compile <i class="fa fa-angle-right"></i> Publish <i class="fa fa-angle-right"></i> Execute
+        </p>
+    </div>
+
+    <div id="save-button-tooltip" style="display: none;">
+        Save it now to make it your own!<br/>
+        <button class="link" data-bind="click: hideSaveTooltip"><i class="fa fa-eye-slash fa-lg"></i>Don't Show This Again</button>
+    </div>
+</div>

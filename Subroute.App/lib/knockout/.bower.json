@@ -1,0 +1,14 @@
+{
+  "name": "knockout",
+  "homepage": "https://github.com/SteveSanderson/knockout",
+  "version": "2.2.0",
+  "_release": "2.2.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.2.0",
+    "commit": "259125182e4a85736e603fb07b6870b8a2687ca4"
+  },
+  "_source": "git://github.com/SteveSanderson/knockout.git",
+  "_target": "2.2.0",
+  "_originalSource": "knockout"
+}

@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.App", "Subroute.App\Subroute.App.csproj", "{0DAED980-68FD-477F-B022-3A516C2F5188}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Api", "Subroute.Api\Subroute.Api.csproj", "{CA7142A4-C36F-4547-B523-D0A71D5D6045}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Core", "Subroute.Core\Subroute.Core.csproj", "{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Container", "Subroute.Container\Subroute.Container.csproj", "{657CC079-CC48-403E-9D14-8A909B21ACCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subroute.Common", "Subroute.Common\Subroute.Common.csproj", "{E6A3BD35-9DEE-41B3-BD85-1BE073549627}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Cloud|Any CPU = Cloud|Any CPU
+		Development|Any CPU = Development|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DAED980-68FD-477F-B022-3A516C2F5188}.Cloud|Any CPU.ActiveCfg = Cloud|Any CPU
+		{0DAED980-68FD-477F-B022-3A516C2F5188}.Cloud|Any CPU.Build.0 = Cloud|Any CPU
+		{0DAED980-68FD-477F-B022-3A516C2F5188}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{0DAED980-68FD-477F-B022-3A516C2F5188}.Development|Any CPU.Build.0 = Development|Any CPU
+		{CA7142A4-C36F-4547-B523-D0A71D5D6045}.Cloud|Any CPU.ActiveCfg = Cloud|Any CPU
+		{CA7142A4-C36F-4547-B523-D0A71D5D6045}.Cloud|Any CPU.Build.0 = Cloud|Any CPU
+		{CA7142A4-C36F-4547-B523-D0A71D5D6045}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{CA7142A4-C36F-4547-B523-D0A71D5D6045}.Development|Any CPU.Build.0 = Development|Any CPU
+		{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}.Cloud|Any CPU.ActiveCfg = Cloud|Any CPU
+		{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}.Cloud|Any CPU.Build.0 = Cloud|Any CPU
+		{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{E2FC2308-3342-4E79-BF16-B7D1EA9CC00D}.Development|Any CPU.Build.0 = Development|Any CPU
+		{657CC079-CC48-403E-9D14-8A909B21ACCB}.Cloud|Any CPU.ActiveCfg = Cloud|Any CPU
+		{657CC079-CC48-403E-9D14-8A909B21ACCB}.Cloud|Any CPU.Build.0 = Cloud|Any CPU
+		{657CC079-CC48-403E-9D14-8A909B21ACCB}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{657CC079-CC48-403E-9D14-8A909B21ACCB}.Development|Any CPU.Build.0 = Development|Any CPU
+		{E6A3BD35-9DEE-41B3-BD85-1BE073549627}.Cloud|Any CPU.ActiveCfg = Cloud|Any CPU
+		{E6A3BD35-9DEE-41B3-BD85-1BE073549627}.Cloud|Any CPU.Build.0 = Cloud|Any CPU
+		{E6A3BD35-9DEE-41B3-BD85-1BE073549627}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{E6A3BD35-9DEE-41B3-BD85-1BE073549627}.Development|Any CPU.Build.0 = Development|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

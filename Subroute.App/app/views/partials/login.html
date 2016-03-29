@@ -1,0 +1,16 @@
+﻿<div class="login">
+    <button class="login-button" data-bind="hidden: auth.isAuthenticated, click: showLogin">Login or Create Account</button>
+    <button data-bind="visible: auth.isAuthenticated, tooltip: { content: $('#user-menu'), options: { style: { classes: 'qtip-tipsy tooltip-menu' }, position: { my: 'right center', at: 'left center', adjust: { x: -8, y: 0, } } } }">
+        <i class="fa fa-github-alt social-icon" data-bind="visible: auth.provider() === 'github'"></i>
+        <i class="fa fa-facebook-official social-icon" data-bind="visible: auth.provider() === 'facebook'"></i>
+        <i class="fa fa-windows social-icon" data-bind="visible: auth.provider() === 'windowslive'"></i>
+        <i class="fa fa-google-plus-square social-icon" data-bind="visible: auth.provider() === 'google-oauth2'"></i>
+        <i class="fa fa-user social-icon" data-bind="visible: auth.provider() === 'auth0'"></i>
+        <span data-bind="text: auth.name"></span>
+        <img class="avatar-circle" data-bind="hidden: auth.useInitials, src: auth.avatarUri" />
+        <span class="avatar-initals" data-bind="visible: auth.useInitials, text: auth.initials"></span>
+    </button>
+    <ul id="user-menu" style="display: none;">
+        <li><button data-bind="click: logout"><i class="fa fa-sign-out fa-lg"></i> Sign Out</button></li>
+    </ul>
+</div>

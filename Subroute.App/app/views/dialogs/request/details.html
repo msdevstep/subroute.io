@@ -1,0 +1,22 @@
+﻿<div id="request-details">
+    <div class="horizontal-form">
+        <label>Request Uri:</label>
+        <input type="text" readonly="readonly" data-bind="value: uri" />
+    </div>
+    <div class="horizontal-form">
+        <label>Method / Status Code / Message:</label>
+        <input type="text" readonly="readonly" data-bind="value: $root.statusCodeAndMessage" />
+    </div>
+    <div class="horizontal-form">
+        <label>IP Address:</label>
+        <input type="text" readonly="readonly" data-bind="value: ipAddress" />
+    </div>
+    <div class="horizontal-form">
+        <label>Occurred On:</label>
+        <input type="text" readonly="readonly" data-bind="date: { value: occurredOn, format: 'MMMM Do YYYY, h:mm:ss a', defaultValue: 'Unknown' }" />
+    </div>
+    <div class="horizontal-form">
+        <label>Completed On:</label>
+        <input type="text" readonly="readonly" data-bind="date: { value: completedOn, format: 'MMMM Do YYYY, h:mm:ss a', defaultValue: 'Unknown' }" />
+    </div>
+</div>

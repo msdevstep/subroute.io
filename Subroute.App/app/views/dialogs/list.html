@@ -1,0 +1,9 @@
+﻿<div id="routes">
+    <h3>Saved Routes</h3>
+
+    <div class="routes-loading-overlay" data-bind="visible: routesLoading"><i class="fa fa-refresh fa-fw fa-spin fa-2x"></i></div>
+    <div class="no-requests" style="display: none;" data-bind="hidden: hasRoutes">No Saved Routes</div>
+    <ul class="route-list" data-bind="foreach: routes">
+        <li><a href="#" data-bind="href: '#routes/edit/' + uri, click: $root.hideDialog"><i class="fa fa-code"></i><span data-bind="text: uri"></span></a></li>
+    </ul>
+</div>

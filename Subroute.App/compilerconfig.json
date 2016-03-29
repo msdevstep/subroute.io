@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "css/container.css",
+    "inputFile": "css/container.less"
+  },
+  {
+    "outputFile": "css/scripts.css",
+    "inputFile": "css/scripts.less"
+  }
+]

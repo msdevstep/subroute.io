@@ -1,0 +1,8 @@
+﻿<div id="routes">
+    <h3>How do I call my route?</h3>
+
+    <p>The Subroute.io execution engine uses convention to determine which method of your class to call. When making a RESTful request to the following endpoint.</p>
+    <code data-bind="text: apiEndpoint"></code>
+    <p>The Subroute.io execution engine will use the HTTP verb (e.g. GET, POST, DELETE, etc...) to determine which method to call. Subroute.io will grab the first method whose name begins with the HTTP verb and execute it by passing in the current request's headers, query string, and body.</p>
+    <p>If your code intends to return a result, it should instantiate an <code>ExecutionResponse</code> and set its status code, headers, and payload to return to the caller.</p>
+</div>

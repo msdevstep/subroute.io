@@ -1,0 +1,34 @@
+﻿<div id="gallery">
+    <div id="gallery-hero">
+        <h1>Explore Subroutes</h1>
+        <p>Browse through interesting shared routes created by the Subroute community and clone them to your account.</p>
+    </div>
+    <div id="gallery-menu">
+        <input type="text" id="search-gallery" placeholder="&#xF002;" name="search-gallery" />
+        <select id="search-criteria" name="search-criteria">
+            <option value="ALL">All</option>
+            <option value="TRENDING">Trending</option>
+            <option value="MOSTRECENT">Most Recent</option>
+            <option value="BYSUBROUTE">By Subroute Staff</option>
+        </select>
+    </div>
+    <div id="gallery-routes">
+        <ul>
+            <!-- ko foreach: $data.routes -->
+            <li>
+                <div>
+                    <h3>
+                        <strong data-bind="text: title"></strong>/<a href="#"><span data-bind="text: uri"></span></a>
+                        <span class="heading-right"><i class="fa fa-star"></i> <span data-bind="text: starredCount"></span> &nbsp; <i class="fa fa-code-fork"></i> <span data-bind="text: clonedCount"></span> </span>
+                    </h3>
+                    <p>
+                        Created by <a href="#" data-bind="text: user.name"></a> &middot; Last modified on <span data-bind="text: $root.formatTimestamp(updatedOn)"></span>
+                        <span class="heading-right"></span>
+                    </p>
+                </div>
+                <hr/>
+            </li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>

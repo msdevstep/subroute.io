@@ -1,0 +1,17 @@
+﻿<div id="login-dialog">
+    <h3>Authenticate with...</h3>
+
+    <p class="login-message" data-bind="visible: hasMessage, text: message"></p>
+
+    <ul class="social-authenticate">
+        <li><a href="#" class="facebook-login" data-bind="href: facebookAuthorizeUrl">
+            <i class="fa fa-facebook-official fa-fw fa-lg"></i> Authenticate with Facebook
+        </a></li>
+        <li><a href="#" class="github-login" data-bind="href: gitHubAuthorizeUrl">
+            <i class="fa fa-github-square fa-fw fa-lg"></i> Authenticate with GitHub
+        </a></li>
+        <li><a href="#" class="microsoft-login" data-bind="href: microsoftAuthorizeUrl">
+            <i class="fa fa-windows fa-fw fa-lg"></i> Authenticate with Microsoft
+        </a></li>
+    </ul>
+</div>
