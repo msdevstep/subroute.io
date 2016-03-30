@@ -213,7 +213,7 @@ button.link:hover {
   width: 100%;
   display: table-cell;
   margin: 0;
-  padding: 0 0 0 24px;
+  padding: 0 0 0 20px;
   height: 60px;
   line-height: 60px;
   font-family: 'Open Sans', sans-serif;
@@ -222,6 +222,13 @@ button.link:hover {
   font-style: italic;
   white-space: nowrap;
   text-wrap: none;
+}
+#container header h1 img {
+  width: 48px;
+  height: 51px;
+  display: inline-block;
+  vertical-align: middle;
+  padding-bottom: 3px;
 }
 #container header h1 .logo {
   cursor: pointer;
