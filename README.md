@@ -1,8 +1,6 @@
 ## Subroute.io - Online C# IDE for Webhooks and Microservices
 
-**Comming Soon:** Developer machine setup and deployment instructions. For now, source repository has been purged of all sensitive information related to hosting and deployment.
-
-### Developer Machine Setup ###
+#### Developer Machine Setup ####
 
 You need to add a *.secret.config file to each of the following projects and they must contain the following settings. You'll need to use your own Azure subscription to satisfy some of the configuration requirements (Subroute.Storage.ConnectionString for example).
 
@@ -59,7 +57,7 @@ You need to add a *.secret.config file to each of the following projects and the
           <add key="Subroute.ServiceBus.ResponseSubscriptionNameFormat" value="" />
         </appSettings>
 
-This repository contains the following projects:
+#### This repository contains the following projects: ####
 
   * Subroute.Api
   
