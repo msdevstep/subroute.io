@@ -357,6 +357,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\Staging.pubxml" />
+    <None Include="Web.Cloud.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Development.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
     <None Include="Web.secret.config" />
   </ItemGroup>
   <ItemGroup>
