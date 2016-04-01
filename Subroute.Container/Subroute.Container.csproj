@@ -157,7 +157,9 @@
     <None Include="App.config">
       <TransformOnBuild>true</TransformOnBuild>
     </None>
-    <None Include="App.secret.config" />
+    <Content Include="App.secret.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
     <None Include="Properties\webjob-publish-settings.json" />

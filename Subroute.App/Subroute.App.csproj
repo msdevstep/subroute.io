@@ -154,6 +154,7 @@
     <Content Include="app\views\gallery.html" />
     <Content Include="app\views\routes\properties.html" />
     <Content Include="app\views\routes\client.html" />
+    <Content Include="app\views\routes\settings.html" />
     <Content Include="app\views\routes\requests.html" />
     <Content Include="app\views\partials\login.html" />
     <Content Include="app\views\routes.html" />

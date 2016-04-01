@@ -270,6 +270,7 @@
       <HintPath>..\packages\System.Spatial.5.6.2\lib\net40\System.Spatial.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
@@ -322,6 +323,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\RouteSettingController.cs" />
+    <Compile Include="Models\RouteSettings\RouteSettingRequest.cs" />
+    <Compile Include="Models\RouteSettings\RouteSettingResponse.cs" />
     <Compile Include="Models\Routes\DefaultResponse.cs" />
     <Compile Include="Models\HttpActionResults\ExecutionResponseActionResult.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />

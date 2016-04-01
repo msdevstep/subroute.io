@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Subroute.Api.Models.RouteSettings;
 using Subroute.Core.Data;
 using Subroute.Core.Models.Routes;
 
@@ -27,6 +28,7 @@ namespace Subroute.Api.Models.Routes
         public string CreatedBy { get; set; }
         public int StarredCount { get; set; }
         public int ClonedCount { get; set; }
+        public RouteSettingResponse[] Settings { get; set; }
 
         public static Expression<Func<Route, RouteResponse>> Projection = r => r == null ? null : new RouteResponse
         {
@@ -46,7 +48,16 @@ namespace Subroute.Api.Models.Routes
             CreatedBy = r.CreatedBy,
             CreatedOn = r.CreatedOn,
             UpdatedBy = r.UpdatedBy,
-            UpdatedOn = r.UpdatedOn
+            UpdatedOn = r.UpdatedOn,
+            Settings = r.RouteSettings == null ? null : r.RouteSettings.Select(rs => new RouteSettingResponse
+            {
+                Name = rs.Name,
+                Value = rs.Value,
+                CreatedOn = rs.CreatedOn,
+                CreatedBy = rs.CreatedBy,
+                UpdatedOn = rs.UpdatedOn,
+                UpdatedBy = rs.UpdatedBy
+            }).ToArray()
         };
 
         public static Func<Route, RouteResponse> Map = Projection.Compile();

@@ -393,9 +393,11 @@
     <Compile Include="Data\DatabaseInitializer.cs" />
     <Compile Include="Data\PagedCollection.cs" />
     <Compile Include="Data\Repositories\RequestRepository.cs" />
+    <Compile Include="Data\Repositories\RouteSettingRepository.cs" />
     <Compile Include="Data\Request.cs" />
     <Compile Include="Data\Route.cs" />
     <Compile Include="Data\Repositories\RouteRepository.cs" />
+    <Compile Include="Data\RouteSetting.cs" />
     <Compile Include="Data\SubrouteContext.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\AuthenticationException.cs" />

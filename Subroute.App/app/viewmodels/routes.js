@@ -75,6 +75,10 @@
             self.activePanel('routes/client.html');
         };
 
+        self.showSettings = function() {
+            self.activePanel('routes/settings.html');
+        };
+
         self.showRequest = function (request) {
             var options = {
                 uri: self.uri(),

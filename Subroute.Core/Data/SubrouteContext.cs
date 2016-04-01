@@ -16,5 +16,6 @@ namespace Subroute.Core.Data
 
         public DbSet<Route> Routes { get; set; }
         public DbSet<Request> Requests { get; set; }
+        public DbSet<RouteSetting> RouteSettings { get; set; }
     }
 }

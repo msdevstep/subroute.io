@@ -29,5 +29,6 @@ namespace Subroute.Core.Data
         public DateTimeOffset CreatedOn { get; set; }
         public string CreatedBy { get; set; }
         public virtual ICollection<Request> Requests { get; set; }
+        public virtual ICollection<RouteSetting> RouteSettings { get; set; }
     }
 }

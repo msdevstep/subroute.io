@@ -55,6 +55,8 @@ You need to add a *.secret.config file to each of the following projects and the
           <add key="Subroute.ServiceBus.ResponseTopicName" value="" />
           <add key="Subroute.ServiceBus.RequestSubscriptionName" value="" />
           <add key="Subroute.ServiceBus.ResponseSubscriptionNameFormat" value="" />
+          <add key="Subroute.ServiceBus.MaxConcurrentExecutions" value="1" />
+          <add key="Subroute.ServiceBus.ResponseTimeoutMinutes" value="2" />
         </appSettings>
 
 #### This repository contains the following projects: ####

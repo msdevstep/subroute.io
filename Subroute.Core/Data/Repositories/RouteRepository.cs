@@ -2,8 +2,10 @@
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Subroute.Core.Exceptions;
+using Subroute.Core.Extensions;
 using Subroute.Core.Models.Routes;
 
 namespace Subroute.Core.Data.Repositories
@@ -26,7 +28,7 @@ namespace Subroute.Core.Data.Repositories
             // We'll load the route from an untracked collection since we don't want outside changes causing unwanted updates.
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.AsNoTracking().AsQueryable();
+                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
 
                 if (userId != null)
                     query = query.Where(q => q.UserId == userId);
@@ -49,7 +51,7 @@ namespace Subroute.Core.Data.Repositories
         {
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.AsNoTracking().AsQueryable();
+                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
 
                 if (userId != null)
                     query = query.Where(q => q.UserId == userId);
@@ -97,16 +99,16 @@ namespace Subroute.Core.Data.Repositories
                 // Do not allow adding a new entry. Entry must already exist.
                 if (route.Id == 0)
                     throw new NotFoundException("Route cannot be updated because it hasn't yet been created.");
-
+                
                 // Ensure route belongs to user.
                 if (userId != null && route.UserId != userId)
                     throw new NotFoundException("Route does not belong to specified user, and cannot be modified.");
-
+                
                 db.Routes.Attach(route);
                 db.Entry(route).State = EntityState.Modified;
                 
                 route.UpdatedOn = DateTimeOffset.Now;
-                route.UpdatedBy = "SYSTEM"; // Todo: Use Authenticated Username.
+                route.UpdatedBy = Thread.CurrentPrincipal.GetUserId();
 
                 await db.SaveChangesAsync();
 
@@ -138,7 +140,7 @@ namespace Subroute.Core.Data.Repositories
         {
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.AsNoTracking().AsQueryable();
+                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
 
                 if (!string.IsNullOrEmpty(search))
                 {
