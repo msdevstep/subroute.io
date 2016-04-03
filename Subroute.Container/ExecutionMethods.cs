@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -57,6 +58,7 @@ namespace Subroute.Container
 
                 var request = requestTask.Result;
                 var route = request.Route;
+                var routeSettings = route.RouteSettings;
 
                 try
                 {
@@ -98,7 +100,12 @@ namespace Subroute.Container
                     var userConfigDirectory = Path.Combine(tempDirectory, route.Uri);
                     var userConfigFilePath = Path.Combine(userConfigDirectory, "app.config");
                     Directory.CreateDirectory(userConfigDirectory);
-                    File.WriteAllText(userConfigFilePath, @"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration></configuration>");
+
+                    var configFile = routeSettings.Aggregate(@"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration><appSettings>", 
+                        (current, setting) => current + $"<add key=\"{setting.Name}\" value=\"{setting.Value}\" />{Environment.NewLine}", 
+                        result => $"{result}</appSettings></configuration>");
+
+                    File.WriteAllText(userConfigFilePath, configFile);
 
                     // We'll add one last permission to allow the user access to their own private folder.
                     sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory }));

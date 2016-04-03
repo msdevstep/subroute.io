@@ -1182,6 +1182,54 @@ ul.sub-nav li button i.fa-flip-horizontal {
 .a0-overlay {
   z-index: 20000 !important;
 }
+#settings .save-settings {
+  margin: 0 0 8px 0;
+}
+#settings button i {
+  padding-right: 6px;
+}
+#settings ul {
+  display: block;
+  list-style: none;
+  margin: 0 0 6px 0;
+  padding: 0;
+}
+#settings ul.settings-list {
+  margin: 0;
+  padding: 0;
+}
+#settings ul li {
+  white-space: nowrap;
+  padding: 0 0 8px 0;
+}
+#settings ul li input[type=text] {
+  font-family: 'Lato', sans-serif;
+}
+#settings ul li .setting-name {
+  display: table-cell;
+  width: 45%;
+  margin-right: 3px;
+  -webkit-box-sizing: padding-box;
+  -moz-box-sizing: padding-box;
+  box-sizing: padding-box;
+}
+#settings ul li .setting-value {
+  display: table-cell;
+  width: 46%;
+  -webkit-box-sizing: padding-box;
+  -moz-box-sizing: padding-box;
+  box-sizing: padding-box;
+}
+#settings ul li .setting-options {
+  width: 10%;
+  padding: 6px;
+  cursor: pointer;
+  color: red;
+  font-size: 1.2em;
+  -webkit-box-sizing: padding-box;
+  -moz-box-sizing: padding-box;
+  box-sizing: padding-box;
+}
 /* Include Page LESS Files */
 [role="button"] {
   cursor: pointer;

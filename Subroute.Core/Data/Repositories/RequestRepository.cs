@@ -23,7 +23,11 @@ namespace Subroute.Core.Data.Repositories
         {
             using (var db = new SubrouteContext())
             {
-                var request = await db.Requests.Include(r => r.Route).AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
+                var request = await db.Requests
+                    .Include(r => r.Route)
+                    .Include(r => r.Route.RouteSettings)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(r => r.Id == id);
 
                 if (request == null)
                     throw new NotFoundException($"No request with ID '{id}' was found.");

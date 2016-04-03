@@ -13,6 +13,7 @@
         self.isCurrent = ko.observable(false);
         self.isDefault = ko.observable(false);
         self.executionCount = ko.observable(0);
+        self.settings = ko.observableArray();
         self.updatedOn = ko.observable();
         self.publishedOn = ko.observable();
         self.activePanel = ko.observable('routes/properties.html');
@@ -22,6 +23,13 @@
         self.saving = ko.observable(false);
         self.auth = authentication;
         self.config = config;
+
+        self.hasSettings = ko.computed(function() {
+            if (!self.settings()) {
+                return false;
+            };
+            return self.settings().length > 0;
+        });
 
         self.contentTypes = {
             "application/json": '{\n    "Foo": "Bar"\n}',
@@ -123,6 +131,21 @@
         self.hideSaveTooltip = function() {
             self.hideTooltipStorageValue(true);
             $('.save-button-qtip').qtip('destroy');
+        };
+
+        self.addSetting = function() {
+            if (!self.settings()) {
+                self.settings([]);
+            };
+
+            self.settings.push({
+                name: '',
+                value: ''
+            });
+        };
+
+        self.removeSetting = function(setting) {
+            self.settings.remove(setting);
         };
 
         self.compile = function () {
@@ -321,6 +344,7 @@
             self.isOnline(route.isOnline);
             self.isCurrent(route.isCurrent);
             self.isDefault(route.isDefault);
+            self.settings(route.settings);
             self.updatedOn(route.updatedOn);
             self.publishedOn(route.publishedOn);
         };

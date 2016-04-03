@@ -3,12 +3,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
+using Subroute.Core.Tracing;
 
 namespace Subroute.Api.Handlers
 {
     public class SecureHandler : DelegatingHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
@@ -22,10 +24,10 @@ namespace Subroute.Api.Handlers
                 response.Headers.Location = sslUri.Uri;
                 response.ReasonPhrase = "SSL is required to access API.";
 
-                return Task.FromResult(response);
+                return response;
             }
 
-            return base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken);
         }
     }
 }

@@ -38,10 +38,11 @@ define(['require', 'config', 'durandal/system', 'durandal/app', 'durandal/viewLo
     // Setup global authentication
     $.ajaxSetup({
         beforeSend: function (xhr) {
-            //// During debug mode, I will enable request tracing to help with optimizations.
-            //if (this.headers && system.debug()) {
-            //    xhr.setRequestHeader('Enable-Tracing', 'true');
-            //}
+            // During debug mode, enable custom tracing to help with optimizations.
+            if (system.debug()) {
+                xhr.setRequestHeader('Enable-Tracing', 'true');
+                system.log('Tracing Enabled');
+            }
 
             // Don't add the header if a local ajax request added one first.
             if (this.headers && this.headers.Authorization)

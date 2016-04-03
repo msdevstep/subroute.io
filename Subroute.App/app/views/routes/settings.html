@@ -1,3 +1,18 @@
 ﻿<div id="settings">
-    Settings
+    <div class="toolbox-well">
+        <div class="save-settings" data-bind="visible: hasSettings">
+            <button><i class="fa fa-save"></i>Save Settings</button>
+        </div>
+
+        <ul class="settings-list" data-bind="foreach: settings">
+            <li>
+                <input type="text" class="setting-name" placeholder="Setting Name" data-bind="value: name" />
+                <input type="text" class="setting-value" placeholder="Setting Value" data-bind="value: value" />
+                <span class="setting-options" data-bind="click: $root.removeSetting">
+                    <i class="fa fa-remove"></i>
+                </span>
+            </li>
+        </ul>
+        <button class="link" data-bind="click: addSetting"><i class="fa fa-plus"></i>Add Setting</button>
+    </div>
 </div>

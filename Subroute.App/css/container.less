@@ -1294,6 +1294,61 @@ ul.sub-nav {
     z-index: 20000 !important;
 }
 
+#settings {
+    .save-settings {
+        margin: 0 0 8px 0;
+    }
+
+    button {
+        i {
+            padding-right: 6px;
+        }
+    }
+
+    ul {
+        display: block;
+        list-style: none;
+        margin: 0 0 6px 0;
+        padding: 0;
+
+        &.settings-list {
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            white-space: nowrap;
+            padding: 0 0 8px 0;
+
+            input[type=text] {
+                font-family: 'Lato', sans-serif;
+            }
+
+            .setting-name {
+                display: table-cell;
+                width: 45%;
+                margin-right: 3px;
+                .box-sizing(padding-box)
+            }
+
+            .setting-value {
+                display: table-cell;
+                width: 46%;
+                .box-sizing(padding-box)
+            }
+
+            .setting-options {
+                width: 10%;
+                padding: 6px;
+                cursor: pointer;
+                color: red;
+                font-size: 1.2em;
+                .box-sizing(padding-box)
+            }
+        }
+    }
+}
+
 
 /* Include Page LESS Files */
 @import "modal.less";
