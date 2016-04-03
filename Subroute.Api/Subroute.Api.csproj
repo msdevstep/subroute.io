@@ -323,6 +323,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\DatabaseConfig.cs" />
     <Compile Include="Controllers\RouteSettingController.cs" />
     <Compile Include="Models\RouteSettings\RouteSettingRequest.cs" />
     <Compile Include="Models\RouteSettings\RouteSettingResponse.cs" />

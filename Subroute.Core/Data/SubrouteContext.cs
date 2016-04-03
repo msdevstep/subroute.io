@@ -17,5 +17,14 @@ namespace Subroute.Core.Data
         public DbSet<Route> Routes { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<RouteSetting> RouteSettings { get; set; }
+
+        public static void InitializeMetadata()
+        {
+            using (var db = new SubrouteContext())
+            {
+                // Hack: Perform a no-op query to force EntityFramework to load metadata (which can take a while).
+                var routes = db.Routes.Take(0).ToArray();
+            }
+        }
     }
 }

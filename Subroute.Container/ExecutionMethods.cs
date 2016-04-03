@@ -18,24 +18,24 @@ using Subroute.Core;
 using Subroute.Core.Data.Repositories;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Execution;
+using Subroute.Core.Extensions;
+using Subroute.Core.Utilities;
 using RouteRequest = Subroute.Common.RouteRequest;
 
 namespace Subroute.Container
 {
     public class ExecutionMethods
     {
-        private static readonly IRequestRepository RequestRepository;
-
-        static ExecutionMethods()
+        public static void Execute([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")]out BrokeredMessage response)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var builder = Bootstrapper.GetContainerBuilder(assembly);
-            var container = builder.Build();
+            var stopwatch = Stopwatch.StartNew();
+            ExecuteInternal(message, out response);
+            stopwatch.Stop();
 
-            RequestRepository = container.Resolve<IRequestRepository>();
+            Trace.TraceInformation($"Trace 'Total Execution' - Elapsed {stopwatch.ElapsedMilliseconds}");
         }
 
-        public static void Execute([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")]out BrokeredMessage response)
+        private static void ExecuteInternal(BrokeredMessage message, out BrokeredMessage response)
         {
             // We must set the out parameter no matter what, so do that first.
             response = new BrokeredMessage();
@@ -53,8 +53,8 @@ namespace Subroute.Container
 
                 // The request will also load the associated route, so we'll use that feature
                 // to reduce the number of SQL calls we make.
-                var requestTask = RequestRepository.GetRequestByIdAsync(requestId);
-                requestTask.Wait();
+                var requestTask = TraceUtility.TraceTime("Get Load Request Task", () => Program.RequestRepository.GetRequestByIdAsync(requestId));
+                TraceUtility.TraceTime("Load Request", () => requestTask.Wait());
 
                 var request = requestTask.Result;
                 var route = request.Route;
@@ -64,28 +64,31 @@ namespace Subroute.Container
                 {
                     var ev = new Evidence();
                     ev.AddHostEvidence(new Zone(SecurityZone.Internet));
-                    var assemblyType = typeof (ExecutionSandbox);
+                    var assemblyType = typeof(ExecutionSandbox);
                     var assemblyPath = Path.GetDirectoryName(assemblyType.Assembly.Location);
-                    var sandboxPermissionSet = SecurityManager.GetStandardSandbox(ev);
+                    var sandboxPermissionSet = TraceUtility.TraceTime("Create Sandbox Permission Set", () => SecurityManager.GetStandardSandbox(ev));
 
                     // Exit with an error code if for some reason we can't get the sandbox permission set.
                     if (sandboxPermissionSet == null)
                         throw new EntryPointException("Unable to load the sandbox environment, please contact Subroute.io for help with this error.");
 
-                    // Remove access to UI components since we are in a headless environment.
-                    sandboxPermissionSet.RemovePermission(typeof (UIPermission));
+                    TraceUtility.TraceTime("Reconfigure Appropriate Permission Sets", () =>
+                    {
+                        // Remove access to UI components since we are in a headless environment.
+                        sandboxPermissionSet.RemovePermission(typeof(UIPermission));
 
-                    // Remove access to the File System Dialog since we are headless.
-                    sandboxPermissionSet.RemovePermission(typeof (FileDialogPermission));
+                        // Remove access to the File System Dialog since we are headless.
+                        sandboxPermissionSet.RemovePermission(typeof(FileDialogPermission));
 
-                    // Add the ability to use reflection for invocation and serialization.
-                    sandboxPermissionSet.AddPermission(new ReflectionPermission(PermissionState.Unrestricted));
+                        // Add the ability to use reflection for invocation and serialization.
+                        sandboxPermissionSet.AddPermission(new ReflectionPermission(PermissionState.Unrestricted));
 
-                    // Add the ability to make web requests.
-                    sandboxPermissionSet.AddPermission(new WebPermission(PermissionState.Unrestricted));
+                        // Add the ability to make web requests.
+                        sandboxPermissionSet.AddPermission(new WebPermission(PermissionState.Unrestricted));
 
-                    // Add the ability to use the XmlSerializer and the DataContractSerializer.
-                    sandboxPermissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter));
+                        // Add the ability to use the XmlSerializer and the DataContractSerializer.
+                        sandboxPermissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter));
+                    });
 
                     // We'll create a new folder to hold an empty config file we create, and by
                     // doing this, it prevents the user from gaining access to our configuration
@@ -99,31 +102,34 @@ namespace Subroute.Container
                     var tempDirectory = Path.GetTempPath();
                     var userConfigDirectory = Path.Combine(tempDirectory, route.Uri);
                     var userConfigFilePath = Path.Combine(userConfigDirectory, "app.config");
-                    Directory.CreateDirectory(userConfigDirectory);
+                    TraceUtility.TraceTime("Create Sandbox Directory", () => Directory.CreateDirectory(userConfigDirectory));
 
-                    var configFile = routeSettings.Aggregate(@"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration><appSettings>", 
-                        (current, setting) => current + $"<add key=\"{setting.Name}\" value=\"{setting.Value}\" />{Environment.NewLine}", 
-                        result => $"{result}</appSettings></configuration>");
+                    var configFile = TraceUtility.TraceTime("Generate App.Config File", () => routeSettings.Aggregate(@"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration><appSettings>",
+                        (current, setting) => current + $"<add key=\"{setting.Name}\" value=\"{setting.Value}\" />{Environment.NewLine}",
+                        result => $"{result}</appSettings></configuration>"));
 
-                    File.WriteAllText(userConfigFilePath, configFile);
+                    TraceUtility.TraceTime("Write App.Config to Disk", () => File.WriteAllText(userConfigFilePath, configFile));
 
                     // We'll add one last permission to allow the user access to their own private folder.
-                    sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory }));
+                    TraceUtility.TraceTime("Add Permission to Read App.Config File", () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory })));
 
-                    var appDomainSetup = new AppDomainSetup {ApplicationBase = assemblyPath, ConfigurationFile = userConfigFilePath };
-                    sandboxDomain = AppDomain.CreateDomain("Sandboxed", ev, appDomainSetup, sandboxPermissionSet);
+                    TraceUtility.TraceTime("Create AppDomain", () =>
+                    {
+                        var appDomainSetup = new AppDomainSetup { ApplicationBase = assemblyPath, ConfigurationFile = userConfigFilePath };
+                        sandboxDomain = AppDomain.CreateDomain("Sandboxed", ev, appDomainSetup, sandboxPermissionSet);
+                    });
 
                     // The ExecutionSandbox is a MarshalByRef type that allows us to dynamically
                     // load their assemblies via a byte array and execute methods inside of
                     // their app domain from out full-trust app domain. It's the bridge that
                     // cross the app domain boundary.
-                    var executionSandbox = (ExecutionSandbox) sandboxDomain.CreateInstance(
+                    var executionSandbox = TraceUtility.TraceTime("Create ExecutionSandbox Instance", () => (ExecutionSandbox)sandboxDomain.CreateInstance(
                         assemblyType.Assembly.FullName,
                         assemblyType.FullName,
                         false,
                         BindingFlags.Public | BindingFlags.Instance,
                         null, null, null, null)
-                        .Unwrap();
+                        .Unwrap());
 
                     // Build the ExecutionRequest object that represents the incoming request
                     // which holds the payload, headers, method, etc. The class is serialized
@@ -131,12 +137,12 @@ namespace Subroute.Container
                     // full-trust host app domain, and deserialized and reinstantiated in
                     // the sandbox app domain.
                     var uri = new Uri(request.Uri, UriKind.Absolute);
-                    var executionRequest = new RouteRequest(uri, request.Method)
+                    var executionRequest = TraceUtility.TraceTime("Create RouteRequest Instance", () => new RouteRequest(uri, request.Method)
                     {
                         IpAddress = request.IpAddress,
                         Headers = HeaderHelpers.DeserializeHeaders(request.RequestHeaders),
                         Body = request.RequestPayload
-                    };
+                    });
 
                     try
                     {
@@ -145,23 +151,26 @@ namespace Subroute.Container
                         // will pass the ExecutionRequest we created above. In return, we receive
                         // an instance of ExecutionResponse that has been serialized like the request
                         // and deserialized in our full-trust host domain.
-                        var executionResponse = executionSandbox.Execute(route.Assembly, executionRequest);
+                        var executionResponse = TraceUtility.TraceTime("Load and Execute Route", () => executionSandbox.Execute(route.Assembly, executionRequest));
 
                         // We'll use the data that comes back from the response to fill out the 
                         // remaineder of the database request record which will return the status
                         // code, message, payload, and headers. Then we update the database.
-                        request.CompletedOn = DateTimeOffset.UtcNow;
-                        request.StatusCode = (int) executionResponse.StatusCode;
-                        request.StatusMessage = executionResponse.StatusMessage;
-                        request.ResponsePayload = executionResponse.Body;
-                        request.ResponseHeaders = Common.RouteResponse.SerializeHeaders(executionResponse.Headers);
+                        TraceUtility.TraceTime("Update Request Record", () =>
+                        {
+                            request.CompletedOn = DateTimeOffset.UtcNow;
+                            request.StatusCode = (int)executionResponse.StatusCode;
+                            request.StatusMessage = executionResponse.StatusMessage;
+                            request.ResponsePayload = executionResponse.Body;
+                            request.ResponseHeaders = Common.RouteResponse.SerializeHeaders(executionResponse.Headers);
 
-                        RequestRepository.UpdateRequestAsync(request).Wait();
+                            Program.RequestRepository.UpdateRequestAsync(request).Wait();
+                        });
 
                         // We'll pass back a small bit of data indiciating to the subscribers of
                         // the response topic listening for our specific correlation ID that indicates
                         // the route code was executed successfully and to handle it as such.
-                        response.Properties["Result"] = (int) ExecutionResult.Success;
+                        response.Properties["Result"] = (int)ExecutionResult.Success;
                         response.Properties["Message"] = "Completed Successfully";
                     }
                     catch (TargetInvocationException invokationException)
@@ -208,7 +217,7 @@ namespace Subroute.Container
 
                     if (statusCodeException != null)
                     {
-                        statusCode = (int) statusCodeException.StatusCode;
+                        statusCode = (int)statusCodeException.StatusCode;
                         statusMessage = appDomainException.Message;
 
                         if (appDomainException is CodeException)
@@ -220,9 +229,9 @@ namespace Subroute.Container
                     request.ResponsePayload = PayloadHelpers.CreateErrorPayload(statusMessage, stackTrace);
                     request.ResponseHeaders = HeaderHelpers.GetDefaultHeaders();
 
-                    RequestRepository.UpdateRequestAsync(request).Wait();
+                    Program.RequestRepository.UpdateRequestAsync(request).Wait();
 
-                    response.Properties["Result"] = (int) ExecutionResult.Failed;
+                    response.Properties["Result"] = (int)ExecutionResult.Failed;
                     response.Properties["Message"] = appDomainException.Message;
                 }
             }
@@ -230,14 +239,14 @@ namespace Subroute.Container
             {
                 // These exceptions are absolutely fatal. We'll have to notify the waiting thread
                 // via the service bus message, because we're unable to load a related request.
-                response.Properties["Result"] = (int) ExecutionResult.Fatal;
+                response.Properties["Result"] = (int)ExecutionResult.Fatal;
                 response.Properties["Message"] = fatalException.Message;
             }
             finally
             {
                 // Unload the users app domain to recover all memory used by it.
                 if (sandboxDomain != null)
-                    AppDomain.Unload(sandboxDomain);
+                    TraceUtility.TraceTime("Unload AppDomain", () => AppDomain.Unload(sandboxDomain));
             }
         }
 
