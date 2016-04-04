@@ -40,14 +40,17 @@ namespace Subroute.Container
             // the execution of an individual request.
             RequestRepository = Program.Container.Resolve<IRequestRepository>();
 
-            // Assign a custom DatabaseInitializer to configure certain aspects of our database.
-            Database.SetInitializer(new DatabaseInitializer());
-
             // Force the database to initialize Entity Framework metadata.
             // It turns out Entity Framework lazy-loads all its metadata
             // and this make the first request take many seconds to run.
             // The initialization performs a no-op query which warms EF up.
-            TraceUtility.TraceTime("Initialize Entity Framework", SubrouteContext.InitializeMetadata);
+            TraceUtility.TraceTime("Initialize Entity Framework", () =>
+            {
+                // Assign a custom DatabaseInitializer to configure certain aspects of our database.
+                Database.SetInitializer(new DatabaseInitializer());
+
+                SubrouteContext.InitializeMetadata();
+            });
 
             var jobHostConfig = new JobHostConfiguration
             {

@@ -1822,7 +1822,7 @@
     <Content Include="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Properties\PublishProfiles\Staging.pubxml" />
+    <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Web.Cloud.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
