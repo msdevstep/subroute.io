@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -89,6 +90,11 @@ namespace Subroute.App.Properties
             // raw string value with the requested content type (for module).
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(output, Encoding.UTF8, contentType);
+            response.Headers.CacheControl = new CacheControlHeaderValue()
+            {
+                Public = true,
+                MaxAge = new TimeSpan(1, 0, 0, 0)
+            };
             return response;
         }
 

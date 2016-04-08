@@ -1,4 +1,4 @@
-﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'ace/lib/lang', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, lang, app, ajax, requestModal) {
+﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request', 'ace/ace'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, app, ajax, requestModal, ace) {
     return function () {
         var self = this;
 
@@ -295,6 +295,9 @@
                 self.script(data.code);
 
                 $('.qtip').show();
+
+                // Force editor to resize after suggestion bar shows.
+                self.resizeEditor();
             }).fail(function () {
                 self.script(config.blankRoute);
             }).always(function () {
@@ -452,6 +455,11 @@
             });
         };
 
+        self.resizeEditor = function() {
+            var editor = ace.edit('editor');
+            editor.resize();
+        };
+
         self.canDeactivate = function () {
             return true;
         };
@@ -479,7 +487,7 @@
                         meta: item.kind,
                         type: "snippet",
                         score: -(++index),
-                        docHTML: lang.escapeHTML(item.displayText)
+                        docHTML: item.displayText
                     }
                 });
                 callback(null, completions);

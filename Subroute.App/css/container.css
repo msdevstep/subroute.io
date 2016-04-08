@@ -225,7 +225,7 @@ button.link:hover {
 }
 #container header h1 img {
   width: 48px;
-  height: 51px;
+  height: 46px;
   display: inline-block;
   vertical-align: middle;
   padding-bottom: 3px;
@@ -871,6 +871,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   padding: 0;
   background: #f1f1f1;
   border-bottom: 1px solid #c2c2c2;
+  overflow: hidden;
 }
 #scripts #suggestion .suggestion-name {
   font-weight: 700;

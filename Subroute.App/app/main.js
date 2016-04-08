@@ -4,18 +4,18 @@
         'durandal': '../lib/durandal/js',
         'plugins': '../lib/durandal/js/plugins',
         'transitions': '../lib/durandal/js/transitions',
-        'jquery': '../lib/jquery/jquery',
-        'jquery-ui': '../lib/jquery-ui/jquery-ui',
+        'jquery': '//code.jquery.com/jquery-2.2.3.min',
+        'jquery-ui': '//code.jquery.com/ui/1.11.4/jquery-ui.min',
         'base64': '../lib/jquery.base64/jquery.base64',
-        'knockout': '../lib/knockout.js/knockout',
-        'validation': '../lib/knockout.validation/Src/knockout.validation',
-        'mapping': '../lib/knockout.mapping/knockout.mapping',
+        'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min',
+        'validation': '../lib/knockout.validation/Dist/knockout.validation.min',
+        'mapping': '../lib/knockout.mapping/knockout.mapping/build/knockout.mapping',
         'cookie': '../lib/jquery.cookie/jquery.cookie',
-        'moment': '../lib/moment/moment',
-        'ace': '../lib/ace/lib/ace',
+        'moment': '../lib/moment/min/moment.min',
+        'ace': '//cdnjs.cloudflare.com/ajax/libs/ace/1.2.3',
         'config': 'config?noext',
         'markdown': '../lib/markdown/markdown',
-        'qtip': '../lib/qtip2/jquery.qtip'
+        'qtip': '../lib/qtip2/jquery.qtip.min'
     },
     shim: {
         'base64': {
@@ -23,6 +23,9 @@
         },
         'qtip': {
             deps: ['jquery']
+        },
+        'ace/ext-language_tools': {
+            deps: ['ace/ace']
         }
     }
 });

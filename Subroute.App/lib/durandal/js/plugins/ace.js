@@ -1,18 +1,20 @@
-﻿define(['knockout', 'ace/ace', 'ace/ext/language_tools', 'config'], function (ko, ace, language, config) {
-
+﻿define(['knockout', 'ace/ace', 'ace/ext-language_tools'], function (ko, ace, lang) {
     return {
         install: function() {
             ko.bindingHandlers.ace = {
                 init: function (element, valueAccessor) {
                     var value = valueAccessor();
                     var options = ko.unwrap(value);
-
                     var editor = ace.edit(element.id);
-                    editor.setTheme("ace/theme/chrome");
-                    editor.getSession().setUseWrapMode(false);
-                    editor.getSession().setWrapLimitRange();
+                    var session = editor.getSession();
+
+                    editor.setTheme("ace/theme/sqlserver");
                     editor.setOption("showPrintMargin", false);
                     editor.setOption('highlightActiveLine', false);
+                    editor.setOption('fontSize', '14px');
+
+                    session.setUseWrapMode(false);
+                    session.setWrapLimitRange();
                     editor.$blockScrolling = Infinity;
 
                     editor.commands.addCommand({
@@ -118,21 +120,13 @@
                     }
                 },
                 switchMode: function (editor, mode, options) {
+                    var language = ace.require('ace/ext/language_tools');
+                    var session = editor.getSession();
+
                     switch (mode) {
-                        case "json":
-                            editor.getSession().setMode('ace/mode/json');
-                            break;
-                        case "xml":
-                            editor.getSession().setMode('ace/mode/xml');
-                            break;
-                        case "html":
-                            editor.getSession().setMode('ace/mode/html');
-                            break;
-                        case "text":
-                            editor.getSession().setMode('ace/mode/text');
-                            break;
                         case "csharp":
-                            editor.getSession().setMode('ace/mode/csharp');
+                            session.setMode('ace/mode/csharp');
+                            editor.setOption("scrollPastEnd", true);
                             editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
 
                             if (options.intellisense) {
@@ -141,6 +135,10 @@
                                 }
                                 language.setCompleters([intellisense]);
                             };
+                            break;
+                        default:
+                            session.setMode('ace/mode/' + mode);
+                            editor.setOption("scrollPastEnd", false);
                             break;
                     };
                 }
