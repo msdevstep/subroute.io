@@ -24,6 +24,10 @@
             return self.getRoutesUri() + uri;
         };
 
+        self.getRouteSettingsUri = function(uri) {
+            return self.getRouteUri(uri) + '/settings';
+        };
+
         self.getRequestUri = function (uri, id) {
             return self.getRouteUri(uri) + '/requests/' + id;
         };

@@ -45,7 +45,9 @@ namespace Subroute.Api.Controllers
             var route = await EnsureAuthorizedRouteAccessAsync(identifier);
 
             // Map all of the incoming route settings to the internal DB type.
+            // Ignore any blank settings with no name or value.
             var mappedSettings = settings
+                .Where(s => s.Name.HasValue() && s.Value.HasValue())
                 .Select(s => RouteSettingRequest.Map(s, route.Id))
                 .ToArray();
 

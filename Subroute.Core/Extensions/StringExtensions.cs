@@ -46,6 +46,11 @@ namespace Subroute.Core.Extensions
             return string.Format(format, args);
         }
 
+        public static bool HasValue(this string value)
+        {
+            return !string.IsNullOrWhiteSpace(value);
+        }
+
         public static string ToCamelCase(this string value)
         {
             // Return null if the value is null.

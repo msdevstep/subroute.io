@@ -1,12 +1,14 @@
 ﻿<div id="settings">
     <div class="toolbox-well">
-        <div class="save-settings" data-bind="visible: hasSettings">
-            <button><i class="fa fa-save"></i>Save Settings</button>
+        <div class="save-settings">
+            <button data-bind="click: saveRouteSettings, loading: { trigger: savingRouteSettings, idle: 'fa-save' }"><i class="fa fa-save"></i>Save Settings</button>
         </div>
+
+        <p><strong>What are route settings?</strong><br/>Route settings allow you to store private data that is only visible to your route code. Route settings prevent you from having to hard-code values into your route. Use the built-in <code>ConfigurationManager.AppSettings[]</code> to access your route settings.</p>
 
         <ul class="settings-list" data-bind="foreach: settings">
             <li>
-                <input type="text" class="setting-name" placeholder="Setting Name" data-bind="value: name" />
+                <input type="text" class="setting-name" placeholder="Setting Name" maxlength="30" data-bind="value: name" />
                 <input type="text" class="setting-value" placeholder="Setting Value" data-bind="value: value" />
                 <span class="setting-options" data-bind="click: $root.removeSetting">
                     <i class="fa fa-remove"></i>

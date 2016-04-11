@@ -11,7 +11,7 @@ namespace Subroute.Core.Data
         public SubrouteContext()
             : base(Settings.ConnectionString)
         {
-
+            
         }
 
         public DbSet<Route> Routes { get; set; }

@@ -17,6 +17,7 @@
         self.updatedOn = ko.observable();
         self.publishedOn = ko.observable();
         self.activePanel = ko.observable('routes/properties.html');
+        self.savingRouteSettings = ko.observable(false);
         self.suggesting = ko.observable(false);
         self.publishing = ko.observable(false);
         self.compiling = ko.observable(false);
@@ -146,6 +147,29 @@
 
         self.removeSetting = function(setting) {
             self.settings.remove(setting);
+        };
+
+        self.saveRouteSettings = function() {
+            var requestUri = uriBuilder.getRouteSettingsUri(self.uri());
+
+            self.savingRouteSettings(true);
+
+            ajax.request({
+                url: requestUri,
+                type: 'PUT',
+                data: ko.toJSON(self.settings()),
+                contentType: 'application/json'
+            }).then(function (data) {
+                // Replace existing settings with settings returned from the server.
+                self.settings.removeAll();
+                for (var i = 0; i < data.length; i++) {
+                    self.settings.push(data[i]);
+                };
+            }).fail(function (error) {
+                alert('Unable to Save Route Settings.');
+            }).always(function() {
+                self.savingRouteSettings(false);
+            });
         };
 
         self.compile = function () {

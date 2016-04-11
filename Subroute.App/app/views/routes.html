@@ -44,7 +44,7 @@
     <div id="toolbox">
         <ul class="sub-nav">
             <li data-bind="css: { active: activePanel() === 'routes/properties.html' }"><button data-bind="click: showProperties"><i class="fa fa-heartbeat fa-fw"></i>STATUS</button></li>
-            <!--<li data-bind="css: { active: activePanel() === 'routes/settings.html' }"><button data-bind="click: showSettings, enable: auth.isAuthenticated && !isNew()"><i class="fa fa-cogs fa-fw"></i>SETTINGS</button></li>-->
+            <li data-bind="css: { active: activePanel() === 'routes/settings.html' }"><button data-bind="click: showSettings, enable: auth.isAuthenticated && !isNew()"><i class="fa fa-cogs fa-fw"></i>SETTINGS</button></li>
             <li data-bind="css: { active: activePanel() === 'routes/requests.html' }"><button data-bind="click: showRequests, enable: auth.isAuthenticated() && !isNew()"><i class="fa fa-history fa-fw"></i>LOG</button></li>
             <li data-bind="css: { active: activePanel() === 'routes/client.html' }"><button data-bind="click: showClient, enable: auth.isAuthenticated && !isNew()"><i class="fa fa-play fa-fw"></i>RUN</button></li>
         </ul>

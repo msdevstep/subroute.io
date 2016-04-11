@@ -12,10 +12,10 @@ namespace Subroute.Core.Data.Repositories
     public interface IRouteSettingRepository
     {
         Task<RouteSetting[]> GetRouteSettingsAsync(RouteIdentifier identifier);
-        Task<RouteSetting> GetRouteSettingByNameAsync(string name);
+        Task<RouteSetting> GetRouteSettingByNameAsync(RouteIdentifier identifier, string name);
         Task<RouteSetting> CreateRouteSettingAsync(RouteSetting setting);
         Task<RouteSetting> UpdateRouteSettingAsync(RouteSetting setting);
-        Task DeleteRouteSettingAsync(string name);
+        Task DeleteRouteSettingAsync(RouteIdentifier identifier, string name);
         Task DeleteRouteSettingAsync(RouteSetting setting);
     }
 
@@ -49,12 +49,26 @@ namespace Subroute.Core.Data.Repositories
         /// <summary>
         /// Load a single route setting by its name.
         /// </summary>
+        /// <param name="identifier"><see cref="RouteIdentifier"/> for the requested route.</param>
         /// <param name="name">String representing the specified route setting name.</param>
         /// <returns>Returns a single <see cref="RouteSetting"/> with the matching route setting identifier.</returns>
-        public async Task<RouteSetting> GetRouteSettingByNameAsync(string name)
+        public async Task<RouteSetting> GetRouteSettingByNameAsync(RouteIdentifier identifier, string name)
         {
             using (var db = new SubrouteContext())
-                return await db.RouteSettings.FirstOrDefaultAsync(rs => rs.Name == name);
+            {
+                var query = db.RouteSettings
+                    .AsNoTracking()
+                    .Where(rs => rs.Name == name);
+                
+                // Ensure we are only returning settings for the specified route
+                // Use the correct identifier type to query the database.
+                query = identifier.Type == RouteIdentifierType.Id
+                    ? query.Where(r => r.RouteId == identifier.Id)
+                    : query.Where(r => r.Route.Uri == identifier.Uri);
+
+                // Return the first match.
+                return await query.FirstOrDefaultAsync();
+            }
         }
 
         /// <summary>
@@ -118,13 +132,14 @@ namespace Subroute.Core.Data.Repositories
         /// <summary>
         /// Delete the route setting record with the specified identifier.
         /// </summary>
+        /// <param name="identifier"><see cref="RouteIdentifier"/> for the requested route.</param>
         /// <param name="name">String that identifies the route setting record to delete.</param>
         /// <returns>Returns a Task, essentially void when using async syntax.</returns>
-        public async Task DeleteRouteSettingAsync(string name)
+        public async Task DeleteRouteSettingAsync(RouteIdentifier identifier, string name)
         {
             using (var db = new SubrouteContext())
             {
-                var route = await GetRouteSettingByNameAsync(name);
+                var route = await GetRouteSettingByNameAsync(identifier, name);
 
                 // Mark route for deletion so the context knowns to delete it.
                 db.Entry(route).State = EntityState.Deleted;
