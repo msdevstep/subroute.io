@@ -25,11 +25,14 @@
         <li>
             <button title="My Routes" data-bind="click: showRoutes, loading: { trigger: routesLoading, idle: 'fa-th-list' }"><span class="icon"><i class="fa fa-th-list"></i></span>My Routes</button>
         </li>
-        <li>
+        <li data-bind="visible: config.enableDocumentation">
             <a href="#documentation" title="Documentation"><span class="icon"><i class="fa fa-question-circle fa-lg"></i></span>Documentation</a>
         </li>
         <li data-bind="visible: config.enableGallery">
             <a href="#gallery" title="Gallery"><span class="icon"><i class="fa fa-map-o"></i></span>Gallery</a>
+        </li>
+        <li>
+            <button id="uservoice" title="Post an Idea"><span class="icon"><i class="fa fa-lightbulb-o fa-lg"></i></span>Post an Idea</button>
         </li>
     </ul>
     <div id="dialog" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }">

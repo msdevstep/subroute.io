@@ -107,5 +107,9 @@
                 self.routesLoading(value);
             });
         };
+
+        self.compositionComplete = function () {
+            UserVoice.push(['addTrigger', '#uservoice']);
+        };
     };
 });

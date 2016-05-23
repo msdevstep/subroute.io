@@ -12,6 +12,7 @@ namespace Subroute.Common
             RequestFormatters.Add(new JsonRequestFormatter());
             RequestFormatters.Add(new XmlRequestFormatter());
             RequestFormatters.Add(new StreamRequestFormatter());
+            RequestFormatters.Add(new PostRequestFormatter());
 
             ResponseFormatters.Add(new StringResponseFormatter());
             ResponseFormatters.Add(new JsonResponseFormatter());

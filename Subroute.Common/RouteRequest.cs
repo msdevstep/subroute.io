@@ -47,6 +47,11 @@ namespace Subroute.Common
             return ReadBodyWithFormatter<Stream>("stream");
         }
 
+        public IDictionary<string, QueryStringValue> ReadBodyAsPostData()
+        {
+            return ReadBodyWithFormatter<IDictionary<string, QueryStringValue>>("post");
+        }
+
         public TPayload ReadBodyWithFormatter<TPayload>(string formatterName)
         {
             var formatter = GlobalConfiguration.RequestFormatters.FirstOrDefault(f => f.Name.CaseInsensitiveEqual(formatterName));
@@ -55,6 +60,23 @@ namespace Subroute.Common
                 throw new NullReferenceException($"No request formatter exists named '{formatterName}'.");
 
             return (TPayload) formatter.ReadRequestBody(typeof (TPayload), Body);
+        }
+    }
+
+    public class QueryStringValue
+    {
+        public QueryStringValue(string[] values)
+        {
+            Values = values ?? new string[0];
+            FirstValue = Values.FirstOrDefault();
+        }
+
+        public string FirstValue { get; }
+        public string[] Values { get; }
+
+        public static implicit operator string(QueryStringValue value)
+        {
+            return value.FirstValue;
         }
     }
 }
