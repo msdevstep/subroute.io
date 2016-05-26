@@ -60,6 +60,9 @@ namespace Subroute.Container
                 var route = request.Route;
                 var routeSettings = route.RouteSettings;
 
+                // Trace the incoming request URI.
+                Trace.TraceInformation("Trace 'Request Uri' - {0}", request.Uri);
+
                 try
                 {
                     var ev = new Evidence();
@@ -159,7 +162,7 @@ namespace Subroute.Container
                         TraceUtility.TraceTime("Update Request Record", () =>
                         {
                             request.CompletedOn = DateTimeOffset.UtcNow;
-                            request.StatusCode = (int)executionResponse.StatusCode;
+                            request.StatusCode = (int) executionResponse.StatusCode;
                             request.StatusMessage = executionResponse.StatusMessage;
                             request.ResponsePayload = executionResponse.Body;
                             request.ResponseHeaders = Common.RouteResponse.SerializeHeaders(executionResponse.Headers);
@@ -170,7 +173,7 @@ namespace Subroute.Container
                         // We'll pass back a small bit of data indiciating to the subscribers of
                         // the response topic listening for our specific correlation ID that indicates
                         // the route code was executed successfully and to handle it as such.
-                        response.Properties["Result"] = (int)ExecutionResult.Success;
+                        response.Properties["Result"] = (int) ExecutionResult.Success;
                         response.Properties["Message"] = "Completed Successfully";
                     }
                     catch (TargetInvocationException invokationException)
@@ -180,6 +183,14 @@ namespace Subroute.Container
                         var securityException = invokationException.InnerException as SecurityException;
                         if (securityException != null)
                             throw new RoutePermissionException(GetPermissionErrorMessage(securityException), invokationException);
+
+                        // Check for BadRequestException, we need to wrap it with the core exception.
+                        // These exceptions can occur when query string parsing fails, and since the
+                        // user's code doesn't have access to the core exceptions, we'll need to wrap
+                        // it instead manually.
+                        var badRequestException = invokationException.InnerException as Common.BadRequestException;
+                        if (badRequestException != null)
+                            throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
 
                         // Otherwise it is most likely a custom user exception.
                         throw new CodeException(invokationException.InnerException?.Message ?? "Route raised a custom exception.", invokationException.InnerException);
@@ -197,6 +208,13 @@ namespace Subroute.Container
                         // These exceptions can occur when we encounter a permission exception where 
                         // the user doesn't have permission to execute a particular block of code.
                         throw new RoutePermissionException(GetPermissionErrorMessage(securityException), securityException);
+                    }
+                    catch (Common.BadRequestException badRequestException)
+                    {
+                        // These exceptions can occur when query string parsing fails, and since the
+                        // user's code doesn't have access to the core exceptions, we'll need to wrap
+                        // it instead manually.
+                        throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
                     }
                     catch (Exception routeException)
                     {

@@ -79,10 +79,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BadRequestException.cs" />
     <Compile Include="BaseController.cs" />
     <Compile Include="EntryPointException.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="QueryStringParser.cs" />
+    <Compile Include="QueryStringValue.cs" />
     <Compile Include="RequestFormatters\PostRequestFormatter.cs" />
     <Compile Include="RouteRequest.cs" />
     <Compile Include="RouteResponse.cs" />
