@@ -35,7 +35,7 @@ namespace Subroute.Core.Extensions
                     }
                     catch (Exception ex)
                     {
-                        // Give the calling code a chance to handle the exception withou disturbing
+                        // Give the calling code a chance to handle the exception without disturbing
                         // the task that is running. Monitor will throw original exception if
                         // calling code chose not to handle the exception or returned false.
                         if (error == null || !error(ex))

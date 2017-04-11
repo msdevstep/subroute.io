@@ -11,7 +11,7 @@
                     editor.setTheme("ace/theme/sqlserver");
                     editor.setOption("showPrintMargin", false);
                     editor.setOption('highlightActiveLine', false);
-                    editor.setOption('fontSize', '14px');
+                    editor.setOption('fontSize', '12px');
 
                     session.setUseWrapMode(false);
                     session.setWrapLimitRange();

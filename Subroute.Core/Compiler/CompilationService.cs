@@ -42,7 +42,7 @@ namespace Subroute.Core.Compiler
             if (string.IsNullOrWhiteSpace(code))
                 throw new CompilationException("No source code was provided.");
 
-            // Build a syntax tree of provided source code, this will allow CodeAnalysis to properly under stand the code.
+            // Build a syntax tree of provided source code, this will allow CodeAnalysis to properly understand the code.
             var tree = CSharpSyntaxTree.ParseText(code);
 
             // We need to reference assemblies that the code relies on.
@@ -136,7 +136,7 @@ namespace Subroute.Core.Compiler
                 MetadataReference.CreateFromFile(typeof (JObject).Assembly.Location),                       // Newtonsoft.Json
                 MetadataReference.CreateFromFile(typeof (HttpClient).Assembly.Location),                    // System.Net.Http
                 MetadataReference.CreateFromFile(typeof (HttpContentExtensions).Assembly.Location),         // System.Net.Http.Formatting
-                MetadataReference.CreateFromFile(typeof (Common.RouteRequest).Assembly.Location),       // Subroute.Common
+                MetadataReference.CreateFromFile(typeof (Common.RouteRequest).Assembly.Location),           // Subroute.Common
                 MetadataReference.CreateFromFile(typeof (XmlElement).Assembly.Location),                    // System.Xml
                 MetadataReference.CreateFromFile(typeof (XObject).Assembly.Location),                       // System.Xml.Linq
                 MetadataReference.CreateFromFile(typeof (DataContractAttribute).Assembly.Location),         // System.Runtime.Serialization

@@ -15,7 +15,8 @@ namespace Subroute.Core.ServiceBus
         Task CreateSubscriptionAsync(string topicName, string subscriptionName, Filter filter);
         Task DeleteSubscriptionAsync(string topicName, string subscriptionName);
         Task<TopicClient> CreateTopicClientAsync(string topicName, bool ensureExists = false);
-        Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, Filter filter = null, bool ensureExists = false);
+        Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, bool ensureExists = false);
+        Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, Filter filter, bool ensureExists = false);
     }
 
     public class TopicFactory : ITopicFactory
@@ -46,11 +47,13 @@ namespace Subroute.Core.ServiceBus
 
         public async Task CreateSubscriptionAsync(string topicName, string subscriptionName)
         {
-            await CreateSubscriptionAsync(topicName, subscriptionName, null);
+            await CreateSubscriptionAsync(topicName, subscriptionName, new TrueFilter());
         }
 
         public async Task CreateSubscriptionAsync(string topicName, string subscriptionName, Filter filter)
         {
+            if (filter == null) throw new ArgumentNullException("filter");
+
             var namespaceManager = NamespaceManager.CreateFromConnectionString(Settings.ServiceBusConnectionString);
 
             if (!await namespaceManager.SubscriptionExistsAsync(topicName, subscriptionName))
@@ -72,7 +75,12 @@ namespace Subroute.Core.ServiceBus
                 await namespaceManager.DeleteSubscriptionAsync(topicName, subscriptionName);
         }
 
-        public async Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, Filter filter = null, bool ensureExists = false)
+        public Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, bool ensureExists = false)
+        {
+            return CreateSubscriptionClientAsync(topicName, subscriptionName, new TrueFilter(), ensureExists);
+        }
+
+        public async Task<SubscriptionClient> CreateSubscriptionClientAsync(string topicName, string subscriptionName, Filter filter, bool ensureExists = false)
         {
             if (ensureExists)
                 await CreateSubscriptionAsync(topicName, subscriptionName, filter);

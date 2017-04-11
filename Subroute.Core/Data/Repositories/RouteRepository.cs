@@ -112,9 +112,6 @@ namespace Subroute.Core.Data.Repositories
 
                 await db.SaveChangesAsync();
 
-                // Detach entry so its changes won't be tracked.
-                db.Entry(route).State = EntityState.Detached;
-
                 return route;
             }
         }

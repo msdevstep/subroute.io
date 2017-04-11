@@ -363,7 +363,7 @@
                 self.executionCount('Unknown');
                 system.error(error);
             });
-        }
+        };
 
         self.updatePageData = function (route) {
             self.title(route.title);

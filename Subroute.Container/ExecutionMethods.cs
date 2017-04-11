@@ -124,8 +124,8 @@ namespace Subroute.Container
 
                     // The ExecutionSandbox is a MarshalByRef type that allows us to dynamically
                     // load their assemblies via a byte array and execute methods inside of
-                    // their app domain from out full-trust app domain. It's the bridge that
-                    // cross the app domain boundary.
+                    // their app domain from our full-trust app domain. It's the bridge that
+                    // crosses the app domain boundary.
                     var executionSandbox = TraceUtility.TraceTime("Create ExecutionSandbox Instance", () => (ExecutionSandbox)sandboxDomain.CreateInstance(
                         assemblyType.Assembly.FullName,
                         assemblyType.FullName,
@@ -157,7 +157,7 @@ namespace Subroute.Container
                         var executionResponse = TraceUtility.TraceTime("Load and Execute Route", () => executionSandbox.Execute(route.Assembly, executionRequest));
 
                         // We'll use the data that comes back from the response to fill out the 
-                        // remaineder of the database request record which will return the status
+                        // remainder of the database request record which will return the status
                         // code, message, payload, and headers. Then we update the database.
                         TraceUtility.TraceTime("Update Request Record", () =>
                         {
