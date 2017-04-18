@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using Newtonsoft.Json.Linq;
-
-namespace Subroute.Api
+namespace Subroute.Api.App_Start
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Claims;
+    using Newtonsoft.Json.Linq;
+    using System.Text;
+
     public static class JsonWebToken
     {
         private const string NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
@@ -20,9 +22,15 @@ namespace Subroute.Api
 
         private static DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        public static ClaimsPrincipal ValidateToken(string token, string secretKey, string audience = null, bool checkExpiration = false, string issuer = null)
+        public static ClaimsPrincipal ValidateToken(string token, string secretKey, string audience = null, bool checkExpiration = false, string issuer = null, bool isSecretBase64Encoded = true)
         {
-            var payloadJson = JWT.JsonWebToken.Decode(token, Convert.FromBase64String(secretKey), verify: true);
+            byte[] secret;
+            if (isSecretBase64Encoded)
+                secret = Convert.FromBase64String(secretKey);
+            else
+                secret = Encoding.UTF8.GetBytes(secretKey);
+
+            var payloadJson = JWT.JsonWebToken.Decode(token, secret, verify: true);
             var payloadData = JObject.Parse(payloadJson).ToObject<Dictionary<string, object>>();
 
             // audience check

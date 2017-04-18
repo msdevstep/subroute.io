@@ -13,12 +13,22 @@ namespace Subroute.Common
 
         }
 
-        public RouteResponse NoContent()
+        public RouteResponse StatusCode(HttpStatusCode statusCode)
         {
-            return new RouteResponse(HttpStatusCode.NoContent)
+            return new RouteResponse(statusCode)
             {
                 Body = new byte[0]
             };
+        }
+
+        public RouteResponse BadRequest()
+        {
+            return StatusCode(HttpStatusCode.BadRequest);
+        }
+
+        public RouteResponse NoContent()
+        {
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         public RouteResponse Json(HttpStatusCode statusCode, object payload)

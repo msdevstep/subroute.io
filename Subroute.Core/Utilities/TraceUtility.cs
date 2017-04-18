@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Subroute.Core.Utilities
 {
@@ -20,6 +21,26 @@ namespace Subroute.Core.Utilities
         {
             var stopwatch = Stopwatch.StartNew();
             action();
+            stopwatch.Stop();
+
+            Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");
+        }
+
+        public static TResult TraceTime<TResult>(this Task<TResult> task, string name)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            task.Wait();
+            stopwatch.Stop();
+
+            Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");
+
+            return task.Result;
+        }
+
+        public static void TraceTime(this Task task, string name)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            task.Wait();
             stopwatch.Stop();
 
             Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");

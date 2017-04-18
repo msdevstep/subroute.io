@@ -1,9 +1,9 @@
+using System;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-using Subroute.Api;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(SessionAuthenticationConfig), "PreAppStart")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Subroute.Api.App_Start.SessionAuthenticationConfig), "PreAppStart")]
 
-namespace Subroute.Api
+namespace Subroute.Api.App_Start
 {
     public static class SessionAuthenticationConfig
     {

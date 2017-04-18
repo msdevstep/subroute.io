@@ -54,9 +54,7 @@ namespace Subroute.Container
                 // The request will also load the associated route, so we'll use that feature
                 // to reduce the number of SQL calls we make.
                 var requestTask = TraceUtility.TraceTime("Get Load Request Task", () => Program.RequestRepository.GetRequestByIdAsync(requestId));
-                TraceUtility.TraceTime("Load Request", () => requestTask.Wait());
-
-                var request = requestTask.Result;
+                var request = requestTask.TraceTime("Load Request");
                 var route = request.Route;
                 var routeSettings = route.RouteSettings;
 
@@ -159,16 +157,13 @@ namespace Subroute.Container
                         // We'll use the data that comes back from the response to fill out the 
                         // remainder of the database request record which will return the status
                         // code, message, payload, and headers. Then we update the database.
-                        TraceUtility.TraceTime("Update Request Record", () =>
-                        {
-                            request.CompletedOn = DateTimeOffset.UtcNow;
-                            request.StatusCode = (int) executionResponse.StatusCode;
-                            request.StatusMessage = executionResponse.StatusMessage;
-                            request.ResponsePayload = executionResponse.Body;
-                            request.ResponseHeaders = Common.RouteResponse.SerializeHeaders(executionResponse.Headers);
+                        request.CompletedOn = DateTimeOffset.UtcNow;
+                        request.StatusCode = (int)executionResponse.StatusCode;
+                        request.StatusMessage = executionResponse.StatusMessage;
+                        request.ResponsePayload = executionResponse.Body;
+                        request.ResponseHeaders = RouteResponse.SerializeHeaders(executionResponse.Headers);
 
-                            Program.RequestRepository.UpdateRequestAsync(request).Wait();
-                        });
+                        Program.RequestRepository.UpdateRequestAsync(request).TraceTime("Update Request Record");
 
                         // We'll pass back a small bit of data indiciating to the subscribers of
                         // the response topic listening for our specific correlation ID that indicates
@@ -247,7 +242,7 @@ namespace Subroute.Container
                     request.ResponsePayload = PayloadHelpers.CreateErrorPayload(statusMessage, stackTrace);
                     request.ResponseHeaders = HeaderHelpers.GetDefaultHeaders();
 
-                    Program.RequestRepository.UpdateRequestAsync(request).Wait();
+                    Program.RequestRepository.UpdateRequestAsync(request).TraceTime("Update Request Record (Error)");
 
                     response.Properties["Result"] = (int)ExecutionResult.Failed;
                     response.Properties["Message"] = appDomainException.Message;
