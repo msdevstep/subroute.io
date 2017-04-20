@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Configuration;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization;
-using System.Security.Claims;
 using System.ServiceModel;
 using System.Spatial;
 using System.Threading;
@@ -17,15 +14,13 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.FindSymbols;
-using Microsoft.CodeAnalysis.Host;
-using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Recommendations;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json.Linq;
-using Subroute.Core.Compiler.Intellisense;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Extensions;
+using Microsoft.CodeAnalysis.Completion;
+using System.Collections.Concurrent;
 
 namespace Subroute.Core.Compiler
 {
@@ -37,6 +32,15 @@ namespace Subroute.Core.Compiler
 
     public class CompilationService : ICompilationService
     {
+        static IDictionary<string, string> DocumentationFileCache = new ConcurrentDictionary<string, string>();
+
+        private readonly IMetadataProvider MetadataProvider = null;
+
+        public CompilationService(IMetadataProvider metadataProvider)
+        {
+            MetadataProvider = metadataProvider;
+        }
+
         public CompilationResult Compile(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -46,7 +50,7 @@ namespace Subroute.Core.Compiler
             var tree = CSharpSyntaxTree.ParseText(code);
 
             // We need to reference assemblies that the code relies on.
-            var references = GetMetadataReferences();
+            var references = MetadataProvider.GetCompilationMetadata();
 
             // Compile syntax tree into a new compilation of a DLL, since we have no need for an entry point.
             var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -81,89 +85,83 @@ namespace Subroute.Core.Compiler
 
         public async Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, string code)
         {
+            // Setup a workspace for this code file, since we aren't actively managing a project or solutions.
             var workspace = new AdhocWorkspace();
             var projectName = RandomString(6, "Project");
             var assemblyName = RandomString(6, "Assembly");
             var documentName = RandomString(6, "Document");
-            var project = workspace.CurrentSolution.AddProject(projectName, assemblyName, LanguageNames.CSharp);
+            var references = MetadataProvider.GetCompilationMetadata();
 
-            // We need to reference assemblies that the code relies on.
-            var references = GetMetadataReferences();
-
-            project = project.WithMetadataReferences(references);
-
-            var document = project.AddDocument(documentName, SourceText.From(code));
-            
+            var document = workspace.CurrentSolution
+                .AddProject(projectName, assemblyName, LanguageNames.CSharp)
+                .WithMetadataReferences(references)
+                .AddDocument(documentName, SourceText.From(code));
+        
+            // Determine position of cursor so we know which symbols to recommend.
             var text = await document.GetTextAsync();
             var position = text.Lines.GetPosition(new LinePosition(request.Line, request.Character));
+            
+            // The code analysis libraries have rolled in all the intellisense code
+            // so all we need to do is get a reference to the CompletionService and
+            // request completions for the given character position.
+            var service = CompletionService.GetService(document);
+            var completions = await service.GetCompletionsAsync(document, position);
+            var completionResults = new List<CompletionResult>();
+
+            // We'll handle special cases for keywords, and determine whether the
+            // completions we received are valid for the given text position.
+            if (completions != null)
+            {
+                foreach (var item in completions.Items)
+                {
+                    if (item.Tags.Contains(CompletionTags.Keyword))
+                    {
+                        // For keywords we'll assume the completion text is the same as the display text.
+                        var keyword = item.DisplayText;
+
+                        if (keyword.IsValidCompletionFor(request.WordToComplete))
+                        {
+                            var response = new CompletionResult()
+                            {
+                                CompletionText = item.DisplayText,
+                                DisplayText = item.DisplayText,
+                                Snippet = item.DisplayText,
+                                Kind = request.WantKind ? "Keyword" : null
+                            };
+
+                            completionResults.Add(response);
+                        }
+                    }
+                }
+            }
+            
+            // Now we'll add completions based on the semantics model and referenced assemblies.
             var model = await document.GetSemanticModelAsync();
-            var completions = new List<CompletionResult>();
-
-            AddKeywords(workspace, completions, model, position, request.WantKind, request.WordToComplete);
-
-            var symbols = Recommender.GetRecommendedSymbolsAtPosition(model, position, workspace);
+            var symbols = await Recommender.GetRecommendedSymbolsAtPositionAsync(model, position, workspace);
 
             foreach (var symbol in symbols.Where(s => s.Name.IsValidCompletionFor(request.WordToComplete)))
             {
                 if (request.WantSnippet)
                 {
                     foreach (var completion in MakeSnippetedResponses(request, symbol))
-                        completions.Add(completion);
+                    {
+                        completionResults.Add(completion);
+                    }
                 }
                 else
                 {
-                    completions.Add(MakeAutoCompleteResponse(request, symbol));
+                    completionResults.Add(MakeAutoCompleteResponse(request, symbol));
                 }
             }
-
-            return completions
+            
+            // Order the list to the most appropriate completions first.
+            return completionResults
                 .OrderByDescending(c => c.CompletionText.IsValidCompletionStartsWithExactCase(request.WordToComplete))
                 .ThenByDescending(c => c.CompletionText.IsValidCompletionStartsWithIgnoreCase(request.WordToComplete))
                 .ThenByDescending(c => c.CompletionText.IsCamelCaseMatch(request.WordToComplete))
                 .ThenByDescending(c => c.CompletionText.IsSubsequenceMatch(request.WordToComplete))
                 .ThenBy(c => c.CompletionText)
                 .ToArray();
-        }
-
-        private static PortableExecutableReference[] GetMetadataReferences()
-        {
-            var references = new[]
-            {
-                MetadataReference.CreateFromFile(typeof (Uri).Assembly.Location),                           // System
-                MetadataReference.CreateFromFile(typeof (object).Assembly.Location),                        // mscorlib
-                MetadataReference.CreateFromFile(typeof (Enumerable).Assembly.Location),                    // System.Core
-                MetadataReference.CreateFromFile(typeof (ConfigurationManager).Assembly.Location),          // System.Configuration
-                MetadataReference.CreateFromFile(typeof (JObject).Assembly.Location),                       // Newtonsoft.Json
-                MetadataReference.CreateFromFile(typeof (HttpClient).Assembly.Location),                    // System.Net.Http
-                MetadataReference.CreateFromFile(typeof (HttpContentExtensions).Assembly.Location),         // System.Net.Http.Formatting
-                MetadataReference.CreateFromFile(typeof (Common.RouteRequest).Assembly.Location),           // Subroute.Common
-                MetadataReference.CreateFromFile(typeof (XmlElement).Assembly.Location),                    // System.Xml
-                MetadataReference.CreateFromFile(typeof (XObject).Assembly.Location),                       // System.Xml.Linq
-                MetadataReference.CreateFromFile(typeof (DataContractAttribute).Assembly.Location),         // System.Runtime.Serialization
-                MetadataReference.CreateFromFile(typeof (BasicHttpBinding).Assembly.Location),              // System.ServiceModel
-                MetadataReference.CreateFromFile(typeof (DataSet).Assembly.Location),                       // System.Data
-                MetadataReference.CreateFromFile(typeof (DataRowExtensions).Assembly.Location),             // System.Data.DataSetExtensions
-                MetadataReference.CreateFromFile(typeof (Geography).Assembly.Location),                     // System.Spatial
-            };
-            return references;
-        }
-
-        private void AddKeywords(Workspace workspace, List<CompletionResult> completions, SemanticModel model, int position, bool wantKind, string wordToComplete)
-        {
-            var context = CSharpSyntaxContext.CreateContext(workspace, model, position, CancellationToken.None);
-            var keywordHandler = new KeywordContextHandler();
-            var keywords = keywordHandler.Get(context, model, position);
-
-            foreach (var keyword in keywords.Where(k => k.IsValidCompletionFor(wordToComplete)))
-            {
-                completions.Add(new CompletionResult
-                {
-                    CompletionText = keyword,
-                    DisplayText = keyword,
-                    Snippet = keyword,
-                    Kind = wantKind ? "Keyword" : null
-                });
-            }
         }
 
         private IEnumerable<CompletionResult> MakeSnippetedResponses(CompletionRequest request, ISymbol symbol)
@@ -209,17 +207,7 @@ namespace Subroute.Core.Compiler
             {
                 response.Kind = symbol.GetKind();
             }
-
-            // Handle special case for constructors.
-            var methodSymbol = symbol as IMethodSymbol;
-            if (methodSymbol?.MethodKind == MethodKind.Constructor)
-            {
-                response.CompletionText = methodSymbol.ContainingType.Name;
-
-                if (request.WantKind)
-                    response.Kind = "Class";
-            }
-
+           
             // TODO: Do something more intelligent here
             response.DisplayText = displayNameGenerator.Generate(symbol);
 

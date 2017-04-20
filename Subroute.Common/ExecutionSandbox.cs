@@ -16,6 +16,15 @@ namespace Subroute.Common
     {
         public RouteResponse Execute(byte[] assemblyBytes, RouteRequest request)
         {
+            // Run the private async method synchronously.
+            var task = ExecuteAsync(assemblyBytes, request);
+            task.Wait();
+
+            return task.Result;
+        }
+
+        private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, RouteRequest request)
+        {
             var assembly = Assembly.Load(assemblyBytes);
             var baseController = typeof (BaseController);
             var classType = assembly.GetTypes().FirstOrDefault(t => t.InheritsFrom(baseController));
@@ -31,23 +40,34 @@ namespace Subroute.Common
             if (methodType == null)
                 throw new EntryPointException($"No method was found for http verb '{request.Method}'.");
 
+            // For async methods we need to ensure that the method is marked async. Otherwise we will fail
+            // with an exception. We could still run it, but we don't want to promote bad code.
+            if ((methodType.ReturnType == typeof(Task) || methodType.ReturnType.InheritsFrom(typeof(Task))) && !methodType.IsAsyncMethod())
+                throw new EntryPointException($"Found method named '{methodType.Name}' which returns Task, however the method must be marked as async.");
+
             // Create an instance of controller and execute the method.
             var instance = classType.CreateInstance();
             var result = methodType.Invoke(instance, new object[] { request });
 
-            // Determine how to handle the result of the user method.
+            // Depending on the result, we can determine if a method is asynchronous or not
+            // and treat it as such by waiting for it to complete before returning the result.
             switch (result)
             {
+                // Standard synchronous return type, return it straight away.
                 case RouteResponse resultTyped:
                     return resultTyped;
-                case Task<RouteResponse> resultTaskTyped:
-                    resultTaskTyped.Wait();
 
-                    return resultTaskTyped.Result;
+                // Typed async result, wait for the result then return it.
+                case Task<RouteResponse> resultTaskTyped:
+                    return await resultTaskTyped;
+
+                // Untyped async result, wait for completion then return a no content result.
                 case Task resultTask:
-                    resultTask.Wait();
+                    await resultTask;
 
                     return RouteResponse.NoContent;
+
+                // For void methods, we'll return a no content result, otherwise it's an unknown type so throw.
                 default:
                     // Void is a valid type, return an empty result.
                     if (methodType.ReturnType == typeof(void))

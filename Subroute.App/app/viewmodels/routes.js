@@ -511,7 +511,7 @@
                         meta: item.kind,
                         type: "snippet",
                         score: -(++index),
-                        docHTML: item.displayText
+                        docHTML: "<b>" + item.displayText + "</b>\n" + item.description
                     }
                 });
                 callback(null, completions);

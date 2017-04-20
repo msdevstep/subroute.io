@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Transactions;
 using System.Web.Http;
 using Subroute.Api.Models.RouteSettings;
-using Subroute.Core.Compiler.Intellisense;
 using Subroute.Core.Data;
 using Subroute.Core.Data.Repositories;
 using Subroute.Core.Exceptions;

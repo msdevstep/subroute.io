@@ -10,15 +10,11 @@ using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
 using System.Threading.Tasks;
-using Autofac;
 using Microsoft.Azure.WebJobs;
 using Microsoft.ServiceBus.Messaging;
 using Subroute.Common;
-using Subroute.Core;
-using Subroute.Core.Data.Repositories;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Execution;
-using Subroute.Core.Extensions;
 using Subroute.Core.Utilities;
 using RouteRequest = Subroute.Common.RouteRequest;
 
@@ -26,19 +22,19 @@ namespace Subroute.Container
 {
     public class ExecutionMethods
     {
-        public static void Execute([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")]out BrokeredMessage response)
+        public static async Task ExecuteAsync([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")] ICollector<BrokeredMessage> response)
         {
             var stopwatch = Stopwatch.StartNew();
-            ExecuteInternal(message, out response);
+            await ExecuteInternalAsync(message, response);
             stopwatch.Stop();
 
             Trace.TraceInformation($"Trace 'Total Execution' - Elapsed {stopwatch.ElapsedMilliseconds}");
         }
 
-        private static void ExecuteInternal(BrokeredMessage message, out BrokeredMessage response)
+        private static async Task ExecuteInternalAsync(BrokeredMessage message, ICollector<BrokeredMessage> response)
         {
-            // We must set the out parameter no matter what, so do that first.
-            response = new BrokeredMessage();
+            // We'll always need a response message, so create it now and populate it below.
+            var responseMessage = new BrokeredMessage();
 
             // We'll create the app domain in the outer scope so we can unload it when we are finished (if it was created).
             AppDomain sandboxDomain = null;
@@ -48,13 +44,12 @@ namespace Subroute.Container
                 var requestId = (int) message.Properties["RequestId"];
 
                 // Set correlation id of response message using the correlation ID of the request message.
-                response.CorrelationId = message.CorrelationId;
-                response.Properties["RequestId"] = requestId;
+                responseMessage.CorrelationId = message.CorrelationId;
+                responseMessage.Properties["RequestId"] = requestId;
 
                 // The request will also load the associated route, so we'll use that feature
                 // to reduce the number of SQL calls we make.
-                var requestTask = TraceUtility.TraceTime("Get Load Request Task", () => Program.RequestRepository.GetRequestByIdAsync(requestId));
-                var request = requestTask.TraceTime("Load Request");
+                var request = await Program.RequestRepository.GetRequestByIdAsync(requestId).TraceTimeAsync("Load Request");
                 var route = request.Route;
                 var routeSettings = route.RouteSettings;
 
@@ -110,7 +105,7 @@ namespace Subroute.Container
                         result => $"{result}</appSettings></configuration>"));
 
                     TraceUtility.TraceTime("Write App.Config to Disk", () => File.WriteAllText(userConfigFilePath, configFile));
-
+                    
                     // We'll add one last permission to allow the user access to their own private folder.
                     TraceUtility.TraceTime("Add Permission to Read App.Config File", () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory })));
 
@@ -152,7 +147,7 @@ namespace Subroute.Container
                         // will pass the ExecutionRequest we created above. In return, we receive
                         // an instance of ExecutionResponse that has been serialized like the request
                         // and deserialized in our full-trust host domain.
-                        var executionResponse = TraceUtility.TraceTime("Load and Execute Route", () => executionSandbox.Execute(route.Assembly, executionRequest));
+                        var executionResponse = TraceUtility.TraceTime("Load and Execute Request", () => executionSandbox.Execute(route.Assembly, executionRequest));
 
                         // We'll use the data that comes back from the response to fill out the 
                         // remainder of the database request record which will return the status
@@ -163,13 +158,16 @@ namespace Subroute.Container
                         request.ResponsePayload = executionResponse.Body;
                         request.ResponseHeaders = RouteResponse.SerializeHeaders(executionResponse.Headers);
 
-                        Program.RequestRepository.UpdateRequestAsync(request).TraceTime("Update Request Record");
+                        await Program.RequestRepository.UpdateRequestAsync(request).TraceTimeAsync("Update Request Record");
 
                         // We'll pass back a small bit of data indiciating to the subscribers of
                         // the response topic listening for our specific correlation ID that indicates
                         // the route code was executed successfully and to handle it as such.
-                        response.Properties["Result"] = (int) ExecutionResult.Success;
-                        response.Properties["Message"] = "Completed Successfully";
+                        responseMessage.Properties["Result"] = (int) ExecutionResult.Success;
+                        responseMessage.Properties["Message"] = "Completed Successfully";
+
+                        // Create the response message and send it on its way.
+                        response.Add(responseMessage);
                     }
                     catch (TargetInvocationException invokationException)
                     {
@@ -211,6 +209,30 @@ namespace Subroute.Container
                         // it instead manually.
                         throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
                     }
+                    catch (AggregateException asyncException) // Captures async and task exceptions.
+                    {
+                        // These exceptions occur when an entry point could not be located.
+                        // Since we don't have a reference to core in the common library.
+                        // We'll instead wrap this exception in a core 
+                        // exception to apply a status code.
+                        if (asyncException?.InnerException is EntryPointException entryPointException)
+                            throw new RouteEntryPointException(entryPointException.Message, entryPointException);
+
+                        // These exceptions can occur when we encounter a permission exception where 
+                        // the user doesn't have permission to execute a particular block of code.
+                        if (asyncException?.InnerException is SecurityException securityException)
+                            throw new RoutePermissionException(GetPermissionErrorMessage(securityException), securityException);
+
+                        // These exceptions can occur when query string parsing fails, and since the
+                        // user's code doesn't have access to the core exceptions, we'll need to wrap
+                        // it instead manually.
+                        if (asyncException?.InnerException is SecurityException badRequestException)
+                            throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
+
+                        // These are all other exceptions that occur during the execution of
+                        // a route. These exceptions are raised by the users code.
+                        throw new RouteException(asyncException.Message, asyncException);
+                    }
                     catch (Exception routeException)
                     {
                         // These are all other exceptions that occur during the execution of
@@ -242,18 +264,24 @@ namespace Subroute.Container
                     request.ResponsePayload = PayloadHelpers.CreateErrorPayload(statusMessage, stackTrace);
                     request.ResponseHeaders = HeaderHelpers.GetDefaultHeaders();
 
-                    Program.RequestRepository.UpdateRequestAsync(request).TraceTime("Update Request Record (Error)");
+                    await Program.RequestRepository.UpdateRequestAsync(request).TraceTimeAsync("Update Request Record (Error)");
 
-                    response.Properties["Result"] = (int)ExecutionResult.Failed;
-                    response.Properties["Message"] = appDomainException.Message;
+                    responseMessage.Properties["Result"] = (int)ExecutionResult.Failed;
+                    responseMessage.Properties["Message"] = appDomainException.Message;
+
+                    // Create the response message and send it on its way.
+                    response.Add(responseMessage);
                 }
             }
             catch (Exception fatalException)
             {
                 // These exceptions are absolutely fatal. We'll have to notify the waiting thread
                 // via the service bus message, because we're unable to load a related request.
-                response.Properties["Result"] = (int)ExecutionResult.Fatal;
-                response.Properties["Message"] = fatalException.Message;
+                responseMessage.Properties["Result"] = (int)ExecutionResult.Fatal;
+                responseMessage.Properties["Message"] = fatalException.Message;
+
+                // Create the response message and send it on its way.
+                response.Add(responseMessage);
             }
             finally
             {

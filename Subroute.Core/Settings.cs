@@ -27,6 +27,7 @@ namespace Subroute.Core
         public static string MailChimpApiKey => GetSetting<string>("Subroute.MailChimp.API.Key");
         public static string MailChimpAllSubscriberListId => GetSetting<string>("Subroute.MailChimp.All.Subscriber.ListId");
         public static string AppInsightsInstrumentationKey => GetSetting<string>("Subroute.AppInsights.InstrumentationKey");
+        public static string DocumentationPath => GetSetting<string>("Subroute.Documentation.Path");
 
         /// <summary>
         /// Get a strongly-typed setting value from the active environments configuration provider.

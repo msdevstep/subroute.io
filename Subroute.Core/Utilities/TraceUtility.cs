@@ -37,10 +37,30 @@ namespace Subroute.Core.Utilities
             return task.Result;
         }
 
+        public static async Task<TResult> TraceTimeAsync<TResult>(this Task<TResult> task, string name)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var result = await task;
+            stopwatch.Stop();
+
+            Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");
+
+            return result;
+        }
+
         public static void TraceTime(this Task task, string name)
         {
             var stopwatch = Stopwatch.StartNew();
             task.Wait();
+            stopwatch.Stop();
+
+            Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");
+        }
+
+        public static async Task TraceTimeAsync(this Task task, string name)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            await task;
             stopwatch.Stop();
 
             Trace.TraceInformation($"Trace '{name}' - Elapsed {stopwatch.ElapsedMilliseconds}");

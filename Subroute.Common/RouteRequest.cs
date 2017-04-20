@@ -17,6 +17,9 @@ namespace Subroute.Common
             Headers = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Gets the incoming URI for the current request.
+        /// </summary>
         public Uri Uri { get; }
 
         public string Method { get; }
