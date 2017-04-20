@@ -26,5 +26,10 @@ namespace Subroute.Common
         {
             return string.Join("\n", headers.Select(h => $"{h.Key}:{h.Value}"));
         }
+
+        public static RouteResponse NoContent
+        {
+            get { return new RouteResponse(HttpStatusCode.NoContent) { Body = new byte[0] }; }
+        }
     }
 }

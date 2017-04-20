@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Subroute.Common.Extensions
 {
@@ -80,6 +82,19 @@ namespace Subroute.Common.Extensions
         public static bool IsPrimitive(this Type type)
         {
             return (type.IsValueType || type.IsNullable() || type == typeof(string));
+        }
+
+        public static bool IsAsyncMethod(this MethodInfo method)
+        {
+            // Obtain the method with the specified name.
+            var attType = typeof(AsyncStateMachineAttribute);
+
+            // Obtain the custom attribute for the method. 
+            // The value returned contains the StateMachineType property. 
+            // Null is returned if the attribute isn't present for the method. 
+            var attrib = (AsyncStateMachineAttribute)method.GetCustomAttribute(attType);
+
+            return (attrib != null);
         }
     }
 }

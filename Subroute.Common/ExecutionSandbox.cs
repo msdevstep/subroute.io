@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using Subroute.Common.Extensions;
+using System.Threading.Tasks;
 
 namespace Subroute.Common
 {
@@ -30,23 +31,31 @@ namespace Subroute.Common
             if (methodType == null)
                 throw new EntryPointException($"No method was found for http verb '{request.Method}'.");
 
-            // Create an instance of controller.
+            // Create an instance of controller and execute the method.
             var instance = classType.CreateInstance();
+            var result = methodType.Invoke(instance, new object[] { request });
 
-            // Void methods are treated as a no content result, so we'll create the ExecutionResponse object 
-            // ourselves with NoContent status code. We'll also invoke the message to ensure it's processed.
-            if (methodType.ReturnType == typeof(void))
+            // Determine how to handle the result of the user method.
+            switch (result)
             {
-                methodType.Invoke(instance, new object[] { request });
+                case RouteResponse resultTyped:
+                    return resultTyped;
+                case Task<RouteResponse> resultTaskTyped:
+                    resultTaskTyped.Wait();
 
-                return new RouteResponse(HttpStatusCode.NoContent)
-                {
-                    Body = new byte[0]
-                };
+                    return resultTaskTyped.Result;
+                case Task resultTask:
+                    resultTask.Wait();
+
+                    return RouteResponse.NoContent;
+                default:
+                    // Void is a valid type, return an empty result.
+                    if (methodType.ReturnType == typeof(void))
+                        return RouteResponse.NoContent;
+
+                    // All other types should produce an exception because we aren't sure what they want us to do with it.
+                    throw new EntryPointException($"Found method named '{methodType.Name}', but has an invalid return type. Valid types are void, RouteResponse, Task, and Task<RouteResponse>.");
             }
-                
-            // Methods that directly return an ExecutionResponse are considered bare-metal responses, so we'll just pass it along.
-            return (RouteResponse) methodType.Invoke(instance, new object[] { request });
         }
     }
 }
