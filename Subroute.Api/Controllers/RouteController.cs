@@ -75,7 +75,7 @@ namespace Subroute.Api.Controllers
                 throw new NotFoundException("No saved default routes exists.");
 
             var client = new ManagementApiClient(Settings.SubrouteAuth0ManagementApiToken, new Uri(Settings.SubrouteAuth0ManagementApiUri));
-            var user = await client.Users.Get(route.UserId);
+            var user = await client.Users.GetAsync(route.UserId);
             
             return new DefaultResponse
             {

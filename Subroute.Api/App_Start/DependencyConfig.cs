@@ -20,7 +20,7 @@ namespace Subroute.Api
 
             // We need to register all web api related components.
             builder.RegisterApiControllers(assembly);
-            builder.RegisterWebApiModelBinders(assembly);
+            builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(configuration);
 
             // We need a container to actually resolve types, so use the builder we populated with registrations

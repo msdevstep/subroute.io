@@ -20,8 +20,19 @@ using RouteRequest = Subroute.Common.RouteRequest;
 
 namespace Subroute.Container
 {
+    /// <summary>
+    /// Contains methods wired up to the web jobs framework.
+    /// </summary>
     public class ExecutionMethods
     {
+        /// <summary>
+        /// Primary entry point for container, accepts in coming requests over the service bus
+        /// and executes users code to create a response and republish the response back over
+        /// the service bus.
+        /// </summary>
+        /// <param name="message">Incoming message containing request details.</param>
+        /// <param name="response">Outgoing response that publishes the response details to the service bus.</param>
+        /// <returns>Empty task with async context.</returns>
         public static async Task ExecuteAsync([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")] ICollector<BrokeredMessage> response)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -173,16 +184,14 @@ namespace Subroute.Container
                     {
                         // These exceptions can occur when we encounter a permission exception where 
                         // the user doesn't have permission to execute a particular block of code.
-                        var securityException = invokationException.InnerException as SecurityException;
-                        if (securityException != null)
+                        if (invokationException.InnerException is SecurityException securityException)
                             throw new RoutePermissionException(GetPermissionErrorMessage(securityException), invokationException);
 
                         // Check for BadRequestException, we need to wrap it with the core exception.
                         // These exceptions can occur when query string parsing fails, and since the
                         // user's code doesn't have access to the core exceptions, we'll need to wrap
                         // it instead manually.
-                        var badRequestException = invokationException.InnerException as Common.BadRequestException;
-                        if (badRequestException != null)
+                        if (invokationException.InnerException is Common.BadRequestException badRequestException)
                             throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
 
                         // Otherwise it is most likely a custom user exception.

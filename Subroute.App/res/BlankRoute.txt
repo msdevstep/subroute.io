@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Net;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Subroute.Common;
 
 namespace Subroute.Container
 {
 	public class RouteMethods : BaseController
 	{
-		public RouteResponse Get(RouteRequest request)
+		public async Task<RouteResponse> GetAsync(RouteRequest request)
 		{
 			return NoContent();
 		}
 
-		public RouteResponse Post(RouteRequest request)
+		public async Task<RouteResponse> PostAsync(RouteRequest request)
 		{
 			return NoContent();
 		}
 
-		public RouteResponse Put(RouteRequest request)
+		public async Task<RouteResponse> PutAsync(RouteRequest request)
 		{
 			return NoContent();
 		}
 
-		public RouteResponse Delete(RouteRequest request)
+		public async Task<RouteResponse> DeleteAsync(RouteRequest request)
 		{
 			return NoContent();
 		}

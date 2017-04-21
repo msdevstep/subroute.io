@@ -7,6 +7,8 @@ namespace Subroute.Api.App_Start
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
     using System.Text;
+    using JWT;
+    using JWT.Serializers;
 
     public static class JsonWebToken
     {
@@ -29,13 +31,18 @@ namespace Subroute.Api.App_Start
                 secret = Convert.FromBase64String(secretKey);
             else
                 secret = Encoding.UTF8.GetBytes(secretKey);
+            
+            var serializer = new JsonNetSerializer();
+            var provider = new UtcDateTimeProvider();
+            var validator = new JwtValidator(serializer, provider);
+            var urlEncoder = new JwtBase64UrlEncoder();
+            var decoder = new JwtDecoder(serializer, validator, urlEncoder);
 
-            var payloadJson = JWT.JsonWebToken.Decode(token, secret, verify: true);
+            var payloadJson = decoder.Decode(token, secret, verify: true);
             var payloadData = JObject.Parse(payloadJson).ToObject<Dictionary<string, object>>();
 
             // audience check
-            object aud;
-            if (!string.IsNullOrEmpty(audience) && payloadData.TryGetValue("aud", out aud))
+            if (!string.IsNullOrEmpty(audience) && payloadData.TryGetValue("aud", out object aud))
             {
                 if (!aud.ToString().Equals(audience, StringComparison.Ordinal))
                 {
@@ -44,8 +51,7 @@ namespace Subroute.Api.App_Start
             }
 
             // expiration check
-            object exp;
-            if (checkExpiration && payloadData.TryGetValue("exp", out exp))
+            if (checkExpiration && payloadData.TryGetValue("exp", out object exp))
             {
                 DateTime validTo = FromUnixTime(long.Parse(exp.ToString()));
                 if (DateTime.Compare(validTo, DateTime.UtcNow) <= 0)
@@ -56,8 +62,7 @@ namespace Subroute.Api.App_Start
             }
 
             // issuer check
-            object iss;
-            if (payloadData.TryGetValue("iss", out iss))
+            if (payloadData.TryGetValue("iss", out object iss))
             {
                 if (!string.IsNullOrEmpty(issuer))
                 {
