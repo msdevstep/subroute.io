@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Subroute.Common.Extensions
 {
+    /// <summary>
+    /// Various extension methods for working with streams.
+    /// </summary>
     public static class StreamExtensions
     {
         /// <summary>

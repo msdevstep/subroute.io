@@ -4,8 +4,16 @@ using System.Linq;
 
 namespace Subroute.Common
 {
+    /// <summary>
+    /// Helper methods for working with query string data.
+    /// </summary>
     public static class QueryStringParser
     {
+        /// <summary>
+        /// Parses a string containing query string formatted data.
+        /// </summary>
+        /// <param name="query">String containing query string formatted data.</param>
+        /// <returns>Dictionary containing the provided query string data.</returns>
         public static IDictionary<string, QueryStringValue> ParseQueryString(string query)
         {
             // Remove any leading question mark for the case of query string parsing.

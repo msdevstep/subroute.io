@@ -14,6 +14,12 @@ namespace Subroute.Common
     /// </summary>
     public class ExecutionSandbox : MarshalByRefObject
     {
+        /// <summary>
+        /// Loads the assembly from the byte array and executes the best matched method based on the incoming request.
+        /// </summary>
+        /// <param name="assemblyBytes">Byte array containing the assembly to be loaded.</param>
+        /// <param name="request"><see cref="RouteRequest"/> object containing all data for the current request.</param>
+        /// <returns><see cref="RouteResponse"/> object containing the response for the current request.</returns>
         public RouteResponse Execute(byte[] assemblyBytes, RouteRequest request)
         {
             // Run the private async method synchronously.

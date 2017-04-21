@@ -5,8 +5,15 @@ using Subroute.Common.Extensions;
 
 namespace Subroute.Common
 {
+    /// <summary>
+    /// Class containing various methods for working with headers.
+    /// </summary>
     public static class HeaderHelpers
     {
+        /// <summary>
+        /// Returns the default response headers.
+        /// </summary>
+        /// <returns>String containing the default response headers.</returns>
         public static string GetDefaultHeaders()
         {
             var headers = new[]
@@ -17,6 +24,11 @@ namespace Subroute.Common
             return String.Join("\n", headers);
         }
 
+        /// <summary>
+        /// Deserializes the string representation of header data.
+        /// </summary>
+        /// <param name="headers">String containing the header data.</param>
+        /// <returns>Dictionary containing the parsed header data.</returns>
         public static IDictionary<string, string> DeserializeHeaders(string headers)
         {
             var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
@@ -37,6 +49,12 @@ namespace Subroute.Common
             return result;
         }
 
+        /// <summary>
+        /// Returns whether the provided content type exist in the header dictionary.
+        /// </summary>
+        /// <param name="headers">Dictionary containing header data.</param>
+        /// <param name="contentTypes">Content types to be located in the header data dictionary.</param>
+        /// <returns>Boolean value indicated whether the content type exists in the header data.</returns>
         public static bool ContainsContentType(IDictionary<string, string> headers, params string[] contentTypes)
         {
             if (headers == null)

@@ -4,6 +4,10 @@ using Subroute.Common.ResponseFormatters;
 
 namespace Subroute.Common
 {
+    /// <summary>
+    /// Class containing the specific configuration for the current route.
+    /// This class can be used to register request and response formatters.
+    /// </summary>
     public static class GlobalConfiguration
     {
         static GlobalConfiguration()
@@ -20,7 +24,14 @@ namespace Subroute.Common
             ResponseFormatters.Add(new StreamResponseFormatter());
         }
 
+        /// <summary>
+        /// Request formatters used to read data from the request stream.
+        /// </summary>
         public static readonly List<IRequestFormatter> RequestFormatters = new List<IRequestFormatter>();
+
+        /// <summary>
+        /// Response formatters used to format data for the response stream.
+        /// </summary>
         public static readonly List<IResponseFormatter> ResponseFormatters = new List<IResponseFormatter>();
     }
 }
