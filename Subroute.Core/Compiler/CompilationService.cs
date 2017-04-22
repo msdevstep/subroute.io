@@ -68,15 +68,25 @@ namespace Subroute.Core.Compiler
                     Assembly = ms.ToArray(),
                     Diagnostics = emitResult.Diagnostics.Select(d =>
                     {
-                        var linePos = d.Location.GetLineSpan().StartLinePosition;
+                        var lineSpan = d.Location.GetLineSpan();
+                        var startPostion = lineSpan.StartLinePosition;
+                        var endPosition = lineSpan.EndLinePosition;
 
                         return new Diagnostic
                         {
                             Severity = d.Severity,
                             Code = d.Id,
                             Description = d.GetMessage(),
-                            Line = linePos.Line + 1,
-                            Character = linePos.Character
+                            Start = new CursorPosition
+                            {
+                                Line = startPostion.Line,
+                                Character = startPostion.Character
+                            },
+                            End = new CursorPosition
+                            {
+                                Line = endPosition.Line,
+                                Character = endPosition.Character
+                            }
                         };
                     }).ToArray()
                 };

@@ -10,7 +10,7 @@ namespace Subroute.Core.Compiler
         public DiagnosticSeverity Severity { get; set; }
         public string Code { get; set; }
         public string Description { get; set; }
-        public int Line { get; set; }
-        public int Character { get; set; }
+        public CursorPosition Start { get; set; }
+        public CursorPosition End { get; set; }
     }
 }

@@ -12,10 +12,11 @@
         'mapping': '../lib/knockout.mapping/knockout.mapping/build/knockout.mapping',
         'cookie': '../lib/jquery.cookie/jquery.cookie',
         'moment': '../lib/moment/min/moment.min',
-        'ace': '//cdnjs.cloudflare.com/ajax/libs/ace/1.2.3',
+        'ace': '//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6',
         'config': 'config?noext',
         'markdown': '../lib/markdown/markdown',
-        'qtip': '../lib/qtip2/jquery.qtip.min'
+        'qtip': '../lib/qtip2/jquery.qtip.min',
+        'modes': '../modes'
     },
     shim: {
         'base64': {

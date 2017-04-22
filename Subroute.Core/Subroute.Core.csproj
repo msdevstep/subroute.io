@@ -249,6 +249,7 @@
     <Compile Include="Compiler\CompilationResult.cs" />
     <Compile Include="Compiler\CompletionRequest.cs" />
     <Compile Include="Compiler\CompletionResult.cs" />
+    <Compile Include="Compiler\CursorPosition.cs" />
     <Compile Include="Compiler\Diagnostic.cs" />
     <Compile Include="Compiler\DocumentationConverter.cs" />
     <Compile Include="Compiler\FormattingOptions.cs" />

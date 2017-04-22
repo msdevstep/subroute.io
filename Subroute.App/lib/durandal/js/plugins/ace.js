@@ -125,7 +125,7 @@
 
                     switch (mode) {
                         case "csharp":
-                            session.setMode('ace/mode/csharp');
+                            session.setMode('modes/csharp');
                             editor.setOption("scrollPastEnd", true);
                             editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
 

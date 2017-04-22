@@ -180,6 +180,8 @@
     <Content Include="img\ms-icon-150x150.png" />
     <Content Include="img\ms-icon-310x310.png" />
     <Content Include="img\ms-icon-70x70.png" />
+    <Content Include="img\wavy_error.gif" />
+    <Content Include="img\wavy_warning.png" />
     <Content Include="lib\ace-build\ChangeLog.txt" />
     <Content Include="lib\ace-build\editor.html" />
     <Content Include="lib\ace-build\src-min-noconflict\ace.js" />
@@ -1310,6 +1312,8 @@
     <Content Include="lib\qtip2\jquery.qtip.min.js" />
     <Content Include="lib\requirejs-text\text.js" />
     <Content Include="lib\requirejs\require.js" />
+    <Content Include="modes\csharp.js" />
+    <Content Include="modes\csharp_highlight_rules.js" />
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>

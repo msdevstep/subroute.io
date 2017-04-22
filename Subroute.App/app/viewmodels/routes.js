@@ -1,4 +1,4 @@
-﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request', 'ace/ace'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, app, ajax, requestModal, ace) {
+﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request', 'ace/ace', 'ace/range'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, app, ajax, requestModal, ace, range) {
     return function () {
         var self = this;
 
@@ -172,6 +172,45 @@
             });
         };
 
+        self.clearErrors = function () {
+            var editor = ace.edit('editor');
+            var session = editor.getSession();
+            var markers = session.getMarkers();
+
+            for (marker in markers) {
+                session.removeMarker(marker);
+            }
+        };
+
+        self.showErrors = function (diagnostics) {
+            var editor = ace.edit('editor');
+            var session = editor.getSession();
+            var aceRange = range.Range;
+
+            self.clearErrors();
+
+            for (var d = 0; d < diagnostics.length; d++) {
+                var diagnostic = diagnostics[d];
+                var start = diagnostic.start;
+                var end = diagnostic.end;
+
+                // When it's a single character error, nothing will show if we don't add an offset.
+                if (start.line == end.line && start.character == end.character) {
+                    var line = session.getLine(start.line);
+
+                    if (end.character >= line.length) {
+                        start.character--;
+                    } else {
+                        end.character++;
+                    };
+                }
+
+                var css = diagnostic.severity == 'Error' ? 'ace_error' : 'ace_warning';
+
+                var markerId = session.addMarker(new aceRange(start.line, start.character, end.line, end.character), css, 'text');
+            }
+        };
+
         self.compile = function () {
             var requestUri = uriBuilder.getCompileUri();
 
@@ -184,6 +223,8 @@
                 data: self.script(),
                 contentType: 'text/plain'
             }).then(function (data) {
+                self.clearErrors();
+
                 system.log(data);
                 self.diagnostics([]);
                 self.diagnosticsVisible(false);
@@ -191,6 +232,9 @@
                 self.showSuccessMessage('Compiled Successfully');
             }).fail(function (error) {
                 var data = JSON.parse(error.responseText);
+
+                self.showErrors(data.diagnostics);
+
                 self.diagnostics(data.diagnostics);
                 self.diagnosticsVisible(true);
                 self.showErrorMessage('Compile Failed - ' + self.diagnosticsCount() + ' Message(s)');
@@ -386,7 +430,7 @@
         };
 
         self.formatPosition = function (diagnostic) {
-            return 'Line ' + diagnostic.line + ', Character ' + diagnostic.character;
+            return 'Line ' + (diagnostic.start.line + 1) + ', Character ' + diagnostic.start.character;
         };
 
         self.canActivate = function (action, uri) {
