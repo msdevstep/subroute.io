@@ -6,7 +6,7 @@
         'transitions': '../lib/durandal/js/transitions',
         'jquery': '//code.jquery.com/jquery-2.2.3.min',
         'jquery-ui': '//code.jquery.com/ui/1.11.4/jquery-ui.min',
-        'base64': '../lib/jquery.base64/jquery.base64',
+        'base64': '../lib/jquery.base64.js/jquery.base64',
         'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min',
         'validation': '../lib/knockout.validation/Dist/knockout.validation.min',
         'mapping': '../lib/knockout.mapping/knockout.mapping/build/knockout.mapping',
@@ -16,7 +16,9 @@
         'config': 'config?noext',
         'markdown': '../lib/markdown/markdown',
         'qtip': '../lib/qtip2/jquery.qtip.min',
-        'modes': '../modes'
+        'modes': '../modes',
+        'highlight': '../lib/highlightjs/highlight.pack',
+        'remarkable': '../lib/remarkable/dist/remarkable'
     },
     shim: {
         'base64': {

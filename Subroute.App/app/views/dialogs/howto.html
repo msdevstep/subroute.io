@@ -4,5 +4,39 @@
     <p>The Subroute.io execution engine uses convention to determine which method of your class to call. When making a RESTful request to the following endpoint.</p>
     <code data-bind="text: apiEndpoint"></code>
     <p>The Subroute.io execution engine will use the HTTP verb (e.g. GET, POST, DELETE, etc...) to determine which method to call. Subroute.io will grab the first method whose name begins with the HTTP verb and execute it by passing in the current request's headers, query string, and body.</p>
-    <p>If your code intends to return a result, it should instantiate an <code>ExecutionResponse</code> and set its status code, headers, and payload to return to the caller.</p>
+    <p>If your code intends to return a result, it should instantiate an <code>RouteResponse</code> and set its status code, headers, and payload to return to the caller.</p>
+    <p>You can also use the base methods to make returning a result easier. The following methods are available:</p>
+      
+    <p>
+        Serialize a POCO object as JSON and return 200 OK.<br/>
+        <code>Json(HttpStatusCode, object)</code>
+    </p>
+    <p>
+        Serialize a POCO object as XML and return 200 OK.<br />
+        <code>Xml(HttpStatusCode, object)</code>
+    </p>
+    <p>
+        Return provided string and return 200 OK.<br />
+        <code>String(HttpStatusCode, string)</code>
+    </p>
+    <p>
+        Use the provided stream as the response payload and return 200 OK.<br />
+        <code>Stream(HttpStatusCode, Stream, string)</code>
+    </p>
+    <p>
+        Return an empty result with 204 No Content.<br />
+        <code>NoContent()</code>
+    </p>
+    <p>
+        Return an empty result with 400 Bad Request.<br />
+        <code>BadRequest()</code>
+    </p>
+    <p>
+        Return an empty result with the specified status code.<br />
+        <code>StatusCode(HttpStatusCode)</code>
+    </p>
+    <p>
+        Use the specified response formatter to serialize the provied payload and return the specified status code.<br />
+        <code>Formatted(HttpStatusCode, string, object)</code>
+    </p>
 </div>

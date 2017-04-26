@@ -1,0 +1,137 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="Solution_Path">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="SolutionPath" type="xs:string" minOccurs="0" />
+                <xs:element name="SolutionVersion" type="xs:string" minOccurs="0" />
+                <xs:element name="PlogVersion" type="xs:unsignedInt" minOccurs="0" />
+                <xs:element name="ModificationDate" msdata:DateTimeMode="Utc" type="xs:dateTime" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PVS-Studio_Analysis_Log">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="FavIcon" type="xs:boolean" minOccurs="0" />
+                <xs:element name="Level" type="xs:unsignedInt" minOccurs="0" />
+                <xs:element name="DefaultOrder" type="xs:int" minOccurs="0" />
+                <xs:element name="ErrorCode" type="xs:string" minOccurs="0" />
+                <xs:element name="Message" type="xs:string" />
+                <xs:element name="Project" type="xs:string" minOccurs="0" />
+                <xs:element name="ShortFile" type="xs:string" minOccurs="0" />
+                <xs:element name="Line" type="xs:int" />
+                <xs:element name="FalseAlarm" type="xs:boolean" minOccurs="0" />
+                <xs:element name="File" type="xs:string" />
+                <xs:element name="CodePrev" type="xs:unsignedInt" minOccurs="0" />
+                <xs:element name="CodeCurrent" type="xs:unsignedInt" minOccurs="0" />
+                <xs:element name="CodeNext" type="xs:unsignedInt" minOccurs="0" />
+                <xs:element name="TrialMessage" type="xs:boolean" minOccurs="0" />
+                <xs:element name="Analyzer" type="xs:int" minOccurs="0" />
+                <xs:element name="LineExtension" type="xs:string" minOccurs="0" />
+                <xs:element name="Retired" type="xs:boolean" default="false" minOccurs="0" />
+                <xs:element name="AnalyzedSourceFiles" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+        <xs:selector xpath=".//PVS-Studio_Analysis_Log" />
+        <xs:field xpath="Line" />
+        <xs:field xpath="Message" />
+        <xs:field xpath="File" />
+      </xs:unique>
+    </xs:element>
+  </xs:schema>
+  <Solution_Path>
+    <SolutionPath>D:\Workspaces\Subroute\Subroute.sln</SolutionPath>
+    <SolutionVersion>15.0</SolutionVersion>
+    <PlogVersion>4</PlogVersion>
+    <ModificationDate>2017-04-25T02:40:40.7409293Z</ModificationDate>
+  </Solution_Path>
+  <PVS-Studio_Analysis_Log>
+    <FavIcon>false</FavIcon>
+    <Level>2</Level>
+    <DefaultOrder>1</DefaultOrder>
+    <ErrorCode>V3114</ErrorCode>
+    <Message>IDisposable object 'jobHost' is not disposed before method returns.</Message>
+    <Project>Subroute.Container</Project>
+    <ShortFile>Program.cs</ShortFile>
+    <Line>75</Line>
+    <FalseAlarm>false</FalseAlarm>
+    <File>D:\Workspaces\Subroute\Subroute.Container\Program.cs</File>
+    <CodePrev>0</CodePrev>
+    <CodeCurrent>480778348</CodeCurrent>
+    <CodeNext>152268353</CodeNext>
+    <TrialMessage>false</TrialMessage>
+    <Analyzer>4</Analyzer>
+    <LineExtension />
+    <Retired>false</Retired>
+    <AnalyzedSourceFiles />
+  </PVS-Studio_Analysis_Log>
+  <PVS-Studio_Analysis_Log>
+    <FavIcon>false</FavIcon>
+    <Level>1</Level>
+    <DefaultOrder>2</DefaultOrder>
+    <ErrorCode>V3022</ErrorCode>
+    <Message>Expression 'asyncException' is always not null. The operator '?.' is excessive.</Message>
+    <Project>Subroute.Container</Project>
+    <ShortFile>ExecutionMethods.cs</ShortFile>
+    <Line>227</Line>
+    <FalseAlarm>false</FalseAlarm>
+    <File>D:\Workspaces\Subroute\Subroute.Container\ExecutionMethods.cs</File>
+    <CodePrev>1474523161</CodePrev>
+    <CodeCurrent>2486883264</CodeCurrent>
+    <CodeNext>1543151992</CodeNext>
+    <TrialMessage>false</TrialMessage>
+    <Analyzer>4</Analyzer>
+    <LineExtension />
+    <Retired>false</Retired>
+    <AnalyzedSourceFiles />
+  </PVS-Studio_Analysis_Log>
+  <PVS-Studio_Analysis_Log>
+    <FavIcon>false</FavIcon>
+    <Level>1</Level>
+    <DefaultOrder>3</DefaultOrder>
+    <ErrorCode>V3022</ErrorCode>
+    <Message>Expression 'asyncException' is always not null. The operator '?.' is excessive.</Message>
+    <Project>Subroute.Container</Project>
+    <ShortFile>ExecutionMethods.cs</ShortFile>
+    <Line>232</Line>
+    <FalseAlarm>false</FalseAlarm>
+    <File>D:\Workspaces\Subroute\Subroute.Container\ExecutionMethods.cs</File>
+    <CodePrev>2141888589</CodePrev>
+    <CodeCurrent>3527446779</CodeCurrent>
+    <CodeNext>248551686</CodeNext>
+    <TrialMessage>false</TrialMessage>
+    <Analyzer>4</Analyzer>
+    <LineExtension />
+    <Retired>false</Retired>
+    <AnalyzedSourceFiles />
+  </PVS-Studio_Analysis_Log>
+  <PVS-Studio_Analysis_Log>
+    <FavIcon>false</FavIcon>
+    <Level>1</Level>
+    <DefaultOrder>4</DefaultOrder>
+    <ErrorCode>V3022</ErrorCode>
+    <Message>Expression 'asyncException' is always not null. The operator '?.' is excessive.</Message>
+    <Project>Subroute.Container</Project>
+    <ShortFile>ExecutionMethods.cs</ShortFile>
+    <Line>238</Line>
+    <FalseAlarm>false</FalseAlarm>
+    <File>D:\Workspaces\Subroute\Subroute.Container\ExecutionMethods.cs</File>
+    <CodePrev>21366972</CodePrev>
+    <CodeCurrent>1237253226</CodeCurrent>
+    <CodeNext>1285583711</CodeNext>
+    <TrialMessage>false</TrialMessage>
+    <Analyzer>4</Analyzer>
+    <LineExtension />
+    <Retired>false</Retired>
+    <AnalyzedSourceFiles />
+  </PVS-Studio_Analysis_Log>
+</NewDataSet>

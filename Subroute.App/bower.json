@@ -4,13 +4,21 @@
   "dependencies": {
     "requirejs-text": "2.0.14",
     "jquery": "2.2.0",
+    "jquery.cookie": "1.4.1",
+    "jquery.base64.js": "0.0.2",
     "durandal": "2.1.0",
     "ace-build": "1.2.3",
     "knockout.js": "3.1.0",
     "knockout.validation": "1.0.2",
     "knockout.mapping": "2.0.1",
     "qtip2": "2.2.1",
-    "moment": "2.12.0",
-    "font-awesome": "4.6.1"
+    "font-awesome": "4.6.1",
+    "remarkable": "1.7.1",
+    "highlightjs": "9.10.0",
+    "moment": "2.18.1"
+  },
+  "resolutions": {
+    "requirejs-text": "2.0.14",
+    "jquery": ">=1.6.0"
   }
 }

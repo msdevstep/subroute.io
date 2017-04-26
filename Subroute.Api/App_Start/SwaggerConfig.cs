@@ -3,6 +3,7 @@ using System.Web.Http;
 using WebActivatorEx;
 using Subroute.Api;
 using Swashbuckle.Application;
+using System.IO;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 namespace Subroute.Api
@@ -12,7 +13,17 @@ namespace Subroute.Api
         public static void Register()
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
-            var xmlCommentPath = HostingEnvironment.MapPath("~/Subroute.Api.xml");
+            var appRoot = HostingEnvironment.MapPath("~/");
+            string xmlDocPath = null;
+
+            // Search app directory and sub-directories for Subroute.Api.xml file.
+            foreach (var directory in Directory.EnumerateDirectories(appRoot, "*", SearchOption.AllDirectories))
+            {
+                var path = Path.Combine(directory, "Subroute.Api.xml");
+
+                if (File.Exists(path))
+                    xmlDocPath = path;
+            }
 
             GlobalConfiguration.Configuration 
                 .EnableSwagger(c =>
@@ -97,7 +108,9 @@ namespace Subroute.Api
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        c.IncludeXmlComments(xmlCommentPath);
+                        // Include the xml doc file for this assembly if one was located.
+                        if (xmlDocPath != null)
+                            c.IncludeXmlComments(xmlDocPath);
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occasions when more control of the output is needed.

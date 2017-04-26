@@ -38,7 +38,7 @@ namespace Subroute.Container
             // We'll also get an instance of the RequestRepository. Since the RequestRepository is thread-safe
             // we'll register a single instance of it here to reduce the amount of operations we perform during
             // the execution of an individual request.
-            RequestRepository = Program.Container.Resolve<IRequestRepository>();
+            RequestRepository = Container.Resolve<IRequestRepository>();
 
             // Force the database to initialize Entity Framework metadata.
             // It turns out Entity Framework lazy-loads all its metadata
@@ -72,8 +72,8 @@ namespace Subroute.Container
 
             jobHostConfig.UseServiceBus(serviceBusConfig);
 
-            var jobHost = new JobHost(jobHostConfig);
-            jobHost.RunAndBlock();
+            using (var jobHost = new JobHost(jobHostConfig))
+                jobHost.RunAndBlock();
         }
     }
 }

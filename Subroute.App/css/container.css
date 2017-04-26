@@ -465,6 +465,9 @@ button.link:hover {
   padding: 12px;
   outline: none;
 }
+#container div#dialog.scrollable {
+  overflow-y: auto;
+}
 #container div#dialog-overlay {
   position: fixed;
   top: 61px;
@@ -1236,6 +1239,88 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -webkit-box-sizing: padding-box;
   -moz-box-sizing: padding-box;
   box-sizing: padding-box;
+}
+#doc-content {
+  width: 75%;
+  background: #eee;
+  padding-top: 60px;
+  float: left;
+}
+#doc-content #documentation {
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+#doc-content #documentation .ace_editor {
+  border: 1px solid #aaa;
+  margin-bottom: 20px;
+}
+#doc-content #documentation code {
+  font-size: 1em;
+  font-weight: normal;
+  padding: 0;
+  background-color: inherit;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+#doc-content #documentation pre {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #000;
+  background: #fff;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+#doc-content #documentation h1 {
+  margin-top: 0;
+  font-size: 1.6em;
+}
+#doc-content #documentation h2 {
+  font-size: 1.4em;
+}
+#doc-content #documentation h3 {
+  font-size: 1.2em;
+}
+#doc-sidebar {
+  float: right;
+  width: 25%;
+  padding-top: 60px;
+}
+#doc-sidebar #documentation-sidebar {
+  padding: 20px;
+  color: #222;
+}
+#doc-sidebar #documentation-sidebar a {
+  color: #d13438;
+  text-decoration: none;
+}
+#doc-sidebar #documentation-sidebar a:hover {
+  color: #ef5256;
+}
+#doc-sidebar #documentation-sidebar h2 {
+  font-size: 1.2em;
+}
+#doc-sidebar #documentation-sidebar h4 {
+  font-size: 1em;
+  margin-bottom: 0.8em;
+}
+#doc-sidebar #documentation-sidebar ul {
+  font-size: 0.95em;
+  padding: 0;
+  list-style: none;
+}
+#doc-sidebar #documentation-sidebar ul li {
+  padding-bottom: 0.2em;
 }
 /* Include Page LESS Files */
 [role="button"] {

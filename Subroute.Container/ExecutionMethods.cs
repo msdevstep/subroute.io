@@ -224,18 +224,18 @@ namespace Subroute.Container
                         // Since we don't have a reference to core in the common library.
                         // We'll instead wrap this exception in a core 
                         // exception to apply a status code.
-                        if (asyncException?.InnerException is EntryPointException entryPointException)
+                        if (asyncException.InnerException is EntryPointException entryPointException)
                             throw new RouteEntryPointException(entryPointException.Message, entryPointException);
 
                         // These exceptions can occur when we encounter a permission exception where 
                         // the user doesn't have permission to execute a particular block of code.
-                        if (asyncException?.InnerException is SecurityException securityException)
+                        if (asyncException.InnerException is SecurityException securityException)
                             throw new RoutePermissionException(GetPermissionErrorMessage(securityException), securityException);
 
                         // These exceptions can occur when query string parsing fails, and since the
                         // user's code doesn't have access to the core exceptions, we'll need to wrap
                         // it instead manually.
-                        if (asyncException?.InnerException is SecurityException badRequestException)
+                        if (asyncException.InnerException is SecurityException badRequestException)
                             throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
 
                         // These are all other exceptions that occur during the execution of

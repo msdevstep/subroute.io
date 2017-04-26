@@ -4,6 +4,7 @@
             ko.bindingHandlers.ace = {
                 init: function (element, valueAccessor) {
                     var value = valueAccessor();
+                    var valueFormatted = element.innerText.trim();
                     var options = ko.unwrap(value);
                     var editor = ace.edit(element.id);
                     var session = editor.getSession();
@@ -12,6 +13,12 @@
                     editor.setOption("showPrintMargin", false);
                     editor.setOption('highlightActiveLine', false);
                     editor.setOption('fontSize', '12px');
+
+                    if (options.autoHeight) {
+                        editor.setOptions({
+                            maxLines: Infinity
+                        });
+                    };
 
                     session.setUseWrapMode(false);
                     session.setWrapLimitRange();
@@ -67,13 +74,19 @@
                     // Handle edits made in the editor
                     editor.on('input', function () {
                         var editorValue = editor.getValue();
-                        var observable = options.value;
-                        observable(editorValue);
+
+                        if (typeof options.value === "function") {
+                            var observable = options.value;
+                            observable(editorValue);
+                        };
                     });
 
-                    var valueFormatted = options.value();
+                    if (typeof options.value === "function") {
+                        valueFormatted = options.value();
+                    };
 
                     editor.setValue(valueFormatted, -1);
+                    
                     editor.focus();
                 },
                 update: function (element, valueAccessor) {
@@ -81,12 +94,15 @@
                     var valueAccess = valueAccessor();
                     var options = ko.unwrap(valueAccess);
                     var syntax = ko.unwrap(options.syntax);
-                    var value = options.value();
-                    var valueFormatted = value;
+                    var valueFormatted = '';
+
+                    if (typeof options.value === "function") {
+                        valueFormatted = options.value();
+                    };
 
                     // We'll capture any formatting errors and on error, just use original value.
                     try {
-                        valueFormatted = ko.bindingHandlers.ace.getFormattedCode(syntax, value);
+                        valueFormatted = ko.bindingHandlers.ace.getFormattedCode(syntax, valueFormatted);
                     }
                     catch(ex) {
                         
@@ -95,7 +111,7 @@
                     var editor = ace.edit(element.id);
                     var editorValue = editor.getValue();
 
-                    if (editorValue !== valueFormatted) {
+                    if (typeof options.value ==="function" && editorValue !== valueFormatted) {
                         editor.setValue(valueFormatted || '');
                         editor.gotoLine(0);
                     }

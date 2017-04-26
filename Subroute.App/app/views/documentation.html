@@ -1,52 +1,132 @@
-﻿<pre data-bind="visible: false, source: markdown">
-    # An exhibit of Markdown
-This note demonstrates some of what [Markdown][1] is capable of doing.
-*Note: Feel free to play with this page. Unlike regular notes, this doesn't automatically save itself.*
-## Basic formatting
-Paragraphs can be written like so. A paragraph is the basic block of Markdown. A paragraph is what text will turn into when there is no reason it should become anything else.
-Paragraphs must be separated by a blank line. Basic formatting of *italics* and **bold** is supported. This *can be **nested** like* so.
-## Lists
-### Ordered list
-1. Item 1
-2. A second item
-3. Number 3
-4. Ⅳ
-*Note: the fourth item uses the Unicode character for [Roman numeral four][2].*
-### Unordered list
-* An item
-* Another item
-* Yet another item
-* And there's more...
-## Paragraph modifiers
-### Code block
-    Code blocks are very useful for developers and other people who look at code or other things that are written in plain text. As you can see, it uses a fixed-width font.
-You can also make `inline code` to add code into other things.
-### Quote
-> Here is a quote. What this is should be self explanatory. Quotes are automatically indented when they are used.
-## Headings
-There are six levels of headings. They correspond with the six levels of HTML headings. You've probably noticed them already in the page. Each level down uses one more hash character.
-### Headings *can* also contain **formatting**
-### They can even contain `inline code`
-Of course, demonstrating what headings look like messes up the structure of the page.
-I don't recommend using more than three or four levels of headings here, because, when you're smallest heading isn't too small, and you're largest heading isn't too big, and you want each size up to look noticeably larger and more important, there there are only so many sizes that you can use.
-## URLs
-URLs can be made in a handful of ways:
-* A named link to [MarkItDown][3]. The easiest way to do these is to select what you want to make a link and hit `Ctrl+L`.
-* Another named link to [MarkItDown](http://www.markitdown.net/)
-* Sometimes you just want a URL like <http://www.markitdown.net/>.
-## Horizontal rule
-A horizontal rule is a line that goes across the middle of the page.
----
-It's sometimes handy for breaking things up.
-## Images
-Markdown can also contain images. I'll need to add something here sometime.
-## Finally
-There's actually a lot more to Markdown than this. See the official [introduction][4] and [syntax][5] for more information. However, be aware that this is not using the official implementation, and this might work subtly differently in some of the little things.
-  [1]: http://daringfireball.net/projects/markdown/
-  [2]: http://www.fileformat.info/info/unicode/char/2163/index.htm
-  [3]: http://www.markitdown.net/
-  [4]: http://daringfireball.net/projects/markdown/basics
-  [5]: http://daringfireball.net/projects/markdown/syntax
+﻿<pre id="source" style="display:none;" data-bind="visible: false, source: markdown">
+## Getting Started
+## What is Subroute.io?
+        
+Subroute.io is a hosting and execution environment for C# code built on the .NET framework. Subroute.io is ideal for building microservices,
+webhooks, slackbots, or anything that needs to be hosted on the open web. All code written with Subroute.io is compiled as an assembly and
+executed in a safe sandbox environment. Your code has full access to the entire .NET framework and has permission to make outgoing web requests.
+        
+### Writing your First Route
+``` csharp
+using System;
+using System.Net;
+using Subroute.Common;
+using System.Net.Http;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Subroute.Container
+{
+    // &lt;summary&gt;
+    // Website Monitor
+    // Make the request with a "url" query parameter
+    // that contains the website to verify uptime.
+    // &lt;/summary&gt;
+    public class RouteMethods : BaseController
+    {
+	    public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+	    {
+		    // Ensure the request has a "url" parameter, otherwise return a 400 bad request.
+		    QueryStringValue url;
+		    if (!request.QueryString.TryGetValue("url", out url))
+		        return Json(HttpStatusCode.BadRequest, new { success = false, message = "You must specify a 'url' query string parameter."});
+		    
+		    try
+		    {
+		        // We'll use the HttpClient class to make the outgoing GET request to check
+		        // whether the website is up. Subroute now supports await to make the request.
+    		    var client = new HttpClient();
+    		    var response = await client.GetAsync(url);
+		    
+		        // Verify that we got a successful response back, then return a 200 OK.
+    		    if (response.IsSuccessStatusCode)
+    		        return Json(HttpStatusCode.OK, new { success = true, message = "Website is available." });
+    		    
+    		    // Otherwise we got something other than a success response. So include
+    		    // the status code in the response.
+		        return Json(HttpStatusCode.OK, new { success = false, message = $"Status code {(int)response.StatusCode} received from server." });
+		    }
+		    catch (AggregateException ex)
+		    {
+		        // Sometimes a URL is malformed or some other network exception occurs.
+		        // so we capture the exception and return the error message.
+		        // AggregateExceptions occur when something fails with an async call.
+		        var message = ex?.InnerException?.InnerException.Message;
+		        return Json(HttpStatusCode.InternalServerError, new { success = false, message = message });
+		    }
+		    catch (Exception ex)
+		    {
+		        // Something else went wrong with the outgoing request. Capture that
+		        // and return the error message.
+		        var message = ex.Message;
+		        return Json(HttpStatusCode.InternalServerError, new { success = false, message = message });
+		    }
+	    }
+    }
+}
+```
+
+### Execution Pipeline
+Content goes here
+
+### Supported Wire Formats
+Content goes here
+
+## Working with Requests
+### Query String
+Content goes here
+
+### Serialization
+Content goes here
+
+### Form Data
+Content goes here
+
+### Request Headers
+Content goes here
+
+## Creating Responses
+### Response Headers
+Content goes here
+
+### Status Code &amp; Message
+Content goes here
+
+### Serialization
+Content goes here
 </pre>
 
-<div id="documentation" data-bind="html: rendered"></div>
+<div id="doc-content">
+    <div id="documentation">
+        
+    </div>
+</div>
+<div id="doc-sidebar">
+    <div id="documentation-sidebar">
+        <h2>Navigation</h2>
+
+        <h4>Getting Started</h4>
+        <ul>
+            <li><a href="#">What is Subroute.io?</a></li>
+            <li><a href="#">Writing your First Route</a></li>
+            <li><a href="#">Execution Pipeline</a></li>
+            <li><a href="#">Supported Wire Formats</a></li>
+        </ul>
+
+        <h4>Working with Requests</h4>
+        <ul>
+            <li><a href="#">Query String</a></li>
+            <li><a href="#">Serialization</a></li>
+            <li><a href="#">Form Data</a></li>
+            <li><a href="#">Request Headers</a></li>
+        </ul>
+
+        <h4>Creating Responses</h4>
+        <ul>
+            <li><a href="#">Response Headers</a></li>
+            <li><a href="#">Status Code &amp; Message</a></li>
+            <li><a href="#">Serialization</a></li>
+        </ul>
+    </div>
+</div>

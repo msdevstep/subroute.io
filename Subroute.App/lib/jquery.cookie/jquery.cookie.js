@@ -2,7 +2,7 @@
  * jQuery Cookie Plugin v1.4.1
  * https://github.com/carhartl/jquery-cookie
  *
- * Copyright 2006, 2014 Klaus Hartl
+ * Copyright 2013 Klaus Hartl
  * Released under the MIT license
  */
 (function (factory) {
@@ -56,7 +56,7 @@
 
 		// Write
 
-		if (arguments.length > 1 && !$.isFunction(value)) {
+		if (value !== undefined && !$.isFunction(value)) {
 			options = $.extend({}, config.defaults, options);
 
 			if (typeof options.expires === 'number') {

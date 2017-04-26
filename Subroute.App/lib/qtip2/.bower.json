@@ -41,7 +41,7 @@
     "tag": "v2.2.1",
     "commit": "2f67997b5449bb4dea568e82966fb35dc11fb84e"
   },
-  "_source": "git://github.com/qTip2/bower.git",
+  "_source": "https://github.com/qTip2/bower.git",
   "_target": "2.2.1",
   "_originalSource": "qtip2"
 }

@@ -15,6 +15,10 @@ namespace Subroute.Api.Controllers
     {
         private readonly ICompilationService _compilationService;
 
+        /// <summary>
+        /// Constructs an instance of CompileController.
+        /// </summary>
+        /// <param name="compilationService">Compilation service to provided compiler functionality.</param>
         public CompileController(ICompilationService compilationService)
         {
             _compilationService = compilationService;

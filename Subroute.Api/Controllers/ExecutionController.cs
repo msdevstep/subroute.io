@@ -7,15 +7,28 @@ using Subroute.Core.Extensions;
 
 namespace Subroute.Api.Controllers
 {
+    /// <summary>
+    /// Queues user code execution in the container sandbox and waits for a response.
+    /// </summary>
     public class ExecutionController : ApiController
     {
         private readonly IExecutionService _executionService;
 
+        /// <summary>
+        /// Constructs an instance of ExecutionController.
+        /// </summary>
+        /// <param name="executionService">Execution service to provided execution related functionality.</param>
         public ExecutionController(IExecutionService executionService)
         {
             _executionService = executionService;
         }
 
+        /// <summary>
+        /// Queues specified route code to be executed in container sandbox. Will use the HTTP method type
+        /// (e.g. GET, POST, PUT, etc.) to determine which C# method to execute.
+        /// </summary>
+        /// <param name="route">Specific route to load and execute.</param>
+        /// <returns>The result of the user's code after execution in the container sandbox.</returns>
         [Route("v1/{route}"), AcceptVerbs("GET", "POST", "PUT", "PATCH", "MERGE", "DELETE", "OPTIONS", "HEAD"), AllowAnonymous]
         public async Task<IHttpActionResult> ExecuteRouteAsync(string route)
         {

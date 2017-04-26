@@ -35,7 +35,7 @@
             <button id="uservoice" title="Post an Idea"><span class="icon"><i class="fa fa-lightbulb-o fa-lg"></i></span>Post an Idea</button>
         </li>
     </ul>
-    <div id="dialog" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }">
+    <div id="dialog" class="scrollable" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }">
         <a href="#" class="close" data-bind="click: dialog.closeDialog"><i class="fa fa-close"></i></a>
         <div data-bind="compose: dialog.activeDialog"></div>
     </div>
