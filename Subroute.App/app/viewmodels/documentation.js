@@ -1,12 +1,32 @@
-﻿define(['knockout', 'remarkable', 'highlight'], function (ko, remarkable, hljs) {
+﻿define(['knockout', 'remarkable', 'highlight', 'jquery'], function (ko, remarkable, hljs, $) {
     return function () {
         var self = this;
 
+        self.anchor = '';
+
         self.markdown = ko.observable(); 
+
+        self.activate = function (anchor) {
+            self.anchor = anchor;
+        }
+
+        self.scrollToAnchor = function (anchor) {
+            if (!anchor)
+                return;
+
+            var element = $('#documentation').find('#' + anchor);
+
+            if (element.length === 0)
+                return;
+
+            $('html, body').animate({
+                scrollTop: element.offset().top - 70
+            }, 1000);
+        };
 
         self.compositionComplete = function () {
             var md = new remarkable('full', {
-                html: false,                // Enable HTML tags in source
+                html: true,                 // Enable HTML tags in source
                 xhtmlOut: false,            // Use '/' to close single tags (<br />)
                 breaks: false,              // Convert '\n' in paragraphs into <br>
                 langPrefix: 'language-',    // CSS language prefix for fenced blocks
@@ -37,11 +57,11 @@
                 }
             });
 
-            var destination = document.getElementById("documentation");
+            var destination = $('#documentation');
             var source = self.markdown();
             var html = md.render(source);
 
-            destination.innerHTML = html;
+            destination.html(html).promise().done(self.scrollToAnchor(self.anchor));
         };
     };
 });

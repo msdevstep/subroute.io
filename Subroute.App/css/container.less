@@ -56,6 +56,28 @@ body {
     padding: 0;
 }
 
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+
+.clearfix {
+    display: inline-table;
+}
+/* Hides from IE-mac \*/
+* html .clearfix {
+    height: 1%;
+}
+
+.clearfix {
+    display: block;
+}
+/* End hide from IE-mac */
+
 h2, h3, h4, h5, h6 {
     margin-top: 0;
 }
@@ -1382,8 +1404,8 @@ ul.sub-nav {
         code {
             font-size: 1em;
             font-weight: normal;
-            padding: 0;
-            background-color: inherit;
+            padding: 1px 3px;
+            background-color: #fff;
             border: none;
             .border-radius(0);
         }
@@ -1394,8 +1416,17 @@ ul.sub-nav {
             padding: 0.5em;
             color: #000;
             background: #fff;
-            border:1px solid #ccc;
+            border: 1px solid #ccc;
             .border-radius(5px);
+
+            code {
+                font-size: 1em;
+                font-weight: normal;
+                padding: 0;
+                background-color: inherit;
+                border: none;
+                .border-radius(0);
+            }
         }
 
         h1 {
@@ -1409,6 +1440,23 @@ ul.sub-nav {
 
         h3 {
             font-size: 1.2em;
+        }
+
+        dl {
+            dt {
+                font-weight: bold;
+
+                code {
+                    background-color: inherit;
+                    padding: 0;
+                    border: none;
+                    font-weight: bold;
+                }
+            }
+
+            dd {
+                margin: 0 0 10px 10px;
+            }
         }
     }
 }

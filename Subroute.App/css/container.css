@@ -7,6 +7,25 @@ body {
   margin: 0;
   padding: 0;
 }
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+.clearfix {
+  display: inline-table;
+}
+/* Hides from IE-mac \*/
+* html .clearfix {
+  height: 1%;
+}
+.clearfix {
+  display: block;
+}
+/* End hide from IE-mac */
 h2,
 h3,
 h4,
@@ -1257,8 +1276,8 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-content #documentation code {
   font-size: 1em;
   font-weight: normal;
-  padding: 0;
-  background-color: inherit;
+  padding: 1px 3px;
+  background-color: #fff;
   border: none;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -1281,6 +1300,19 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
+#doc-content #documentation pre code {
+  font-size: 1em;
+  font-weight: normal;
+  padding: 0;
+  background-color: inherit;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
 #doc-content #documentation h1 {
   margin-top: 0;
   font-size: 1.6em;
@@ -1290,6 +1322,18 @@ ul.sub-nav li button i.fa-flip-horizontal {
 }
 #doc-content #documentation h3 {
   font-size: 1.2em;
+}
+#doc-content #documentation dl dt {
+  font-weight: bold;
+}
+#doc-content #documentation dl dt code {
+  background-color: inherit;
+  padding: 0;
+  border: none;
+  font-weight: bold;
+}
+#doc-content #documentation dl dd {
+  margin: 0 0 10px 10px;
 }
 #doc-sidebar {
   float: right;

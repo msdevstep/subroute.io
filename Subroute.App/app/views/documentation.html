@@ -1,99 +1,356 @@
 ﻿<pre id="source" style="display:none;" data-bind="visible: false, source: markdown">
 ## Getting Started
-## What is Subroute.io?
+## <a id="What-Is-Subroute"></a>What is Subroute.io?
         
 Subroute.io is a hosting and execution environment for C# code built on the .NET framework. Subroute.io is ideal for building microservices,
 webhooks, slackbots, or anything that needs to be hosted on the open web. All code written with Subroute.io is compiled as an assembly and
 executed in a safe sandbox environment. Your code has full access to the entire .NET framework and has permission to make outgoing web requests.
         
-### Writing your First Route
+### <a id="Writing-Your-First-Route"></a>Writing your First Route
 ``` csharp
 using System;
 using System.Net;
-using Subroute.Common;
-using System.Net.Http;
-using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Subroute.Common;
 
 namespace Subroute.Container
 {
-    // &lt;summary&gt;
-    // Website Monitor
-    // Make the request with a "url" query parameter
-    // that contains the website to verify uptime.
-    // &lt;/summary&gt;
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    if (!request.QueryString.TryGetValue("name", out QueryStringValue name))
+		        return BadRequest();
+		    
+		    var greeting = $"Hello {name}!";
+		    
+			return String(HttpStatusCode.OK, greeting);
+		}
+	}
+}
+```
+**Figure 1. Hello World - [Try it Now](https://api.subroute.io/v1/example-hello-world?name=Your+Name)**
+
+In the example above we show you how to access a query string parameter. It's helpful when working with the query string to always ensure the
+value exists using the ```TryGetValue(string key, out QueryStringValue name)``` method. As you may have noticed, Subroute.io supports C# 6 and its
+ability to use inline `out` parameters.
+
+Another handy feature of C# 6 is string interpolation, which you can see in action when we are building the greeting result. Instead of doing
+a `string.Format("Hello {0}!", name)`, we are able to embed the `name` variable directly into the format string like `$"Hello {name}!"`.
+
+If you need granular control over the final response, you can create a `RouteResponse` object manually which will give you direct control over
+the response headers, body, status code, and status message. But an easier way is to use one of the base methods to build and serialize the
+response for you. Read more about returning [Common Responses](#).
+
+### <a id="Execution-Pipeline"></a>Execution Pipeline
+Content goes here
+
+### <a id="Supported-Wire-Formats"></a>Supported Wire Formats
+It's important to note that all data gets stored and sent over the wire as either a base64 string, or byte array. However, we have base methods
+that make working with your desired format easier. Support for wire formats is as follows.
+
++ *Json* - Supported
++ *Xml* - Supported
++ *Plain Text* - Supported
++ *Multipart Form-Data* - Supported
++ *Soap* - Supported (Manually)
++ *Protocol Buffers* - Supported (Manually)
++ *Stream* - Supported (Converted to Byte Array)
+
+## Working with Requests
+### <a id="Query-String"></a>Query String
+There are multiple ways to access to query string. Here are ways to access single value, multiple values, and parameter existance.
+
+``` csharp
+using System;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    // Single parameter /my-route?value=Foo
+		    var singleValue1 = (string) request.QueryString["value"];                         
+		    var singleValue2 = request.QueryString["value"].FirstValue;
+		    
+		    // Multiple parameters /my-route?value=Foo&value=Bar&value=Tomato
+		    var multiValue = request.QueryString["value"].Values;
+		    
+		    // Parameter existance /my-route?value=Foo
+		    if (!request.QueryString.TryGetValue("value", out QueryStringValue value))
+		        BadRequest();
+		    
+			return NoContent();
+		}
+	}
+}
+```
+**Figure 2. Query String Access - [Try it Now](https://api.subroute.io/v1/example-query-string)**
+
+One thing worth noting is that a value you get back from `request.QueryString["value"]` is of type `QueryStringValue` and not `string`.
+However, `QueryStringValue` can be implicitly cast as a `string` and will return the first value when cast.
+
+### <a id="Deserialization"></a>Deserialization
+#### JSON Deserialization
+Deserializing JSON data from the request body uses the Json.NET serializer. The easiest way to read request data as JSON is to use 
+the `ReadBodyAsJson&lt;TPayload&gt;()` method on the RouteRequest object. This will instantiate a new instance of the specified 
+`TPayload` type argument.
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; PostAsync(RouteRequest request)
+		{
+		    var payload = request.ReadBodyAsJson&lt;Product&gt;();
+		    
+			return StatusCode(HttpStatusCode.Created);
+		}
+	}
+	
+	public class Product
+	{
+	    public string Name { get; set; }
+	    public string Description { get; set; }
+	    public DateTime AvailableOn { get; set; }
+	    public int Quantity { get; set; }
+	}
+}
+```                                              
+**Figure 3. JSON Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-json)**
+
+#### XML Deserialization
+Deserializing XML from the request body follows the same pattern as JSON. You use the `ReadBodyAsXml&lt;TPayload&gt;()` method on the 
+RouteRequest object. This will instantiate a new instance of the specified `TPayload` type argument. Internally the Subroute.io framework
+uses the `DataContractSerializer` when working with XML therefore the documentation for the [DataContractSerializer](https://msdn.microsoft.com/en-us/library/system.runtime.serialization.datacontractserializer(v=vs.110).aspx) applies here as well.
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
     public class RouteMethods : BaseController
     {
-	    public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
-	    {
-		    // Ensure the request has a "url" parameter, otherwise return a 400 bad request.
-		    QueryStringValue url;
-		    if (!request.QueryString.TryGetValue("url", out url))
-		        return Json(HttpStatusCode.BadRequest, new { success = false, message = "You must specify a 'url' query string parameter."});
+        public async Task<RouteResponse> PostAsync(RouteRequest request)
+        {
+            var payload = request.ReadBodyAsXml<Product>();
+            
+            return Xml(HttpStatusCode.Created, payload);
+        }
+    }
+    
+    public class Product
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public DateTime AvailableOn { get; set; }
+        public int Quantity { get; set; }
+    }
+}
+```                                                   
+**Figure 4. XML Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-xml)**
+
+### <a id="Form-Data"></a>Form Data
+Subroute.io makes accessing multipart/form-data as easy as working with the query string. When form data is expected on the request, you can 
+use the `ReadBodyAsPostData()` method on the `RouteRequest` object to access a `Dictionary&lt;string, QueryStringValue&gt;` containing the 
+form data from the request body. Here is an example of different ways to access form data parameters.
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+    public class RouteMethods : BaseController
+    {
+        public async Task<RouteResponse> PostAsync(RouteRequest request)
+        {
+            var formData = request.ReadBodyAsPostData();
+            
+		    // Single parameter 
+		    // POST /my-route
+		    // value=Foo
+		    var singleValue1 = (string) formData["value"];
+		    var singleValue2 = formData["value"].FirstValue;
 		    
-		    try
-		    {
-		        // We'll use the HttpClient class to make the outgoing GET request to check
-		        // whether the website is up. Subroute now supports await to make the request.
-    		    var client = new HttpClient();
-    		    var response = await client.GetAsync(url);
+		    // Multiple parameters 
+		    // POST /my-route
+		    // value=Foo&value=Bar&value=Tomato
+		    var multiValue = formData["value"].Values;
 		    
-		        // Verify that we got a successful response back, then return a 200 OK.
-    		    if (response.IsSuccessStatusCode)
-    		        return Json(HttpStatusCode.OK, new { success = true, message = "Website is available." });
-    		    
-    		    // Otherwise we got something other than a success response. So include
-    		    // the status code in the response.
-		        return Json(HttpStatusCode.OK, new { success = false, message = $"Status code {(int)response.StatusCode} received from server." });
-		    }
-		    catch (AggregateException ex)
-		    {
-		        // Sometimes a URL is malformed or some other network exception occurs.
-		        // so we capture the exception and return the error message.
-		        // AggregateExceptions occur when something fails with an async call.
-		        var message = ex?.InnerException?.InnerException.Message;
-		        return Json(HttpStatusCode.InternalServerError, new { success = false, message = message });
-		    }
-		    catch (Exception ex)
-		    {
-		        // Something else went wrong with the outgoing request. Capture that
-		        // and return the error message.
-		        var message = ex.Message;
-		        return Json(HttpStatusCode.InternalServerError, new { success = false, message = message });
-		    }
-	    }
+		    // Parameter existance 
+		    // POST /my-route
+		    // value=Foo
+		    if (!formData.TryGetValue("value", out QueryStringValue value))
+		        BadRequest();
+            
+            return StatusCode(HttpStatusCode.OK);
+        }
     }
 }
 ```
+**Figure 4. Reading Multipart/Form-Data - [Try it Now](https://api.subroute.io/v1/example-request-form-data)**
 
-### Execution Pipeline
-Content goes here
+You'll notice that the pattern for accessing form data parameters is almost identical to the way you access query string parameters. In 
+fact internally Subroute.io uses the same class for working with both. You can access this functionality directly by calling 
+`QueryStringParser.ParseQueryString(string query)`. This will return a `Dictionary&lt;string, QueryStringValue&gt;`, where `QueryStringValue` 
+can represent one or more string values for the same parameter name.
 
-### Supported Wire Formats
-Content goes here
-
-## Working with Requests
-### Query String
-Content goes here
-
-### Serialization
-Content goes here
-
-### Form Data
-Content goes here
-
-### Request Headers
+### <a id="Request-Headers"></a>Request Headers
 Content goes here
 
 ## Creating Responses
-### Response Headers
+### <a id="Response-Headers"></a>Response Headers
 Content goes here
 
-### Status Code &amp; Message
+### <a id="Status-Code-Message"></a>Status Code &amp; Message
 Content goes here
 
-### Serialization
+### <a id="Serialization"></a>Serialization                         
+#### JSON Serialization
+JSON serialization in Subroute.io is handled by [Json.NET](http://www.newtonsoft.com/json). The easiest way to return a json response 
+is to use the base method `Json(HttpStatusMethod, object)`. Pass in a class instance containing the data you want to serialize and the 
+status code to return. The method will create a `RouteResponse` object with the response body containing the serialized JSON representation 
+of the provided class. The method will also set the `Content-Type` header as "application/json".
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    var payload = new 
+		    {
+		        FirstName = "John",
+		        LastName = "Smith",
+		        DOB = new DateTime(1986, 3, 12),
+		        AddressHistory = new []
+		        {
+		            new
+		            {
+		                Address = "123 Lord Baranof",
+		                City = "Soldotna",
+		                State = "Alaska",
+		                PostalCode = "99669",
+		                Year = 2004
+		            },
+		            new
+		            {
+		                Address = "640 Hulman St",
+		                City = "Terre Haute",
+		                State = "Indiana",
+		                PostalCode = "47803",
+		                Year = 1997
+		            }
+		        }
+		    };
+		    
+			return Json(HttpStatusCode.OK, payload);
+		}
+	}
+}
+```
+**Figure 4. Json Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-json)**
+
+#### XML Serialization
+Xml serialization is handled almost identically to Json serialization, except it's provided by the `DataContractSerializer`. To return 
+Xml, you can call the `Xml(HttpStatusCode, object)` base method. You pass the status code you want to return, and a class instance to be 
+serialized. The method will create a `RouteResponse` object with the response body containing the serialized XML representation of the 
+provided class. The method will also set the `Content-Type` header as "application/xml". 
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    var payload = new Person
+		    {
+		        FirstName = "John",
+		        LastName = "Smith",
+		        DOB = new DateTime(1986, 3, 12),
+		        AddressHistory = new []
+		        {
+		            new Location
+		            {
+		                Address = "123 Lord Baranof",
+		                City = "Soldotna",
+		                State = "Alaska",
+		                PostalCode = "99669",
+		                Year = 2004
+		            },
+		            new Location
+		            {
+		                Address = "640 Hulman St",
+		                City = "Terre Haute",
+		                State = "Indiana",
+		                PostalCode = "47803",
+		                Year = 1997
+		            }
+		        }
+		    };
+		    
+			return Xml(HttpStatusCode.OK, payload);
+		}
+	}
+	
+	public class Person
+	{
+	    public string FirstName { get; set; }
+	    public string LastName { get; set; }
+	    public DateTime DOB { get; set; }
+	    public Location[] AddressHistory { get; set; }
+	}
+	
+	public class Location
+	{
+	    public string Address { get; set; }
+	    public string City { get; set; }
+	    public string State { get; set; }
+	    public string PostalCode { get; set; }
+	    public int Year { get; set; }
+	}
+}
+```                         
+**Figure 5. Xml Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-xml)**
+
+You may have noticed that the JSON serializer supports using anonymous types as the XML serializer requires the use of concrete types. 
+But the base methods hide the complexity of creating a `RouteResponse`, setting the headers, and serializing the response body.
+
+### <a id="Common-Responses"></a>Common Responses
+String(HttpStatusCode, value)
+    ~ Returns a content-type of text/plain, where the response body contains the exact string passed.  
+    
+Stream(HttpStatusCode, Stream, contentType, [contentDispostion])
+    ~ Uses the content-type provided as well as any provided content disposition, with a response body containing the provided Stream.
+                             
+### <a id="Custom-Formatters"></a>Common Responses
 Content goes here
 </pre>
 
@@ -108,25 +365,27 @@ Content goes here
 
         <h4>Getting Started</h4>
         <ul>
-            <li><a href="#">What is Subroute.io?</a></li>
-            <li><a href="#">Writing your First Route</a></li>
-            <li><a href="#">Execution Pipeline</a></li>
-            <li><a href="#">Supported Wire Formats</a></li>
+            <li><a href="#documentation/What-Is-Subroute">What is Subroute.io?</a></li>
+            <li><a href="#documentation/Writing-Your-First-Route">Writing your First Route</a></li>
+            <li><a href="#documentation/Execution-Pipeline">Execution Pipeline</a></li>
+            <li><a href="#documentation/Supported-Wire-Formats">Supported Wire Formats</a></li>
         </ul>
 
         <h4>Working with Requests</h4>
         <ul>
-            <li><a href="#">Query String</a></li>
-            <li><a href="#">Serialization</a></li>
-            <li><a href="#">Form Data</a></li>
-            <li><a href="#">Request Headers</a></li>
+            <li><a href="#documentation/Query-String">Query String</a></li>
+            <li><a href="#documentation/Deserialization">Deserialization</a></li>
+            <li><a href="#documentation/Form-Data">Form Data</a></li>
+            <li><a href="#documentation/Request-Headers">Request Headers</a></li>
         </ul>
 
         <h4>Creating Responses</h4>
         <ul>
-            <li><a href="#">Response Headers</a></li>
-            <li><a href="#">Status Code &amp; Message</a></li>
-            <li><a href="#">Serialization</a></li>
+            <li><a href="#documentation/Response-Headers">Response Headers</a></li>
+            <li><a href="#documentation/Status-Code-Message">Status Code &amp; Message</a></li>
+            <li><a href="#documentation/Serialization">Serialization</a></li>
+            <li><a href="#documentation/Common-Responses">Common Responses</a></li>
+            <li><a href="#documentation/Custom-Formatters">Custom Formatters</a></li>
         </ul>
     </div>
 </div>

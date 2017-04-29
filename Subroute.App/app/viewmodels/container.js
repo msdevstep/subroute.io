@@ -3,7 +3,7 @@
     .makeRelative({ moduleId: 'viewmodels' })
     .map([
         { route: ['', 'routes/:action(/:uri)'], moduleId: 'routes', title: 'Routes', nav: true },
-        { route: 'documentation', moduleId: 'documentation', title: 'Documentation', nav: true },
+        { route: 'documentation(/:anchor)', moduleId: 'documentation', title: 'Documentation', nav: true },
         { route: 'gallery', moduleId: 'gallery', title: 'Gallery', nav: true }
     ]).buildNavigationModel();
 

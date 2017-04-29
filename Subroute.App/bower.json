@@ -7,8 +7,6 @@
     "jquery.cookie": "1.4.1",
     "jquery.base64.js": "0.0.2",
     "durandal": "2.1.0",
-    "ace-build": "1.2.3",
-    "knockout.js": "3.1.0",
     "knockout.validation": "1.0.2",
     "knockout.mapping": "2.0.1",
     "qtip2": "2.2.1",

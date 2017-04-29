@@ -194,7 +194,7 @@
                 init: function (element, valueAccessor) {
                     var observable = valueAccessor();
                     var $element = $(element);
-                    observable($element.text());
+                    observable($element.html());
                 }
             };
 

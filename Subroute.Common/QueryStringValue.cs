@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Net;
 
 namespace Subroute.Common
 {
@@ -14,7 +15,7 @@ namespace Subroute.Common
         public QueryStringValue(string[] values)
         {
             Values = values ?? new string[0];
-            FirstValue = Values.FirstOrDefault();
+            FirstValue = WebUtility.UrlDecode(Values.FirstOrDefault());
         }
 
         /// <summary>
@@ -34,6 +35,15 @@ namespace Subroute.Common
         public static implicit operator string(QueryStringValue value)
         {
             return value.FirstValue;
+        }
+
+        /// <summary>
+        /// Returns the string containing QueryStringValue.FirstValue.
+        /// </summary>
+        /// <returns>String containing QueryStringValue.FirstValue.</returns>
+        public override string ToString()
+        {
+            return FirstValue;
         }
     }
 }

@@ -240,7 +240,7 @@ namespace Subroute.Container
 
                         // These are all other exceptions that occur during the execution of
                         // a route. These exceptions are raised by the users code.
-                        throw new RouteException(asyncException.Message, asyncException);
+                        throw new RouteException(asyncException.InnerException?.Message ?? asyncException.Message, asyncException.InnerException);
                     }
                     catch (Exception routeException)
                     {

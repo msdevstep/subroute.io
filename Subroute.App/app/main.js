@@ -7,7 +7,7 @@
         'jquery': '//code.jquery.com/jquery-2.2.3.min',
         'jquery-ui': '//code.jquery.com/ui/1.11.4/jquery-ui.min',
         'base64': '../lib/jquery.base64.js/jquery.base64',
-        'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min',
+        'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min',
         'validation': '../lib/knockout.validation/Dist/knockout.validation.min',
         'mapping': '../lib/knockout.mapping/knockout.mapping/build/knockout.mapping',
         'cookie': '../lib/jquery.cookie/jquery.cookie',
