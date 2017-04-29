@@ -6,15 +6,23 @@
 
         self.markdown = ko.observable(); 
 
-        self.activate = function (anchor) {
-            self.anchor = anchor;
-        }
+        self.canReuseForRoute = function () {
+            return true;
+        };
+
+        self.scrollToTop = function () {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 1000);
+
+            history.replaceState(undefined, undefined, "#documentation");
+        };
 
         self.scrollToAnchor = function (anchor) {
             if (!anchor)
                 return;
 
-            var element = $('#documentation').find('#' + anchor);
+            var element = $('#documentation-content').find('#' + anchor);
 
             if (element.length === 0)
                 return;
@@ -22,7 +30,17 @@
             $('html, body').animate({
                 scrollTop: element.offset().top - 70
             }, 1000);
+
+            history.replaceState(undefined, undefined, "#documentation/" + anchor);
         };
+
+        self.enableScrollLinks = function () {
+            $('.scroll-top').click(self.scrollToTop);
+        };
+
+        self.activate = function (anchor) {
+            self.anchor = anchor;
+        }
 
         self.compositionComplete = function () {
             var md = new remarkable('full', {
@@ -57,11 +75,15 @@
                 }
             });
 
-            var destination = $('#documentation');
-            var source = self.markdown();
-            var html = md.render(source);
+            var source = $('#source');
+            var destination = $('#documentation-content');
+            var unformatted = self.markdown();
+            var html = md.render(unformatted);
 
-            destination.html(html).promise().done(self.scrollToAnchor(self.anchor));
+            source.remove();
+            destination.html(html)
+            self.scrollToAnchor(self.anchor);
+            self.enableScrollLinks();
         };
     };
 });

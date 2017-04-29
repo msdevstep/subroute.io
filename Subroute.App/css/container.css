@@ -1265,15 +1265,23 @@ ul.sub-nav li button i.fa-flip-horizontal {
   padding-top: 60px;
   float: left;
 }
-#doc-content #documentation {
+#doc-content #documentation-content {
   padding: 20px;
   border-right: 1px solid #ccc;
 }
-#doc-content #documentation .ace_editor {
+#doc-content #documentation-content .ace_editor {
   border: 1px solid #aaa;
   margin-bottom: 20px;
 }
-#doc-content #documentation code {
+#doc-content #documentation-content span.scroll-top {
+  color: #d13438;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#doc-content #documentation-content span.scroll-top:hover {
+  color: #ef5256;
+}
+#doc-content #documentation-content code {
   font-size: 1em;
   font-weight: normal;
   padding: 1px 3px;
@@ -1286,7 +1294,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-#doc-content #documentation pre {
+#doc-content #documentation-content pre {
   display: block;
   overflow-x: auto;
   padding: 0.5em;
@@ -1300,7 +1308,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-#doc-content #documentation pre code {
+#doc-content #documentation-content pre code {
   font-size: 1em;
   font-weight: normal;
   padding: 0;
@@ -1313,26 +1321,26 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-#doc-content #documentation h1 {
+#doc-content #documentation-content h1 {
   margin-top: 0;
   font-size: 1.6em;
 }
-#doc-content #documentation h2 {
+#doc-content #documentation-content h2 {
   font-size: 1.4em;
 }
-#doc-content #documentation h3 {
+#doc-content #documentation-content h3 {
   font-size: 1.2em;
 }
-#doc-content #documentation dl dt {
+#doc-content #documentation-content dl dt {
   font-weight: bold;
 }
-#doc-content #documentation dl dt code {
+#doc-content #documentation-content dl dt code {
   background-color: inherit;
   padding: 0;
   border: none;
   font-weight: bold;
 }
-#doc-content #documentation dl dd {
+#doc-content #documentation-content dl dd {
   margin: 0 0 10px 10px;
 }
 #doc-sidebar {
@@ -1343,13 +1351,6 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-sidebar #documentation-sidebar {
   padding: 20px;
   color: #222;
-}
-#doc-sidebar #documentation-sidebar a {
-  color: #d13438;
-  text-decoration: none;
-}
-#doc-sidebar #documentation-sidebar a:hover {
-  color: #ef5256;
 }
 #doc-sidebar #documentation-sidebar h2 {
   font-size: 1.2em;
@@ -1365,6 +1366,14 @@ ul.sub-nav li button i.fa-flip-horizontal {
 }
 #doc-sidebar #documentation-sidebar ul li {
   padding-bottom: 0.2em;
+}
+#doc-sidebar #documentation-sidebar ul li span {
+  color: #d13438;
+  text-decoration: none;
+  cursor: pointer;
+}
+#doc-sidebar #documentation-sidebar ul li span:hover {
+  color: #ef5256;
 }
 /* Include Page LESS Files */
 [role="button"] {

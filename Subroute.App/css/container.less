@@ -1392,13 +1392,23 @@ ul.sub-nav {
     padding-top: @page-header-height;
     float: left;
 
-    #documentation {
+    #documentation-content {
         padding: 20px;
         border-right: 1px solid #ccc;
 
         .ace_editor {
             border: 1px solid #aaa;
             margin-bottom: 20px;
+        }
+
+        span.scroll-top {
+            color: @accent-color;
+            text-decoration: underline;
+            cursor: pointer;
+
+            &:hover {
+                color: @accent-color + 30;
+            }
         }
 
         code {
@@ -1470,15 +1480,6 @@ ul.sub-nav {
         padding: 20px;
         color: #222;
 
-        a {
-            color: @accent-color;
-            text-decoration: none;
-
-            &:hover {
-                color: @accent-color + 30;
-            }
-        }
-
         h2 {
             font-size: 1.2em;
         }
@@ -1489,12 +1490,22 @@ ul.sub-nav {
         }
 
         ul {
-            font-size:0.95em;
+            font-size: 0.95em;
             padding: 0;
             list-style: none;
 
             li {
                 padding-bottom: 0.2em;
+
+                span {
+                    color: @accent-color;
+                    text-decoration: none;
+                    cursor: pointer;
+
+                    &:hover {
+                        color: @accent-color + 30;
+                    }
+                }
             }
         }
     }

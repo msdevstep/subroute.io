@@ -4,7 +4,9 @@
         
 Subroute.io is a hosting and execution environment for C# code built on the .NET framework. Subroute.io is ideal for building microservices,
 webhooks, slackbots, or anything that needs to be hosted on the open web. All code written with Subroute.io is compiled as an assembly and
-executed in a safe sandbox environment. Your code has full access to the entire .NET framework and has permission to make outgoing web requests.
+executed in a safe sandbox environment. Your code has full access to the entire .NET framework and has permission to make outgoing web requests.    
+
+<span class="scroll-top">Back to Top</span>
         
 ### <a id="Writing-Your-First-Route"></a>Writing your First Route
 ``` csharp
@@ -40,10 +42,14 @@ a `string.Format("Hello {0}!", name)`, we are able to embed the `name` variable 
 
 If you need granular control over the final response, you can create a `RouteResponse` object manually which will give you direct control over
 the response headers, body, status code, and status message. But an easier way is to use one of the base methods to build and serialize the
-response for you. Read more about returning [Common Responses](#).
+response for you. Read more about returning [Common Responses](#).    
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Execution-Pipeline"></a>Execution Pipeline
-Content goes here
+Content goes here    
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Supported-Wire-Formats"></a>Supported Wire Formats
 It's important to note that all data gets stored and sent over the wire as either a base64 string, or byte array. However, we have base methods
@@ -55,7 +61,9 @@ that make working with your desired format easier. Support for wire formats is a
 + *Multipart Form-Data* - Supported
 + *Soap* - Supported (Manually)
 + *Protocol Buffers* - Supported (Manually)
-+ *Stream* - Supported (Converted to Byte Array)
++ *Stream* - Supported (Converted to Byte Array)    
+
+<span class="scroll-top">Back to Top</span>
 
 ## Working with Requests
 ### <a id="Query-String"></a>Query String
@@ -91,7 +99,9 @@ namespace Subroute.Container
 **Figure 2. Query String Access - [Try it Now](https://api.subroute.io/v1/example-query-string)**
 
 One thing worth noting is that a value you get back from `request.QueryString["value"]` is of type `QueryStringValue` and not `string`.
-However, `QueryStringValue` can be implicitly cast as a `string` and will return the first value when cast.
+However, `QueryStringValue` can be implicitly cast as a `string` and will return the first value when cast.    
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Deserialization"></a>Deserialization
 #### JSON Deserialization
@@ -160,7 +170,9 @@ namespace Subroute.Container
     }
 }
 ```                                                   
-**Figure 4. XML Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-xml)**
+**Figure 4. XML Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-xml)**                                                   
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Form-Data"></a>Form Data
 Subroute.io makes accessing multipart/form-data as easy as working with the query string. When form data is expected on the request, you can 
@@ -208,17 +220,25 @@ namespace Subroute.Container
 You'll notice that the pattern for accessing form data parameters is almost identical to the way you access query string parameters. In 
 fact internally Subroute.io uses the same class for working with both. You can access this functionality directly by calling 
 `QueryStringParser.ParseQueryString(string query)`. This will return a `Dictionary&lt;string, QueryStringValue&gt;`, where `QueryStringValue` 
-can represent one or more string values for the same parameter name.
+can represent one or more string values for the same parameter name.                             
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Request-Headers"></a>Request Headers
-Content goes here
+Content goes here                             
+
+<span class="scroll-top">Back to Top</span>
 
 ## Creating Responses
 ### <a id="Response-Headers"></a>Response Headers
-Content goes here
+Content goes here                             
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Status-Code-Message"></a>Status Code &amp; Message
-Content goes here
+Content goes here                             
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Serialization"></a>Serialization                         
 #### JSON Serialization
@@ -341,21 +361,27 @@ namespace Subroute.Container
 **Figure 5. Xml Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-xml)**
 
 You may have noticed that the JSON serializer supports using anonymous types as the XML serializer requires the use of concrete types. 
-But the base methods hide the complexity of creating a `RouteResponse`, setting the headers, and serializing the response body.
+But the base methods hide the complexity of creating a `RouteResponse`, setting the headers, and serializing the response body.                             
+
+<span class="scroll-top">Back to Top</span>
 
 ### <a id="Common-Responses"></a>Common Responses
 String(HttpStatusCode, value)
     ~ Returns a content-type of text/plain, where the response body contains the exact string passed.  
     
 Stream(HttpStatusCode, Stream, contentType, [contentDispostion])
-    ~ Uses the content-type provided as well as any provided content disposition, with a response body containing the provided Stream.
+    ~ Uses the content-type provided as well as any provided content disposition, with a response body containing the provided Stream.                             
+
+<span class="scroll-top">Back to Top</span>
                              
-### <a id="Custom-Formatters"></a>Common Responses
+### <a id="Custom-Formatters"></a>Custom Formatters
 Content goes here
+
+<span class="scroll-top">Back to Top</span>
 </pre>
 
 <div id="doc-content">
-    <div id="documentation">
+    <div id="documentation-content">
         
     </div>
 </div>
@@ -365,27 +391,27 @@ Content goes here
 
         <h4>Getting Started</h4>
         <ul>
-            <li><a href="#documentation/What-Is-Subroute">What is Subroute.io?</a></li>
-            <li><a href="#documentation/Writing-Your-First-Route">Writing your First Route</a></li>
-            <li><a href="#documentation/Execution-Pipeline">Execution Pipeline</a></li>
-            <li><a href="#documentation/Supported-Wire-Formats">Supported Wire Formats</a></li>
+            <li><span data-bind="click: scrollToAnchor('What-Is-Subroute')">What is Subroute.io?</span></li>
+            <li><span data-bind="click: scrollToAnchor('Writing-Your-First-Route')">Writing your First Route</span></li>
+            <li><span data-bind="click: scrollToAnchor('Execution-Pipeline')">Execution Pipeline</span></li>
+            <li><span data-bind="click: scrollToAnchor('Supported-Wire-Formats')">Supported Wire Formats</span></li>
         </ul>
 
         <h4>Working with Requests</h4>
         <ul>
-            <li><a href="#documentation/Query-String">Query String</a></li>
-            <li><a href="#documentation/Deserialization">Deserialization</a></li>
-            <li><a href="#documentation/Form-Data">Form Data</a></li>
-            <li><a href="#documentation/Request-Headers">Request Headers</a></li>
+            <li><span data-bind="click: scrollToAnchor('Query-String')">Query String</span></li>
+            <li><span data-bind="click: scrollToAnchor('Deserialization')">Deserialization</span></li>
+            <li><span data-bind="click: scrollToAnchor('Form-Data')">Form Data</span></li>
+            <li><span data-bind="click: scrollToAnchor('Request-Headers')">Request Headers</span></li>
         </ul>
 
         <h4>Creating Responses</h4>
         <ul>
-            <li><a href="#documentation/Response-Headers">Response Headers</a></li>
-            <li><a href="#documentation/Status-Code-Message">Status Code &amp; Message</a></li>
-            <li><a href="#documentation/Serialization">Serialization</a></li>
-            <li><a href="#documentation/Common-Responses">Common Responses</a></li>
-            <li><a href="#documentation/Custom-Formatters">Custom Formatters</a></li>
+            <li><span data-bind="click: scrollToAnchor('Response-Headers')">Response Headers</span></li>
+            <li><span data-bind="click: scrollToAnchor('Status-Code-Message')">Status Code &amp; Message</span></li>
+            <li><span data-bind="click: scrollToAnchor('Serialization')">Serialization</span></li>
+            <li><span data-bind="click: scrollToAnchor('Common-Responses')">Common Responses</span></li>
+            <li><span data-bind="click: scrollToAnchor('Custom-Formatters')">Custom Formatters</span></li>
         </ul>
     </div>
 </div>
