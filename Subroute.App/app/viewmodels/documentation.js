@@ -1,4 +1,4 @@
-﻿define(['knockout', 'remarkable', 'highlight', 'jquery'], function (ko, remarkable, hljs, $) {
+﻿define(['knockout', 'remarkable', 'highlight', 'jquery', 'durandal/app'], function (ko, remarkable, hljs, $, app) {
     return function () {
         var self = this;
 
@@ -36,11 +36,27 @@
 
         self.enableScrollLinks = function () {
             $('.scroll-top').click(self.scrollToTop);
+
+            $('.scroll-link').click(function () {
+                var element = $(this);
+                var anchor = element.attr('data-anchor');
+
+                self.scrollToAnchor(anchor);
+            })
         };
 
         self.activate = function (anchor) {
             self.anchor = anchor;
+
+            // Clear header URI;
+            app.trigger('uri:changed', '');
         }
+
+        self.decodeHtml = function decodeHtml(html) {
+            var txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        };
 
         self.compositionComplete = function () {
             var md = new remarkable('full', {
@@ -79,9 +95,10 @@
             var destination = $('#documentation-content');
             var unformatted = self.markdown();
             var html = md.render(unformatted);
+            var decoded = self.decodeHtml(html);
 
             source.remove();
-            destination.html(html)
+            destination.html(decoded)
             self.scrollToAnchor(self.anchor);
             self.enableScrollLinks();
         };

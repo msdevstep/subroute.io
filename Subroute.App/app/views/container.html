@@ -23,10 +23,10 @@
             <a href="#routes/suggest" title="Suggest Example Route" data-bind="click: showNextSuggestion"><span class="icon"><i class="fa fa-random fa-lg"></i></span>Suggest Example Route</a>
         </li>
         <li>
-            <button title="My Routes" data-bind="click: showRoutes, loading: { trigger: routesLoading, idle: 'fa-th-list' }"><span class="icon"><i class="fa fa-th-list"></i></span>My Routes</button>
+            <button title="My Routes" data-bind="click: showRoutes, loading: { trigger: routesLoading, idle: 'fa-th-list' }"><span class="icon"><i class="fa fa-th-list fa-lg"></i></span>My Routes</button>
         </li>
         <li data-bind="visible: config.enableDocumentation">
-            <a href="#documentation" title="Documentation"><span class="icon"><i class="fa fa-question-circle fa-lg"></i></span>Documentation</a>
+            <a href="#documentation" title="Documentation"><span class="icon"><i class="fa fa-map-signs fa-lg"></i></span>Documentation</a>
         </li>
         <li data-bind="visible: config.enableGallery">
             <a href="#gallery" title="Gallery"><span class="icon"><i class="fa fa-map-o"></i></span>Gallery</a>
@@ -35,7 +35,7 @@
             <button id="uservoice" title="Post an Idea"><span class="icon"><i class="fa fa-lightbulb-o fa-lg"></i></span>Post an Idea</button>
         </li>
     </ul>
-    <div id="dialog" class="scrollable" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }">
+    <div id="dialog" class="scrollable" style="display: none;" data-bind="slideVisible: dialog.visible, style: { width: dialog.width }, css: { 'error-list-visible': errorListVisible }">
         <a href="#" class="close" data-bind="click: dialog.closeDialog"><i class="fa fa-close"></i></a>
         <div data-bind="compose: dialog.activeDialog"></div>
     </div>

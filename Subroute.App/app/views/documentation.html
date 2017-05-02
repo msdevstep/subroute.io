@@ -31,7 +31,7 @@ namespace Subroute.Container
 	}
 }
 ```
-**Figure 1. Hello World - [Try it Now](https://api.subroute.io/v1/example-hello-world?name=Your+Name)**
+**Figure 13. Hello World - [Try it Now](https://api.subroute.io/v1/example-hello-world?name=Your+Name)**
 
 In the example above we show you how to access a query string parameter. It's helpful when working with the query string to always ensure the
 value exists using the ```TryGetValue(string key, out QueryStringValue name)``` method. As you may have noticed, Subroute.io supports C# 6 and its
@@ -43,11 +43,6 @@ a `string.Format("Hello {0}!", name)`, we are able to embed the `name` variable 
 If you need granular control over the final response, you can create a `RouteResponse` object manually which will give you direct control over
 the response headers, body, status code, and status message. But an easier way is to use one of the base methods to build and serialize the
 response for you. Read more about returning [Common Responses](#).    
-
-<span class="scroll-top">Back to Top</span>
-
-### <a id="Execution-Pipeline"></a>Execution Pipeline
-Content goes here    
 
 <span class="scroll-top">Back to Top</span>
 
@@ -96,7 +91,7 @@ namespace Subroute.Container
 	}
 }
 ```
-**Figure 2. Query String Access - [Try it Now](https://api.subroute.io/v1/example-query-string)**
+**Figure 14. Query String Access - [Try it Now](https://api.subroute.io/v1/example-query-string)**
 
 One thing worth noting is that a value you get back from `request.QueryString["value"]` is of type `QueryStringValue` and not `string`.
 However, `QueryStringValue` can be implicitly cast as a `string` and will return the first value when cast.    
@@ -136,7 +131,7 @@ namespace Subroute.Container
 	}
 }
 ```                                              
-**Figure 3. JSON Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-json)**
+**Figure 15. JSON Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-json)**
 
 #### XML Deserialization
 Deserializing XML from the request body follows the same pattern as JSON. You use the `ReadBodyAsXml&lt;TPayload&gt;()` method on the 
@@ -153,7 +148,7 @@ namespace Subroute.Container
 {
     public class RouteMethods : BaseController
     {
-        public async Task<RouteResponse> PostAsync(RouteRequest request)
+        public async Task&lt;RouteResponse&gt; PostAsync(RouteRequest request)
         {
             var payload = request.ReadBodyAsXml<Product>();
             
@@ -170,7 +165,7 @@ namespace Subroute.Container
     }
 }
 ```                                                   
-**Figure 4. XML Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-xml)**                                                   
+**Figure 16. XML Request Deserialization - [Try it Now](https://api.subroute.io/v1/example-request-serialization-xml)**                                                   
 
 <span class="scroll-top">Back to Top</span>
 
@@ -189,7 +184,7 @@ namespace Subroute.Container
 {
     public class RouteMethods : BaseController
     {
-        public async Task<RouteResponse> PostAsync(RouteRequest request)
+        public async Task&lt;RouteResponse&gt; PostAsync(RouteRequest request)
         {
             var formData = request.ReadBodyAsPostData();
             
@@ -215,7 +210,7 @@ namespace Subroute.Container
     }
 }
 ```
-**Figure 4. Reading Multipart/Form-Data - [Try it Now](https://api.subroute.io/v1/example-request-form-data)**
+**Figure 17. Reading Multipart/Form-Data - [Try it Now](https://api.subroute.io/v1/example-request-form-data)**
 
 You'll notice that the pattern for accessing form data parameters is almost identical to the way you access query string parameters. In 
 fact internally Subroute.io uses the same class for working with both. You can access this functionality directly by calling 
@@ -225,18 +220,179 @@ can represent one or more string values for the same parameter name.
 <span class="scroll-top">Back to Top</span>
 
 ### <a id="Request-Headers"></a>Request Headers
-Content goes here                             
+Working with request headers again follows the same pattern as the query string and form data. `request.Headers` returns a 
+`Dictionary&lt;string, string&gt;` and follows the rules of working with any dictionary. Here is an example of how to access header data.
 
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&lt; GetAsync(RouteRequest request)
+		{
+		    // Header Accept: application/json
+		    var accept = request.Headers["Accept"];
+		    
+		    // Header Authorization: Bearer HX2JBYJTTYT27MD767KPJGRPJ
+		    if (!request.Headers.TryGetValue("Authorization", out string authorization))
+		        return StatusCode(HttpStatusCode.Forbidden);
+		    
+			return NoContent();
+		}
+	}
+}
+```                         
+**Figure 18. Request Headers - [Try it Now](https://api.subroute.io/v1/example-request-headers)**
+
+Currently Subroute.io does not offer built-in authentication, as we feel this is an exercise best left for you, the Subroute.io developer.
+There are many ways to implement authentication and authorization. Subroute.io gives you the flexibility to implement any kind you need.
+
+<span class="scroll-top">Back to Top</span>
+
+### <a id="Custom-Request-Formatter"></a>Custom Request Formatter
+Request formatters are one easy way to transform request data into something useful and easy to program against. There are formatters already 
+registered for most common data types (such as XML, JSON, and Post Data). Once you register your custom request formatter, the way you invoke it 
+is via the `request.ReadBodyWithFormatter&lt;TPayload&gt;(string formatterName)`. To invoke your formatter, you pass the name of your formatter and the 
+Subroute.io framework will locate your custom formatter and call its `ReadRequestBody(Type bodyType, byte[] body)` method passing the request 
+data and then casting its result as the request `TPayload` type. Here is an example of how to create, register, and use a custom request formatter.
+
+``` csharp
+using System;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Subroute.Common;
+using Subroute.Common.RequestFormatters;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+	    public RouteMethods()
+	    {
+	        // Register new request formatter with global configuration.
+	        GlobalConfiguration.RequestFormatters.Add(new CSVRequestFormatter());
+	    }
+	    
+		public async Task<RouteResponse> PostAsync(RouteRequest request)
+		{
+		    // Use the request formatter to parse request body into string array.
+		    var csvData = request.ReadBodyWithFormatter<string[]>("csv");
+		    
+		    // Create an anonymous object to return the parsed request data.
+		    var response = new
+		    {
+		        Values = csvData
+		    };
+		    
+			return Json(HttpStatusCode.OK, response);
+		}
+	}
+	
+	public class CSVRequestFormatter : IRequestFormatter
+	{
+	    public string Name
+	    {
+	        get { return "csv"; }
+	    }
+	    
+	    public object ReadRequestBody(Type bodyType, byte[] body)
+	    {
+	        // Convert the request body into a UTF8 encoded string.
+	        var payload = Encoding.UTF8.GetString(body);
+	        
+	        // Split the CSV string into a string array and remove empty entries.
+	        return payload.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+	    }
+	}
+}
+```                                                     
+**Figure 19. Custom Request Formatter - [Try it Now](https://api.subroute.io/v1/example-request-formatter)**
+                                                         
 <span class="scroll-top">Back to Top</span>
 
 ## Creating Responses
 ### <a id="Response-Headers"></a>Response Headers
-Content goes here                             
+
+Subroute.io enables full control over the response headers of your route. Setting the content-type header to indicate what type 
+of response should be expected. This is handled for you automatically when using the base methods for <span class="scroll-link" data-anchor="Common-Responses">Common Responses</span>.
+
+``` csharp
+using System;
+using System.Net;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    var response = new RouteResponse(HttpStatusCode.OK)
+		    {
+		        Headers = new Dictionary<string, string>
+		        {
+		            { "Content-Type", "application/json" }
+		        }
+		    };
+		    
+		    response.Headers.Add("Cache-Control", "no-cache");
+		    response.Headers.Add("WWW-Authenticate", "Basic");
+		    
+			return response;
+		}
+	}
+}
+```
+**Figure 20. Response Headers - [Try it Now](https://api.subroute.io/v1/example-response-headers)**
 
 <span class="scroll-top">Back to Top</span>
 
 ### <a id="Status-Code-Message"></a>Status Code &amp; Message
-Content goes here                             
+
+With Subroute.io it's easy to control the response status code and message. The `RouteResponse` object requires that the status code 
+be set when creating the `RouteResponse` object. The status message isn't required to be set and will default to whatever status message 
+is appropriate for the status code. Here is an example of how to set the status code and message.
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    // Anonymous type representing result.
+		    var payload = new 
+		    { 
+		        Name = "John Smith"
+		    };
+		    
+		    // Base method used to create RouteResponse instance with 200 HTTP status code.
+		    var response = Json(HttpStatusCode.OK, payload);
+		    
+		    // Set the status message.
+		    response.StatusMessage = "Customer Found";
+		    
+			return response;
+		}
+	}
+}
+```
+**Figure 21. Status Code &amp; Message - [Try it Now](https://api.subroute.io/v1/example-status-code-message)**
 
 <span class="scroll-top">Back to Top</span>
 
@@ -290,7 +446,7 @@ namespace Subroute.Container
 	}
 }
 ```
-**Figure 4. Json Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-json)**
+**Figure 22. Json Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-json)**
 
 #### XML Serialization
 Xml serialization is handled almost identically to Json serialization, except it's provided by the `DataContractSerializer`. To return 
@@ -358,7 +514,7 @@ namespace Subroute.Container
 	}
 }
 ```                         
-**Figure 5. Xml Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-xml)**
+**Figure 23. Xml Serialization - [Try it Now](https://api.subroute.io/v1/example-response-serialization-xml)**
 
 You may have noticed that the JSON serializer supports using anonymous types as the XML serializer requires the use of concrete types. 
 But the base methods hide the complexity of creating a `RouteResponse`, setting the headers, and serializing the response body.                             
@@ -366,16 +522,95 @@ But the base methods hide the complexity of creating a `RouteResponse`, setting 
 <span class="scroll-top">Back to Top</span>
 
 ### <a id="Common-Responses"></a>Common Responses
-String(HttpStatusCode, value)
+
+The following methods are available as methods of the base class `BaseController`. They all return a `RouteResponse` object containing 
+values that are appropriate to the type of content they are returning.
+
+String(HttpStatusCode statusCode, string value)
     ~ Returns a content-type of text/plain, where the response body contains the exact string passed.  
     
-Stream(HttpStatusCode, Stream, contentType, [contentDispostion])
+Stream(HttpStatusCode statusCode, Stream stream, string contentType, [string contentDispostion])
     ~ Uses the content-type provided as well as any provided content disposition, with a response body containing the provided Stream.                             
+
+Json(HttpStatusCode statusCode, object payload)
+    ~ Returns a content-type of application/json, where the response body contains the provided object serialized as JSON.
+
+Xml(HttpStatusCode statusCode, object payload)
+    ~ Returns a content-type of application/xml, where the response body contains the provided object serialized as XML.
+
+Formatted(HttpStatusCode statusCode, string formatterName, object payload)
+    ~ Uses a registered formatter with the provided name to serialize the provided object and returns a response with the provided content type.
+
+StatusCode(HttpStatusCode statusCode)
+    ~ Returns an empty response with the provided status code.
+
+NoContent()
+    ~ Returns an empty response with a 204 No Content response.
+
+BadRequest()
+    ~ Returns an empty response with a 400 Bad Request response.
 
 <span class="scroll-top">Back to Top</span>
                              
-### <a id="Custom-Formatters"></a>Custom Formatters
-Content goes here
+### <a id="Custom-Response-Formatter"></a>Custom Response Formatter
+Response formatters make it easy to prepare the response body. They take an expected type and serialize its data as a byte array containing 
+the final response output. After creating a new response formatter, you register it using the `GlobalConfiguration.ResponseFormatters` in the 
+same way you register request formatters. There are response formatters for most common types (such as XML, JSON, and String). To invoke your 
+response formatter, you call the `Formatted(HttpStatusCode statusCode, string formatterName, object payload)` base method. This will locate 
+your formatter by name and pass the provided payload object to it. It will then create a new `RouteResponse` object and set the body to the 
+formatters output. Here is an example of how to create, register, and invoke a custom response formatter.
+
+``` csharp
+using System;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Subroute.Common;
+using Subroute.Common.ResponseFormatters;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+	    public RouteMethods()
+	    {
+	        // Register new request formatter with global configuration.
+	        GlobalConfiguration.ResponseFormatters.Add(new CSVResponseFormatter());
+	    }
+	    
+		public async Task<RouteResponse> GetAsync(RouteRequest request)
+		{
+		    var values = new []
+		    {
+		        "Foo",
+		        "Bar",
+		        "Chu"
+		    };
+		    
+			return Formatted(HttpStatusCode.OK, "csv", values);
+		}
+	}
+	
+	public class CSVResponseFormatter : IResponseFormatter
+	{
+	    public string Name
+	    {
+	        get { return "csv"; }
+	    }
+	    
+	    public byte[] WriteResponseBody(object payload)
+	    {
+	        // Cast and verify the payload is a string array and convert it to 
+	        // as string array and join it together as a CSV string as the result.
+	        if (payload is string[] array)
+	            return Encoding.UTF8.GetBytes(string.Join(",", array));
+	        
+            throw new Exception("CSVResponseFormatter can only output string arrays.");
+	    }
+	}
+}
+```
+**Figure 24. Custom Response Formatter - [Try it Now](https://api.subroute.io/v1/example-response-formatter)**
 
 <span class="scroll-top">Back to Top</span>
 </pre>
@@ -393,7 +628,6 @@ Content goes here
         <ul>
             <li><span data-bind="click: scrollToAnchor('What-Is-Subroute')">What is Subroute.io?</span></li>
             <li><span data-bind="click: scrollToAnchor('Writing-Your-First-Route')">Writing your First Route</span></li>
-            <li><span data-bind="click: scrollToAnchor('Execution-Pipeline')">Execution Pipeline</span></li>
             <li><span data-bind="click: scrollToAnchor('Supported-Wire-Formats')">Supported Wire Formats</span></li>
         </ul>
 
@@ -403,6 +637,7 @@ Content goes here
             <li><span data-bind="click: scrollToAnchor('Deserialization')">Deserialization</span></li>
             <li><span data-bind="click: scrollToAnchor('Form-Data')">Form Data</span></li>
             <li><span data-bind="click: scrollToAnchor('Request-Headers')">Request Headers</span></li>
+            <li><span data-bind="click: scrollToAnchor('Custom-Request-Formatter')">Custom Request Formatter</span></li>
         </ul>
 
         <h4>Creating Responses</h4>
@@ -411,7 +646,7 @@ Content goes here
             <li><span data-bind="click: scrollToAnchor('Status-Code-Message')">Status Code &amp; Message</span></li>
             <li><span data-bind="click: scrollToAnchor('Serialization')">Serialization</span></li>
             <li><span data-bind="click: scrollToAnchor('Common-Responses')">Common Responses</span></li>
-            <li><span data-bind="click: scrollToAnchor('Custom-Formatters')">Custom Formatters</span></li>
+            <li><span data-bind="click: scrollToAnchor('Custom-Response-Formatter')">Custom Response Formatter</span></li>
         </ul>
     </div>
 </div>

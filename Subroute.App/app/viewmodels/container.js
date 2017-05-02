@@ -56,10 +56,14 @@
 
         self.activeHash = ko.computed(function () {
             if (!self.router.activeInstruction()) {
-                return '#';
+                return '';
             };
 
-            return self.router.activeInstruction();
+            return self.router.activeInstruction().fragment;
+        });
+
+        self.errorListVisible = ko.computed(function () {
+            return self.activeHash().startsWith('routes');
         });
 
         self.showRoutes = function () {

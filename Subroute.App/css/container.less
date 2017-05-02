@@ -529,7 +529,7 @@ button {
         width: auto;
         background-color: @dialog-background-color;
         z-index: 50;
-        padding: 24px;
+        padding: 24px 24px @error-list-empty-height 24px;
         .drop-shadow(@x: 1px, @y: 1px);
 
         h3 {
@@ -542,6 +542,10 @@ button {
             right: 16px;
             padding: 12px;
             outline: none;
+        }
+
+        &.error-list-visible {
+            bottom: @error-list-empty-height;
         }
 
         &.scrollable {
@@ -760,6 +764,10 @@ ul.sub-nav {
                 position: relative;
             }
 
+            &:last-child {
+                margin-bottom: 20px;
+            }
+
             &:hover {
                 background-color: @accent-color;
                 color: #fff;
@@ -771,18 +779,6 @@ ul.sub-nav {
                 a {
                     color: #fff;
 
-                    &:after {
-                        content: "";
-                        border-left: .5em solid @accent-color; /* This width determines the arrows length */
-                        border-top: 13pt solid transparent; /* This width has to be 50% of 'line-height + padding-top + padding-bottom' */
-                        border-bottom: 13pt solid transparent; /* Same for this width */
-                        width: 0;
-                        height: 0;
-                        position: absolute;
-                        right: -.5em; /* This has to be the same value as 'border-left's width */
-                        top: 0;
-                        bottom: 0;
-                    }
                 }
             }
         }
@@ -1401,7 +1397,7 @@ ul.sub-nav {
             margin-bottom: 20px;
         }
 
-        span.scroll-top {
+        span.scroll-top, span.scroll-link {
             color: @accent-color;
             text-decoration: underline;
             cursor: pointer;
@@ -1457,15 +1453,18 @@ ul.sub-nav {
                 font-weight: bold;
 
                 code {
-                    background-color: inherit;
+                    background-color: #fff;
                     padding: 0;
                     border: none;
-                    font-weight: bold;
+                    font-size: 1.2em;
+                    font-weight: normal;
                 }
             }
 
             dd {
                 margin: 0 0 10px 10px;
+                color: #333;
+                font-size: 1em;
             }
         }
     }
