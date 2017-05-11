@@ -24,6 +24,7 @@
         self.saving = ko.observable(false);
         self.auth = authentication;
         self.config = config;
+        self.toolboxVisible = ko.observable(true);
 
         self.hasSettings = ko.computed(function() {
             if (!self.settings()) {

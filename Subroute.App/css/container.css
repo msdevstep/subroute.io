@@ -941,11 +941,51 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #scripts .maker a:active {
   color: #fff;
 }
+#scripts .route-sidebar-toggle {
+  position: fixed;
+  bottom: 58px;
+  right: 29px;
+  z-index: 2000;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  background-color: #eee;
+  -webkit-border-radius: 32px;
+  -moz-border-radius: 32px;
+  border-radius: 32px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+#scripts .route-sidebar-toggle.toolbox-visible {
+  right: 445px;
+}
+#scripts .route-sidebar-toggle.toolbox-visible:before {
+  content: "\f054";
+  left: 12px;
+}
+#scripts .route-sidebar-toggle:hover {
+  background-color: #ef5256;
+}
+#scripts .route-sidebar-toggle:before {
+  content: "\f053";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: 100;
+  text-decoration: inherit;
+  /*--adjust as necessary--*/
+  color: #fff;
+  font-size: 15px;
+  padding-right: 0.5em;
+  position: absolute;
+  top: 9px;
+  left: 10px;
+}
 #scripts #editor {
   position: fixed;
   top: 60px;
   left: 60px;
-  right: 418px;
+  right: 0;
   bottom: 32px;
   margin: 0;
   padding: 0;
@@ -955,6 +995,9 @@ ul.sub-nav li button i.fa-flip-horizontal {
   -moz-box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
   box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
   z-index: 40;
+}
+#scripts #editor.toolbox-visible {
+  right: 418px;
 }
 #scripts #editor.has-suggestions {
   top: 120px;

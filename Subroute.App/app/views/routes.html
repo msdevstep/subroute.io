@@ -11,7 +11,8 @@
             <button class="suggestion-show-another" data-bind="click: $root.loadRandomSuggestion, loading: { trigger: $root.suggesting, idle: 'fa-refresh' }"><i class="fa fa-refresh"></i> Show Me Another</button>
         </span>
     </div>
-    <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo }"></pre>
+    <button class="route-sidebar-toggle" data-bind="toggle: toolboxVisible, css: { 'toolbox-visible': toolboxVisible }"></button>
+    <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo, 'toolbox-visible': toolboxVisible }"></pre>
     <div id="error-list" data-bind="css: { 'has-diagnostics': diagnosticsCount() > 0 }">
         <button id="error-status" data-bind="toggle: diagnosticsVisible, css: statusClass"><i class="fa fa-fw" data-bind="visible: diagnosticsCount() > 0, css: { 'fa-caret-up': !diagnosticsVisible() && diagnosticsCount() !== 0, 'fa-caret-down': diagnosticsVisible() && diagnosticsCount() !== 0 }"></i> <span data-bind="text: statusMessage"></span><span class="maker">Made with <i class="fa fa-heart-o"></i> by <a href="http://dylanvester.com" target="_blank">Dylan Vester</a> - Fork me on <a href="https://github.com/msdevstep/subroute.io" target="_blank">GitHub</a> <i class="fa fa-hand-spock-o"></i></span></button>
         <div id="error-list-contents" data-bind="visible: diagnosticsVisible() && diagnosticsCount() > 0, direction: 'down'">
@@ -41,7 +42,7 @@
             </table>
         </div>
     </div>
-    <div id="toolbox">
+    <div id="toolbox" data-bind="visible: toolboxVisible">
         <ul class="sub-nav">
             <li data-bind="css: { active: activePanel() === 'routes/properties.html' }"><button data-bind="click: showProperties"><i class="fa fa-heartbeat fa-fw"></i>STATUS</button></li>
             <li data-bind="css: { active: activePanel() === 'routes/settings.html' }"><button data-bind="click: showSettings, enable: auth.isAuthenticated && !isNew()"><i class="fa fa-cogs fa-fw"></i>SETTINGS</button></li>

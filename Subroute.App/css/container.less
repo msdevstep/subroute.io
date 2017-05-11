@@ -1026,11 +1026,51 @@ ul.sub-nav {
         }
     }
 
+    .route-sidebar-toggle {
+        position: fixed;
+        bottom: @error-list-empty-height + 26px;
+        right: 29px;
+        z-index: 2000;
+        margin: 0;
+        width: 32px;
+        height: 32px;
+        background-color: #eee;
+        .border-radius(32px);
+
+        &.toolbox-visible {
+            right: @toolbox-width + 75;
+
+            &:before {
+                content: "\f054";
+                left: 12px;
+            }
+        }
+
+        &:hover {
+            background-color: @accent-color + 30;
+        }
+
+        &:before {
+            content: "\f053";
+            font-family: FontAwesome;
+            font-style: normal;
+            font-weight: 100;
+            text-decoration: inherit;
+            /*--adjust as necessary--*/
+            color: #fff;
+            font-size: 15px;
+            padding-right: 0.5em;
+            position: absolute;
+            top: 9px;
+            left: 10px;
+        }
+    }
+
     #editor {
         position: fixed;
         top: @page-header-height;
         left: @sidebar-width;
-        right: @toolbox-width + 48;
+        right: 0;
         bottom: @error-list-empty-height;
         margin: 0;
         padding: 0;
@@ -1038,6 +1078,10 @@ ul.sub-nav {
         font-size: 0.9em;
         .drop-shadow(@x: 1px, @y: 1px);
         z-index: 40;
+
+        &.toolbox-visible {
+            right: @toolbox-width + 48;
+        }
 
         &.has-suggestions {
             top: @page-header-height + @suggestion-height;
