@@ -830,7 +830,6 @@
     <Content Include="lib\qtip2\jquery.qtip.js" />
     <Content Include="lib\qtip2\jquery.qtip.min.css" />
     <Content Include="lib\qtip2\jquery.qtip.min.js" />
-    <Content Include="lib\remarkable\bin\remarkable.js" />
     <Content Include="lib\remarkable\dist\remarkable.js" />
     <Content Include="lib\remarkable\dist\remarkable.min.js" />
     <Content Include="lib\requirejs-text\text.js" />
@@ -1013,7 +1012,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>39976</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
