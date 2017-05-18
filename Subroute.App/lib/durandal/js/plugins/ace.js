@@ -36,7 +36,7 @@
 
                     editor.commands.addCommand({
                         name: "compile",
-                        bindKey: { win: "Ctrl-Shift-B", mac: "Command-B" },
+                        bindKey: { win: "Ctrl-B", mac: "Command-B" },
                         exec: function(editor) {
                             if (options.compile) {
                                 options.compile(editor);
@@ -50,6 +50,16 @@
                         exec: function (editor) {
                             if (options.run) {
                                 options.run(editor);
+                            }
+                        }
+                    });
+
+                    editor.commands.addCommand({
+                        name: "publish",
+                        bindKey: { win: "Ctrl-D", mac: "Command-D" },
+                        exec: function (editor) {
+                            if (options.publish) {
+                                options.publish(editor);
                             }
                         }
                     });

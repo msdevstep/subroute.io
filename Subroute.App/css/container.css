@@ -468,7 +468,7 @@ button.link:hover {
   bottom: 0;
   width: auto;
   background-color: #fafafa;
-  z-index: 50;
+  z-index: 75;
   padding: 24px 24px 32px 24px;
   -webkit-box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
@@ -877,13 +877,20 @@ ul.sub-nav li button i.fa-flip-horizontal {
   position: fixed;
   top: 61px;
   left: 60px;
-  right: 416px;
+  right: 0;
   height: 60px;
   line-height: 56px;
   padding: 0;
   background: #f1f1f1;
   border-bottom: 1px solid #c2c2c2;
   overflow: hidden;
+  z-index: 70;
+}
+#scripts #suggestion.toolbox-visible {
+  right: 416px;
+}
+#scripts #suggestion.toolbox-visible .suggestion-buttons {
+  padding: 0;
 }
 #scripts #suggestion .suggestion-name {
   font-weight: 700;
@@ -911,6 +918,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   text-align: right;
   text-wrap: none;
   white-space: nowrap;
+  padding: 0 20px 0 0;
 }
 #scripts #suggestion button {
   font-size: 0.7em;
@@ -945,11 +953,12 @@ ul.sub-nav li button i.fa-flip-horizontal {
   position: fixed;
   bottom: 58px;
   right: 29px;
-  z-index: 2000;
+  z-index: 60;
   margin: 0;
   width: 32px;
   height: 32px;
-  background-color: #eee;
+  background-color: #d13438;
+  opacity: 0.3;
   -webkit-border-radius: 32px;
   -moz-border-radius: 32px;
   border-radius: 32px;
@@ -966,6 +975,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
 }
 #scripts .route-sidebar-toggle:hover {
   background-color: #ef5256;
+  opacity: 1;
 }
 #scripts .route-sidebar-toggle:before {
   content: "\f053";
@@ -1009,7 +1019,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   right: 0;
   min-height: 32px;
   background-color: #fff;
-  z-index: 50;
+  z-index: 70;
 }
 #scripts #error-list.has-diagnostics #error-status {
   cursor: pointer;
@@ -1113,6 +1123,10 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #scripts .toolbox-well .horizontal-form:nth-last-child(1) {
   padding-bottom: 0;
 }
+#scripts .toolbox-well .last {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
 #scripts .toolbox-well .step-crumbs.last {
   margin-bottom: 0;
 }
@@ -1215,6 +1229,84 @@ ul.sub-nav li button i.fa-flip-horizontal {
 .request-modal #response-payload #response-payload-editor {
   height: 343px;
   margin: 0;
+}
+.repeater-list {
+  height: 300px;
+  background-color: #fff;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+.nuget-modal {
+  width: 600px;
+}
+.nuget-modal #browse {
+  font-size: 0.9em;
+}
+.nuget-modal #browse .nuget-package-results {
+  margin: 0;
+  padding: 12px;
+  list-style: none;
+}
+.nuget-modal #browse .nuget-package-results button {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin: 0 0 12px 0;
+  padding: 0;
+  text-align: left;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.nuget-modal #browse .nuget-package-results button:hover {
+  background-color: #dedede;
+  border-color: #bbb;
+}
+.nuget-modal #browse .nuget-package-results button:hover img {
+  border-color: #bbb;
+}
+.nuget-modal #browse .nuget-package-results button .repeater-item-content {
+  padding: 12px;
+  display: block;
+  line-height: 1.2em;
+  color: #000;
+}
+.nuget-modal #browse .nuget-package-results button .repeater-item-content strong {
+  display: block;
+  font-size: 1.4em;
+  line-height: 1.6em;
+}
+.nuget-modal #browse .nuget-package-results button .repeater-item-content span {
+  display: block;
+  text-transform: none;
+  line-height: 1.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: normal;
+  color: #222;
+}
+.nuget-modal #browse .nuget-package-results button .repeater-item-content span.author {
+  font-weight: bold;
+  padding-bottom: 5px;
+}
+.nuget-modal #browse .nuget-package-results img {
+  width: 48px;
+  height: 48px;
+  float: left;
+  margin: 0 12px 0 0;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.nuget-modal #browse .nuget-package-results strong {
+  text-transform: none;
 }
 .payload {
   height: 140px;

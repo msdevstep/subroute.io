@@ -1,0 +1,75 @@
+﻿<div data-view="plugins/messageBox" class="messageBox nuget-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Search NuGet Packages</h3>
+        </div>
+        <div class="modal-body">
+            <div id="request-loading" data-bind="visible: loading">
+                <i class="fa fa-refresh fa-spin fa-2x"></i>
+            </div>
+            <div id="browse">
+                <div class="horizontal-form">
+                    <label>Search Packages:</label>
+                    <input type="text" placeholder="Keywords..." />
+                </div>
+                <div class="repeater-list">
+                    <ul class="nuget-package-results">
+                        <li>
+                            <button>
+                                <span class="repeater-item-content clearfix">
+                                    <img src="../../../img/android-icon-48x48.png" title="Newtonsoft.Json" />
+                                    <strong>Newtonsoft.Json</strong>
+                                    <span class="author">By Dylan Vester</span>
+                                    <span>This is the description of Json.NET. This is a super long description to test the wrapping and I'm going to keep typing until I can't think of anything to say because saying things is what I need to do right now. Here is some more text to see the rest of the wrapping. This is going great! This is going great! This is going great! This is going great!</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button>
+                                <span class="repeater-item-content clearfix">
+                                    <img src="../../../img/android-icon-48x48.png" title="Newtonsoft.Json" />
+                                    <strong>Newtonsoft.Json</strong>
+                                    <span class="author">By Dylan Vester</span>
+                                    <span>This is the description of Json.NET.</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button>
+                                <span class="repeater-item-content clearfix">
+                                    <img src="../../../img/android-icon-48x48.png" title="Newtonsoft.Json" />
+                                    <strong>Newtonsoft.Json</strong>
+                                    <span class="author">By Dylan Vester</span>
+                                    <span>This is the description of Json.NET.</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button>
+                                <span class="repeater-item-content clearfix">
+                                    <img src="../../../img/android-icon-48x48.png" title="Newtonsoft.Json" />
+                                    <strong>Newtonsoft.Json</strong>
+                                    <span class="author">By Dylan Vester</span>
+                                    <span>This is the description of Json.NET.</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button>
+                                <span class="repeater-item-content clearfix">
+                                    <img src="../../../img/android-icon-48x48.png" title="Newtonsoft.Json" />
+                                    <strong>Newtonsoft.Json</strong>
+                                    <span class="author">By Dylan Vester</span>
+                                    <span>This is the description of Json.NET.</span>
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bind="click: close">Close</button>
+        </div>
+    </div>
+</div>

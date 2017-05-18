@@ -1,4 +1,4 @@
-﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request', 'ace/ace', 'ace/range'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, app, ajax, requestModal, ace, range) {
+﻿define(['durandal/system', 'knockout', 'services/dialog', 'config', 'services/authentication', 'services/uri', 'plugins/router', 'moment', 'durandal/app', 'services/ajax', 'viewmodels/dialogs/request', 'viewmodels/dialogs/nuget', 'ace/ace', 'ace/range', 'highlight'], function (system, ko, dialog, config, authentication, uriBuilder, router, moment, app, ajax, requestModal, nugetModal, ace, range, hljs) {
     return function () {
         var self = this;
 
@@ -54,6 +54,10 @@
         self.statusMessage = ko.observable("Ready");
         self.statusClass = ko.observable('neutral');
 
+        self.isPublishing = ko.computed(function () {
+            return self.publishing() && !self.isNew();
+        });
+
         self.showSuggestionInfo = ko.computed(function () {
             return !!self.defaultSuggestion() && config.enableSuggestions;
         });
@@ -95,6 +99,15 @@
                 id: request.id
             };
             dialog.openModal(requestModal, options);
+            return false;
+        };
+
+        self.showNuget = function (request) {
+            var options = {
+                uri: self.uri(),
+                id: request.id
+            };
+            dialog.openModal(nugetModal, options);
             return false;
         };
 
@@ -256,6 +269,7 @@
             var requestUri = uriBuilder.getRoutePublishUri(self.uri());
             var publish = function () {
                 self.publishing(true);
+                self.compiling(true);
                 self.showNeutralMessage('Publishing...');
                 return ajax.request({
                     url: requestUri,
@@ -276,6 +290,7 @@
                     self.showErrorMessage('Publish Failed - ' + self.diagnosticsCount() + ' Message(s)');
                 }).always(function () {
                     self.publishing(false);
+                    self.compiling(false);
                 });
             };
 
@@ -545,6 +560,7 @@
                 var index = 0;
                 var completions = ko.utils.arrayMap(data, function (item) {
                     var display = item.displayText;
+                    var signiture = hljs.highlight('csharp', item.displayText).value;
 
                     if (display.length > 60) {
                         display = display.substring(0, 60).trim() + '…';
@@ -556,7 +572,7 @@
                         meta: item.kind,
                         type: "snippet",
                         score: -(++index),
-                        docHTML: "<b>" + item.displayText + "</b>\n" + item.description
+                        docHTML: "<b>" + signiture + "</b>\n" + item.description
                     }
                 });
                 callback(null, completions);

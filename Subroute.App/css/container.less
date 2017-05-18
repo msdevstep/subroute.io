@@ -35,10 +35,20 @@
 
 @form-label-color: #000;
 @form-aside-color: #808080;
+@control-border-color: #ccc;
+@control-background-color: #fff;
 
 @button-background-color: @accent-color-secondary;
 @button-text-color: #fff;
 @button-link-text-color: @accent-color;
+
+@repeater-text-color: #000;
+@repeater-item-hover-color: #dedede;
+@repeater-item-hover-border-color: #bbb;
+@repeater-item-subtext-color: #222;
+@repeater-item-border-color: #ccc;
+@repeater-item-icon-border-color: #ccc;
+@repeater-background-color: #eee;
 
 @facebook-color: #3b5999;
 @github-color: #444444;
@@ -528,7 +538,7 @@ button {
         bottom: 0;
         width: auto;
         background-color: @dialog-background-color;
-        z-index: 50;
+        z-index: 75;
         padding: 24px 24px @error-list-empty-height 24px;
         .drop-shadow(@x: 1px, @y: 1px);
 
@@ -778,7 +788,6 @@ ul.sub-nav {
 
                 a {
                     color: #fff;
-
                 }
             }
         }
@@ -957,13 +966,22 @@ ul.sub-nav {
         position: fixed;
         top: @page-header-height + 1;
         left: @sidebar-width;
-        right: @toolbox-width + 46;
+        right: 0;
         height: @suggestion-height;
         line-height: @suggestion-height - 4;
         padding: 0;
         background: @toolbox-background-color;
         border-bottom: 1px solid @seperator-color;
         overflow: hidden;
+        z-index: 70;
+
+        &.toolbox-visible {
+            right: @toolbox-width + 46;
+
+            .suggestion-buttons {
+                padding: 0;
+            }
+        }
 
         .suggestion-name {
             font-weight: 700;
@@ -995,6 +1013,7 @@ ul.sub-nav {
             text-align: right;
             text-wrap: none;
             white-space: nowrap;
+            padding: 0 20px 0 0;
         }
 
         button {
@@ -1030,11 +1049,12 @@ ul.sub-nav {
         position: fixed;
         bottom: @error-list-empty-height + 26px;
         right: 29px;
-        z-index: 2000;
+        z-index: 60;
         margin: 0;
         width: 32px;
         height: 32px;
-        background-color: #eee;
+        background-color: @accent-color;
+        opacity: 0.3;
         .border-radius(32px);
 
         &.toolbox-visible {
@@ -1048,6 +1068,7 @@ ul.sub-nav {
 
         &:hover {
             background-color: @accent-color + 30;
+            opacity: 1;
         }
 
         &:before {
@@ -1095,7 +1116,7 @@ ul.sub-nav {
         right: 0;
         min-height: @error-list-empty-height;
         background-color: #fff;
-        z-index: 50;
+        z-index: 70;
 
         &.has-diagnostics {
             #error-status {
@@ -1211,6 +1232,11 @@ ul.sub-nav {
 
         .horizontal-form:nth-last-child(1) {
             padding-bottom: 0;
+        }
+
+        .last {
+            padding-bottom: 0;
+            margin-bottom: 0;
         }
 
         .step-crumbs {
@@ -1343,6 +1369,95 @@ ul.sub-nav {
         #response-payload-editor {
             height: 343px;
             margin: 0;
+        }
+    }
+}
+
+.repeater-list {
+    height: 300px;
+    border: 1px solid @control-border-color;
+    background-color: @control-background-color;
+    overflow-y: auto;
+    border: 1px solid @control-border-color;
+}
+
+.nuget-modal {
+    width: 600px;
+
+    #browse {
+        font-size: 0.9em;
+
+        .nuget-package-results {
+            margin: 0;
+            padding: 12px;
+            list-style: none;
+
+            button {
+                background-color: @repeater-background-color;
+                border: 1px solid @repeater-item-border-color;
+                width: 100%;
+                margin: 0 0 12px 0;
+                padding: 0;
+                text-align: left;
+                .border-radius(5px);
+
+                &:hover {
+                    background-color: @repeater-item-hover-color;
+                    border-color: @repeater-item-hover-border-color;
+
+                    .repeater-item-content {
+
+                        span {
+                        }
+                    }
+
+                    img {
+                        border-color: @repeater-item-hover-border-color;
+                    }
+                }
+
+                .repeater-item-content {
+                    padding: 12px;
+                    display: block;
+                    line-height: 1.2em;
+                    color: @repeater-text-color;
+
+
+                    strong {
+                        display: block;
+                        font-size: 1.4em;
+                        line-height: 1.6em;
+                    }
+
+                    span {
+                        display: block;
+                        text-transform: none;
+                        line-height: 1.2em;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        font-weight: normal;
+                        color: @repeater-item-subtext-color;
+
+                        &.author {
+                            font-weight: bold;
+                            padding-bottom: 5px;
+                        }
+                    }
+                }
+            }
+
+            img {
+                width: 48px;
+                height: 48px;
+                float: left;
+                margin: 0 12px 0 0;
+                border: 1px solid @repeater-item-icon-border-color;
+                .border-radius(5px);
+            }
+
+            strong {
+                text-transform: none;
+            }
         }
     }
 }
@@ -1553,6 +1668,5 @@ ul.sub-nav {
         }
     }
 }
-
 /* Include Page LESS Files */
 @import "modal.less";

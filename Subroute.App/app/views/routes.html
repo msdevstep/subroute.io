@@ -1,5 +1,5 @@
 ﻿<div id="scripts">
-    <div id="suggestion" data-bind="visible: showSuggestionInfo, with: defaultSuggestion">
+    <div id="suggestion" data-bind="visible: showSuggestionInfo, with: defaultSuggestion, css: { 'toolbox-visible': toolboxVisible }">
         <span class="suggestion-author">
             <img class="avatar-circle" data-bind="src: picture" /> Author: <span class="suggestion-name" data-bind="text: name"></span>
         </span>
@@ -12,7 +12,7 @@
         </span>
     </div>
     <button class="route-sidebar-toggle" data-bind="toggle: toolboxVisible, css: { 'toolbox-visible': toolboxVisible }"></button>
-    <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo, 'toolbox-visible': toolboxVisible }"></pre>
+    <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, publish: publish, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo, 'toolbox-visible': toolboxVisible }"></pre>
     <div id="error-list" data-bind="css: { 'has-diagnostics': diagnosticsCount() > 0 }">
         <button id="error-status" data-bind="toggle: diagnosticsVisible, css: statusClass"><i class="fa fa-fw" data-bind="visible: diagnosticsCount() > 0, css: { 'fa-caret-up': !diagnosticsVisible() && diagnosticsCount() !== 0, 'fa-caret-down': diagnosticsVisible() && diagnosticsCount() !== 0 }"></i> <span data-bind="text: statusMessage"></span><span class="maker">Made with <i class="fa fa-heart-o"></i> by <a href="http://dylanvester.com" target="_blank">Dylan Vester</a> - Fork me on <a href="https://github.com/msdevstep/subroute.io" target="_blank">GitHub</a> <i class="fa fa-hand-spock-o"></i></span></button>
         <div id="error-list-contents" data-bind="visible: diagnosticsVisible() && diagnosticsCount() > 0, direction: 'down'">

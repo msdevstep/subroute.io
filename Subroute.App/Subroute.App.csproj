@@ -33,7 +33,7 @@
     </SccAuxPath>
     <SccProvider>
     </SccProvider>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.2</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Development|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -120,6 +120,7 @@
     <Content Include="app\services\ajax.js" />
     <Content Include="app\services\uri.js" />
     <Content Include="app\viewmodels\container.js" />
+    <Content Include="app\viewmodels\dialogs\nuget.js" />
     <Content Include="app\viewmodels\dialogs\request.js" />
     <Content Include="app\viewmodels\dialogs\howto.js" />
     <Content Include="app\viewmodels\dialogs\login.js" />
@@ -131,6 +132,9 @@
     <Content Include="app\viewmodels\home.js" />
     <Content Include="app\views\container.html" />
     <Content Include="app\views\dialogs\howto.html" />
+    <Content Include="app\views\dialogs\nuget.html" />
+    <Content Include="app\views\dialogs\nuget\installed.html" />
+    <Content Include="app\views\dialogs\nuget\browse.html" />
     <Content Include="app\views\dialogs\request.html" />
     <Content Include="app\views\dialogs\login.html" />
     <Content Include="app\views\dialogs\list.html" />
