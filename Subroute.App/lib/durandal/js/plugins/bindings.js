@@ -13,6 +13,18 @@
                 }
             };
 
+            ko.bindingHandlers.safeSrc = {
+                update: function (element, valueAccessor) {
+                    var options = valueAccessor();
+                    var src = ko.unwrap(options.src);
+                    $('<img />').attr('src', src).on('load', function () {
+                        $(element).attr('src', src);
+                    }).on('error', function () {
+                        $(element).attr('src', ko.unwrap(options.fallback));
+                    });
+                }
+            };
+
             ko.bindingHandlers.loading = {
                 // loading: { trigger: compiling, idle: 'fa-upload', loading: 'fa-refresh' }
                 init: function (element, valueAccessor) {

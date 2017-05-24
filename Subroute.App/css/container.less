@@ -1387,6 +1387,13 @@ ul.sub-nav {
     #browse {
         font-size: 0.9em;
 
+        .packages-loading {
+            height: 260px;
+            line-height: 260px;
+            text-align: center;
+            color: #ccc;
+        }
+
         .nuget-package-results {
             margin: 0;
             padding: 12px;
@@ -1427,6 +1434,10 @@ ul.sub-nav {
                         display: block;
                         font-size: 1.4em;
                         line-height: 1.6em;
+                        height: 1.6em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
 
                     span {

@@ -137,7 +137,7 @@ namespace Subroute.Container
                         BindingFlags.Public | BindingFlags.Instance,
                         null, null, null, null)
                         .Unwrap());
-
+                    
                     // Build the ExecutionRequest object that represents the incoming request
                     // which holds the payload, headers, method, etc. The class is serialized
                     // so it can cross the app domain boundary. So it's serialized in our 
@@ -159,7 +159,7 @@ namespace Subroute.Container
                         // an instance of ExecutionResponse that has been serialized like the request
                         // and deserialized in our full-trust host domain.
                         var executionResponse = TraceUtility.TraceTime("Load and Execute Request", () => executionSandbox.Execute(route.Assembly, executionRequest));
-
+                        
                         // We'll use the data that comes back from the response to fill out the 
                         // remainder of the database request record which will return the status
                         // code, message, payload, and headers. Then we update the database.

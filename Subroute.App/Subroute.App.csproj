@@ -184,6 +184,7 @@
     <Content Include="img\ms-icon-150x150.png" />
     <Content Include="img\ms-icon-310x310.png" />
     <Content Include="img\ms-icon-70x70.png" />
+    <Content Include="img\nuget-fallback.png" />
     <Content Include="img\wavy_error.gif" />
     <Content Include="img\wavy_warning.png" />
     <Content Include="lib\durandal\Changes.txt" />

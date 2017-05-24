@@ -5,10 +5,16 @@ namespace Subroute.Core.Nuget
 {
     public class NugetService : INugetService
     {
+        private readonly IPackageRepository _PackageRepository = null;
+
+        public NugetService()
+        {
+            _PackageRepository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
+        }
+
         public NugetPackage[] SearchPackages(string keyword, int? skip = null, int? take = null)
         {
-            var repository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
-            var query = repository.Search(keyword, false);
+            var query = _PackageRepository.Search(keyword, new[] { ".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0" }, true);
 
             if (skip.HasValue)
                 query = query.Skip(skip.Value);
@@ -16,8 +22,15 @@ namespace Subroute.Core.Nuget
             if (take.HasValue)
                 query = query.Take(take.Value);
 
-            return query
-                .ToArray()
+            var materialized = query.ToArray();
+
+            if (materialized.Any())
+            {
+                var first = materialized.First();
+                first.ExtractContents(new PhysicalFileSystem("/"), @"C:\Packages\" + first.Id);
+            }
+
+            return materialized
                 .Select(p => new NugetPackage
                 {
                     Id = p.Id,

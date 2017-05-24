@@ -44,6 +44,13 @@
             return self.apiUrl + '/compile/v1';
         };
 
+        self.getNugetUri = function (keywords, skip, take) {
+            skip = skip || 0;
+            take = take || 20;
+
+            return self.apiUrl + '/nuget/v1?keyword=' + keywords + '&skip=' + skip + '&take=' + take;
+        };
+
         self.trimSlash = function (value) {
             return value.replace(/\/+$/, "");
         };
