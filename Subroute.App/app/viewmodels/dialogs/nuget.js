@@ -4,6 +4,9 @@
         
         self.loading = ko.observable(false);
         self.keywords = ko.observable().extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
+        self.skip = ko.observable(0);
+        self.take = ko.observable(0);
+        self.totalCount = ko.observable(0);
         self.packages = ko.observableArray([]);
 
         self.formatAuthorLine = function (package) {
@@ -22,14 +25,19 @@
             ajax.request({
                 url: requestUri
             }).then(function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    if (!data[i].authors)
+                var packages = data.results;
+
+                for (var i = 0; i < packages.length; i++) {
+                    if (!packages[i].authors)
                         break;
 
-                    self.formatAuthorLine(data[i]);
+                    self.formatAuthorLine(packages[i]);
                 };
 
-                self.packages(data);
+                self.skip(data.skip);
+                self.take(data.take);
+                self.totalCount(data.totalCount);
+                self.packages(packages);
             }).fail(function () {
             }).always(function () {
                 self.loading(false);

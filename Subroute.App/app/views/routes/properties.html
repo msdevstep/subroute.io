@@ -26,15 +26,6 @@
     </div>
 
     <div class="toolbox-well">
-        <h2>NUGET PACKAGES</h2>
-        <ul class="fa-ul">
-            <li><i class="fa-li fa fa-cube"></i> Newtonsoft.Json</li>
-            <li><i class="fa-li fa fa-cube"></i> Autofac</li>
-        </ul>
-        <button id="add-package-button" data-bind="click: showNuget"><i class="fa fa-gift"></i>&nbsp;&nbsp;Manage Packages</button>
-    </div>
-
-    <div class="toolbox-well">
         <h2>SUBROUTE DETAILS</h2>
         <ul class="fa-ul last">
             <li><i class="fa-li fa fa-toggle-off"></i> Status: <strong data-bind="hidden: isOnline">Offline</strong><strong data-bind="visible: isOnline">Online</strong></li>
@@ -43,6 +34,15 @@
             <li><i class="fa-li fa fa-star-o"></i> Up-to-Date: <strong data-bind="hidden: isCurrent">Staging Changes</strong><strong data-bind="visible: isCurrent">Yes</strong></li>
             <li><i class="fa-li fa fa-tachometer"></i> Executions: <strong data-bind="text: executionCount">0</strong></li>
         </ul>
+    </div>
+
+    <div class="toolbox-well">
+        <h2>NUGET PACKAGES</h2>
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-cube"></i> Newtonsoft.Json</li>
+            <li><i class="fa-li fa fa-cube"></i> Autofac</li>
+        </ul>
+        <button id="add-package-button" data-bind="click: showNuget"><i class="fa fa-gift"></i>&nbsp;&nbsp;Manage Packages</button>
     </div>
 
     <div class="toolbox-well">

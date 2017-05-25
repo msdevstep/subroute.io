@@ -1,4 +1,5 @@
 ﻿using NuGet;
+using Subroute.Core.Data;
 using Subroute.Core.Nuget;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace Subroute.Api.Controllers
         /// <param name="take">Specifies the number of records to return in the results.</param>
         /// <returns>An array of <see cref="IPackage"/> representing a list of package results.</returns>
         [Route("nuget/v1")]
-        public NugetPackage[] GetSearchPackages(string keyword = null, int? skip = 0, int? take = 20)
+        public PagedCollection<NugetPackage> GetSearchPackages(string keyword = null, int? skip = 0, int? take = 20)
         {
             return _nugetService.SearchPackages(keyword, skip, take);
         }

@@ -1,9 +1,10 @@
 ﻿using NuGet;
+using Subroute.Core.Data;
 
 namespace Subroute.Core.Nuget
 {
     public interface INugetService
     {
-        NugetPackage[] SearchPackages(string keyword, int? skip = null, int? take = null);
+        PagedCollection<NugetPackage> SearchPackages(string keyword, int? skip = null, int? take = null);
     }
 }
