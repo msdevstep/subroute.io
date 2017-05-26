@@ -10,6 +10,8 @@ namespace Subroute.Core.Nuget
     {
         private readonly IPackageRepository _PackageRepository = null;
 
+        public static string[] TargetFrameworks = new[] { ".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0" };
+
         public NugetService()
         {
             _PackageRepository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
@@ -26,7 +28,7 @@ namespace Subroute.Core.Nuget
 
             // When the package is located, extract its contents into the standard local directory format.
             sourcePackage.ExtractContents(new PhysicalFileSystem(Settings.NugetPackageDirectory), $"{id}.{version.ToString(3)}");
-
+            
             // To simplify getting the package details, we'll return the mapped package details.
             return NugetPackage.Map(sourcePackage);
         }
@@ -43,7 +45,7 @@ namespace Subroute.Core.Nuget
                 take = 100;
 
             // Create source query to filter packages by keyword and target framework (include pre-releases).
-            var query = _PackageRepository.Search(keyword, new[] { ".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0" }, true);
+            var query = _PackageRepository.Search(keyword, TargetFrameworks, true);
 
             // We'll use the PagedCollection class to return critical paging data back to the client.
             // Before we apply paging we'll need to get a total count back from the package store.
@@ -58,7 +60,7 @@ namespace Subroute.Core.Nuget
             };
 
             // Materialize the data from the nuget package repository.
-            var materialized = query
+            var packages = query
                 .Skip(skip.GetValueOrDefault())
                 .Take(take.GetValueOrDefault())
                 .ToArray();
@@ -66,7 +68,7 @@ namespace Subroute.Core.Nuget
             // Make the actual request to the package store to get the current page of packages.
             // Skip and take will always be applied since we don't want to return an unbounded result set.
             // We'll be materializing the data, then projecting the data as a new type that is serializable.
-            result.Results = materialized.Select(NugetPackage.Map).ToArray();
+            result.Results = packages.Select(NugetPackage.Map).ToArray();
 
             return result;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NuGet;
+using System.Linq;
 
 namespace Subroute.Core.Nuget
 {
@@ -21,6 +22,7 @@ namespace Subroute.Core.Nuget
         public IEnumerable<string> Authors { get; set; }
         public IEnumerable<string> Owners { get; set; }
         public DateTimeOffset? PublishedOn { get; set; }
+        public NugetPackageDependency[] Dependencies { get; set; }
 
         public static Func<IPackage, NugetPackage> Map => p => new NugetPackage
         {
@@ -38,7 +40,13 @@ namespace Subroute.Core.Nuget
             PublishedOn = p.Published,
             Owners = p.Owners,
             Language = p.Language,
-            Authors = p.Authors
+            Authors = p.Authors,
+
+            // Map dependencies for frameworks we are targeting.
+            Dependencies = p.DependencySets
+                .Where(ds => ds.SupportedFrameworks.Any(sf => sf.Version >= new Version("4.0.0")))
+                .SelectMany(ds => ds.Dependencies).Select(pd => NugetPackageDependency.Map(pd))
+                .ToArray()
         };
     }
 }
