@@ -29,6 +29,7 @@ namespace Subroute.Core
         public static string AppInsightsInstrumentationKey => GetSetting<string>("Subroute.AppInsights.InstrumentationKey");
         public static string DocumentationPath => GetSetting<string>("Subroute.Documentation.Path");
         public static string NugetPackageUri => GetSetting<string>("Subroute.Nuget.PackageUri");
+        public static string NugetPackageDirectory => GetSetting<string>("Subroute.Nuget.PackageDirectory");
 
         /// <summary>
         /// Get a strongly-typed setting value from the active environments configuration provider.

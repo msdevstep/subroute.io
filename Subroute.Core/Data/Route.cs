@@ -30,5 +30,6 @@ namespace Subroute.Core.Data
         public string CreatedBy { get; set; }
         public virtual ICollection<Request> Requests { get; set; }
         public virtual ICollection<RouteSetting> RouteSettings { get; set; }
+        public virtual ICollection<RoutePackage> RoutePackages { get; set; }
     }
 }

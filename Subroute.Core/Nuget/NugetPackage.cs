@@ -9,18 +9,36 @@ namespace Subroute.Core.Nuget
         public string Id { get; set; }
         public string Title { get; set; }
         public string Summary { get; set; }
-        public string Description { get; internal set; }
-        public int DownloadCount { get; internal set; }
-        public Uri IconUrl { get; internal set; }
-        public Uri ProjectUrl { get; internal set; }
-        public Uri LicenseUrl { get; internal set; }
-        public string Tags { get; internal set; }
-        public string Language { get; internal set; }
-        public string Version { get; internal set; }
-        public IEnumerable<string> Authors { get; internal set; }
-        public IEnumerable<string> Owners { get; internal set; }
-        public bool IsLatestVersion { get; internal set; }
-        public string MinClientVersion { get; internal set; }
-        public DateTimeOffset? PublishedOn { get; internal set; }
+        public string Description { get; set; }
+        public int DownloadCount { get; set; }
+        public Uri IconUrl { get; set; }
+        public Uri ProjectUrl { get; set; }
+        public Uri LicenseUrl { get; set; }
+        public string Tags { get; set; }
+        public string Language { get; set; }
+        public Version Version { get; set; }
+        public string Hash { get; set; }
+        public IEnumerable<string> Authors { get; set; }
+        public IEnumerable<string> Owners { get; set; }
+        public DateTimeOffset? PublishedOn { get; set; }
+
+        public static Func<IPackage, NugetPackage> Map => p => new NugetPackage
+        {
+            Id = p.Id,
+            Title = p.Title,
+            Summary = p.Summary,
+            Description = p.Description,
+            DownloadCount = p.DownloadCount,
+            IconUrl = p.IconUrl,
+            ProjectUrl = p.ProjectUrl,
+            LicenseUrl = p.LicenseUrl,
+            Hash = p.GetHash("SHA256"),
+            Tags = p.Tags,
+            Version = p.Version?.Version,
+            PublishedOn = p.Published,
+            Owners = p.Owners,
+            Language = p.Language,
+            Authors = p.Authors
+        };
     }
 }

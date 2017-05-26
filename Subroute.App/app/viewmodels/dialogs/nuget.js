@@ -9,11 +9,19 @@
         self.totalCount = ko.observable(0);
         self.packages = ko.observableArray([]);
 
+        self.formatVersion = function (version) {
+            if (!version) {
+                return '0.0.0.0';
+            }
+
+            return [version.major, version.minor, version.build, version.revision].join('.');
+        };
+
         self.formatAuthorLine = function (package) {
             if (!package.authors)
-                return 'By Unknown Author - Version: ' + package.version;
+                return 'By Unknown Author - Version: ' + self.formatVersion(package.version);
 
-            package.authorsDisplay = 'By ' + package.authors.join(', ') + ' - Version: ' + package.version;
+            package.authorsDisplay = 'By ' + package.authors.join(', ') + ' - Version: ' + self.formatVersion(package.version);
         };
 
         self.searchPackages = function (keywords) {
