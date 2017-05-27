@@ -30,6 +30,7 @@ namespace Subroute.Core
         public static string DocumentationPath => GetSetting<string>("Subroute.Documentation.Path");
         public static string NugetPackageUri => GetSetting<string>("Subroute.Nuget.PackageUri");
         public static string NugetPackageDirectory => GetSetting<string>("Subroute.Nuget.PackageDirectory");
+        public static string NugetMaxSupportedVersion => GetSetting<string>("Subroute.Nuget.MaxSupportedVersion");
 
         /// <summary>
         /// Get a strongly-typed setting value from the active environments configuration provider.

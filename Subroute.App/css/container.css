@@ -1239,6 +1239,10 @@ ul.sub-nav li button i.fa-flip-horizontal {
 .nuget-modal {
   width: 600px;
 }
+.nuget-modal .paging-details {
+  line-height: 27px;
+  padding-left: 12px;
+}
 .nuget-modal #browse {
   font-size: 0.9em;
 }
@@ -1308,6 +1312,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
   float: left;
   margin: 0 12px 0 0;
   border: 1px solid #ccc;
+  background-color: #fff;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;

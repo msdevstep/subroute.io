@@ -69,7 +69,7 @@ namespace Subroute.Core.Nuget
             // Skip and take will always be applied since we don't want to return an unbounded result set.
             // We'll be materializing the data, then projecting the data as a new type that is serializable.
             result.Results = packages.Select(NugetPackage.Map).ToArray();
-
+            
             return result;
         }
     }
