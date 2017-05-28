@@ -35,7 +35,46 @@ namespace Subroute.Core.Nuget
 
         public NugetPackage[] ResolveDependencies(string id, Version version)
         {
-            return new NugetPackage[0];
+            // Find the actual nuget package from the gallery to get its dependencies.
+            var package = _PackageRepository.FindPackage(id, new SemanticVersion(version));
+
+            if (package == null)
+                throw new NotFoundException($"Unable to locate package. Package ID: {id}, Version: {version.ToString(3)}.");
+
+            // Recursively locate any additional nuget dependencies for this package that their
+            // packages, and combine into a single output array.
+            return new[] { NugetPackage.Map(package) }
+                .Concat(ResolveDependencies(package))
+                .ToArray();
+        }
+
+        private NugetPackage[] ResolveDependencies(IPackage package)
+        {
+            // Find nuget only dependencies.
+            var dependencies = package.DependencySets
+                .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
+                .SelectMany(ds => ds.Dependencies)
+                .ToArray();
+
+            if (!dependencies.Any())
+                return new NugetPackage[0];
+
+            // Find actual packages in nuget gallery by IVersionSpec.
+            var foundDependencies = dependencies
+                .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
+                .ToArray();
+
+            // Determine which packages we could not locate.
+            var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
+
+            if (missing.Any())
+                throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
+
+            // Determine if any of these dependencies have other nuget dependencies.
+            return foundDependencies
+                .Select(NugetPackage.Map)
+                .Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
+                .ToArray();
         }
 
         public PagedCollection<NugetPackage> SearchPackages(string keyword, int? skip = null, int? take = null)
@@ -69,6 +108,9 @@ namespace Subroute.Core.Nuget
             // Skip and take will always be applied since we don't want to return an unbounded result set.
             // We'll be materializing the data, then projecting the data as a new type that is serializable.
             result.Results = packages.Select(NugetPackage.Map).ToArray();
+
+            if (result.Results.Any())
+                ResolveDependencies(result.Results.First().Id, Version.Parse(result.Results.First().Version));
             
             return result;
         }

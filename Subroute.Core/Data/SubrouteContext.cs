@@ -17,6 +17,7 @@ namespace Subroute.Core.Data
         public DbSet<Route> Routes { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<RouteSetting> RouteSettings { get; set; }
+        public DbSet<RoutePackage> RoutePackages { get; set; }
 
         public static void InitializeMetadata()
         {

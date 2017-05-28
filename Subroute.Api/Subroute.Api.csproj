@@ -727,8 +727,11 @@
     <Compile Include="App_Start\DatabaseConfig.cs" />
     <Compile Include="App_Start\JsonWebTokenValidationHandler.cs" />
     <Compile Include="Controllers\NugetController.cs" />
+    <Compile Include="Controllers\RoutePackageController.cs" />
     <Compile Include="Controllers\RouteSettingController.cs" />
     <Compile Include="Models\Publish\PublishResponse.cs" />
+    <Compile Include="Models\RoutePackages\RoutePackageRequest.cs" />
+    <Compile Include="Models\RoutePackages\RoutePackageResponse.cs" />
     <Compile Include="Models\RouteSettings\RouteSettingRequest.cs" />
     <Compile Include="Models\RouteSettings\RouteSettingResponse.cs" />
     <Compile Include="Models\Routes\DefaultResponse.cs" />
@@ -755,6 +758,7 @@
     <Compile Include="Models\HttpActionResults\AuthenticationFailureResult.cs" />
     <Compile Include="Filters\StatusCodeExceptionFilterAttribute.cs" />
     <Compile Include="Models\Requests\RequestResponse.cs" />
+    <Compile Include="Models\Routes\RoutePackageRequest.cs" />
     <Compile Include="Models\Routes\RouteRequest.cs" />
     <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="Global.asax.cs">

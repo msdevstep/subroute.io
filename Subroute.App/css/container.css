@@ -1247,8 +1247,8 @@ ul.sub-nav li button i.fa-flip-horizontal {
   font-size: 0.9em;
 }
 .nuget-modal #browse .packages-loading {
-  height: 260px;
-  line-height: 260px;
+  height: 280px;
+  line-height: 280px;
   text-align: center;
   color: #ccc;
 }
@@ -1305,6 +1305,9 @@ ul.sub-nav li button i.fa-flip-horizontal {
 .nuget-modal #browse .nuget-package-results button .repeater-item-content span.author {
   font-weight: bold;
   padding-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .nuget-modal #browse .nuget-package-results img {
   width: 48px;

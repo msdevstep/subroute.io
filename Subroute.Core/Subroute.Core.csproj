@@ -265,6 +265,7 @@
     <Compile Include="Data\DatabaseInitializer.cs" />
     <Compile Include="Data\PagedCollection.cs" />
     <Compile Include="Data\Repositories\RequestRepository.cs" />
+    <Compile Include="Data\Repositories\RoutePackageRepository.cs" />
     <Compile Include="Data\Repositories\RouteSettingRepository.cs" />
     <Compile Include="Data\Request.cs" />
     <Compile Include="Data\Route.cs" />

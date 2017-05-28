@@ -28,7 +28,11 @@ namespace Subroute.Core.Data.Repositories
             // We'll load the route from an untracked collection since we don't want outside changes causing unwanted updates.
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
+                var query = db.Routes
+                    .Include(r => r.RouteSettings)
+                    .Include(r => r.RoutePackages)
+                    .AsNoTracking()
+                    .AsQueryable();
 
                 if (userId != null)
                     query = query.Where(q => q.UserId == userId);
@@ -51,7 +55,11 @@ namespace Subroute.Core.Data.Repositories
         {
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
+                var query = db.Routes
+                    .Include(r => r.RouteSettings)
+                    .Include(r => r.RoutePackages)
+                    .AsNoTracking()
+                    .AsQueryable();
 
                 if (userId != null)
                     query = query.Where(q => q.UserId == userId);
@@ -137,7 +145,11 @@ namespace Subroute.Core.Data.Repositories
         {
             using (var db = new SubrouteContext())
             {
-                var query = db.Routes.Include(r => r.RouteSettings).AsNoTracking().AsQueryable();
+                var query = db.Routes
+                    .Include(r => r.RouteSettings)
+                    .Include(r => r.RoutePackages)
+                    .AsNoTracking()
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(search))
                 {
