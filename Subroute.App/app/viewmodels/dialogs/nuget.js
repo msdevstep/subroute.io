@@ -52,6 +52,11 @@
             return index + ' - ' + limit + ' of ' + total;
         });
 
+        self.selectPackage = function (package) {
+            system.log(package);
+            dialog.close(self, package);
+        };
+
         self.searchPackages = function () {
             self.loading(true);
             self.packages([]);

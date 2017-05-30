@@ -10,16 +10,20 @@ using Subroute.Core.Data.Repositories;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Extensions;
 using Subroute.Core.Models.Routes;
+using Subroute.Core.Nuget;
+using NuGet;
 
 namespace Subroute.Api.Controllers
 {
     public class RoutePackageController : ApiController
     {
+        private readonly INugetService _nugetService;
         private readonly IRouteRepository _routeRepository;
         private readonly IRoutePackageRepository _routePackageRepository;
 
-        public RoutePackageController(IRouteRepository routeRepository, IRoutePackageRepository routePackageRepository)
+        public RoutePackageController(IRouteRepository routeRepository, IRoutePackageRepository routePackageRepository, INugetService nugetService)
         {
+            _nugetService = nugetService;
             _routeRepository = routeRepository;
             _routePackageRepository = routePackageRepository;
         }
@@ -42,14 +46,19 @@ namespace Subroute.Api.Controllers
         {
             // Ensure that the current user is authorized to access this route.
             var route = await EnsureAuthorizedRouteAccessAsync(identifier);
-
+            
             // Map all of the incoming route packages to the internal DB type.
             // Ignore any blank packages with no name or value.
             var mappedPackages = packages
                 .Where(s => s.Id.HasValue() && s.Version.HasValue())
-                .Select(s => RoutePackageRequest.Map(s, route.Id))
+                .Select(s => new RoutePackage
+                {
+                    RouteId = route.Id,
+                    Id = s.Id,
+                    Version = s.Version
+                })
                 .ToArray();
-
+            
             // All the route package values will be specified, anything missing will be deleted,
             // anything new will be added, and any values that are different will be updated.
             // To compare, we'll need to load all the existing route packages.

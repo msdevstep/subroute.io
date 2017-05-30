@@ -1236,6 +1236,26 @@ ul.sub-nav li button i.fa-flip-horizontal {
   overflow-y: auto;
   border: 1px solid #ccc;
 }
+.no-packages {
+  padding: 6px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  text-align: center;
+  background-color: beige;
+  border: 1px solid #cdcdb4;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.package-options {
+  cursor: pointer;
+  float: right;
+  color: #f00;
+  font-size: 1.2em;
+}
 .nuget-modal {
   width: 600px;
 }

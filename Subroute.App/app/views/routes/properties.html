@@ -38,11 +38,17 @@
 
     <div class="toolbox-well">
         <h2>NUGET PACKAGES</h2>
-        <ul class="fa-ul">
-            <li><i class="fa-li fa fa-cube"></i> Newtonsoft.Json</li>
-            <li><i class="fa-li fa fa-cube"></i> Autofac</li>
+        <ul class="fa-ul" data-bind="foreach: packages">
+            <li>
+                <i class="fa-li fa fa-cube"></i> 
+                <span data-bind="html: $root.formatPackageText($data)"></span>
+                <span class="package-options" data-bind="click: $root.removePackage">
+                    <i class="fa fa-remove"></i>
+                </span>
+            </li>
         </ul>
-        <button id="add-package-button" data-bind="click: showNuget"><i class="fa fa-gift"></i>&nbsp;&nbsp;Add Package</button>
+        <div class="no-packages" data-bind="visible: !hasPackages(), text: emptyPackageText">No packages have been added.</div>
+        <button id="add-package-button" data-bind="click: showNuget, enable: !isNew() && !savingRoutePackages(), loading: { trigger: savingRoutePackages, idle: 'fa-gift' }"><i class="fa fa-gift"></i>&nbsp;&nbsp;Add Package</button>
     </div>
 
     <div class="toolbox-well">

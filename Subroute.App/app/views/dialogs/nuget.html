@@ -16,7 +16,7 @@
                     </div>
                     <ul class="nuget-package-results" data-bind="foreach: packages, visible: !loading()">
                         <li>
-                            <button>
+                            <button data-bind="click: $root.selectPackage">
                                 <span class="repeater-item-content clearfix">
                                     <img src="../../../img/android-icon-144x144.png" title="Newtonsoft.Json" data-bind="safeSrc: {src: iconUrl, fallback: '../../../img/android-icon-144x144.png'}" />
                                     <strong data-bind="text: title">Newtonsoft.Json</strong>

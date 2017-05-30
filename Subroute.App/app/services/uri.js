@@ -28,6 +28,10 @@
             return self.getRouteUri(uri) + '/settings';
         };
 
+        self.getRoutePackagesUri = function (uri) {
+            return self.getRouteUri(uri) + '/packages';
+        };
+
         self.getRequestUri = function (uri, id) {
             return self.getRouteUri(uri) + '/requests/' + id;
         };

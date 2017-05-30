@@ -40,4 +40,17 @@ namespace Subroute.Core.Nuget
             Authors = p.Authors
         };
     }
+
+    public class NugetPackageComparer : IEqualityComparer<NugetPackage>
+    {
+        public bool Equals(NugetPackage x, NugetPackage y)
+        {
+            return x?.Id == y?.Id;
+        }
+
+        public int GetHashCode(NugetPackage obj)
+        {
+            return string.Concat(obj?.Id, obj?.Version).GetHashCode();
+        }
+    }
 }

@@ -33,13 +33,13 @@ namespace Subroute.Core.Nuget
             return NugetPackage.Map(sourcePackage);
         }
 
-        public NugetPackage[] ResolveDependencies(string id, Version version)
+        public NugetPackage[] ResolveDependencies(string id, SemanticVersion version)
         {
             // Find the actual nuget package from the gallery to get its dependencies.
-            var package = _PackageRepository.FindPackage(id, new SemanticVersion(version));
+            var package = _PackageRepository.FindPackage(id, version);
 
             if (package == null)
-                throw new NotFoundException($"Unable to locate package. Package ID: {id}, Version: {version.ToString(3)}.");
+                throw new NotFoundException($"Unable to locate package. Package ID: {id}, Version: {version.ToFullString()}.");
 
             // Recursively locate any additional nuget dependencies for this package that their
             // packages, and combine into a single output array.
@@ -108,9 +108,6 @@ namespace Subroute.Core.Nuget
             // Skip and take will always be applied since we don't want to return an unbounded result set.
             // We'll be materializing the data, then projecting the data as a new type that is serializable.
             result.Results = packages.Select(NugetPackage.Map).ToArray();
-
-            if (result.Results.Any())
-                ResolveDependencies(result.Results.First().Id, Version.Parse(result.Results.First().Version));
             
             return result;
         }

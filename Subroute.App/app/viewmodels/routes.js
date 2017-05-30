@@ -14,10 +14,12 @@
         self.isDefault = ko.observable(false);
         self.executionCount = ko.observable(0);
         self.settings = ko.observableArray();
+        self.packages = ko.observableArray();
         self.updatedOn = ko.observable();
         self.publishedOn = ko.observable();
         self.activePanel = ko.observable('routes/properties.html');
         self.savingRouteSettings = ko.observable(false);
+        self.savingRoutePackages = ko.observable(false);
         self.suggesting = ko.observable(false);
         self.publishing = ko.observable(false);
         self.compiling = ko.observable(false);
@@ -25,6 +27,21 @@
         self.auth = authentication;
         self.config = config;
         self.toolboxVisible = ko.observable(true);
+
+        self.emptyPackageText = ko.computed(function () {
+            if (self.isNew()) {
+                return 'Save your route before you can add packages.';
+            };
+
+            return 'No packages have been added.';
+        });
+
+        self.hasPackages = ko.computed(function () {
+            if (!self.packages()) {
+                return false;
+            };
+            return self.packages().length > 0;
+        });
 
         self.hasSettings = ko.computed(function() {
             if (!self.settings()) {
@@ -107,8 +124,75 @@
                 uri: self.uri(),
                 id: request.id
             };
-            dialog.openModal(nugetModal, options);
+            dialog.openModal(nugetModal, options).then(function (package) {
+                var exists = ko.utils.arrayFirst(self.packages(), function (item) {
+                    return item.id == package.id;
+                });
+
+                var packageModel = {
+                    id: package.id,
+                    version: package.version
+                };
+
+                if (!exists) {
+                    self.packages.push(packageModel);
+                } else {
+                    exists.version = package.version;
+                };
+
+                self.savePackages().fail(function () {
+                    // Remove added package to restore state.
+                    self.packages.remove(packageModel);
+                });
+            });
+
             return false;
+        };
+
+        self.formatPackageText = function (package) {
+            var text = package.id + ' ' + package.version;
+
+            if (text && text.length > 40) {
+                text = text.substr(0, 40).trim() + '&hellip;';
+            };
+
+            return text;
+        };
+
+        self.savePackages = function () {
+            var requestUri = uriBuilder.getRoutePackagesUri(self.uri());
+
+            self.savingRoutePackages(true);
+
+            return ajax.request({
+                url: requestUri,
+                type: 'PUT',
+                data: ko.toJSON(self.packages()),
+                contentType: 'application/json'
+            }).then(function (data) {
+                // Replace existing packages with packages returned from the server.
+                self.packages.removeAll();
+                for (var i = 0; i < data.length; i++) {
+                    self.packages.push(data[i]);
+                };
+            }).fail(function (error) {
+                alert('Unable to save route packages.');
+            }).always(function () {
+                self.savingRoutePackages(false);
+            });
+        };
+
+        self.removePackage = function (package) {
+            if (self.savingRoutePackages()) {
+                return;
+            };
+
+            self.packages.remove(package);
+
+            self.savePackages().fail(function () {
+                // Readd the package to the array to restore proper state.
+                self.packages.push(package);
+            });
         };
 
         self.showHowTo = function () {
@@ -432,6 +516,7 @@
             self.isCurrent(route.isCurrent);
             self.isDefault(route.isDefault);
             self.settings(route.settings);
+            self.packages(route.packages);
             self.updatedOn(route.updatedOn);
             self.publishedOn(route.publishedOn);
         };
