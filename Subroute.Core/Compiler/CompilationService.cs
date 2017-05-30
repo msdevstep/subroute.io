@@ -26,7 +26,7 @@ namespace Subroute.Core.Compiler
 {
     public interface ICompilationService
     {
-        CompilationResult Compile(string code);
+        CompilationResult Compile(CompileRequest request);
         Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, string code);
     }
 
@@ -41,17 +41,20 @@ namespace Subroute.Core.Compiler
             MetadataProvider = metadataProvider;
         }
 
-        public CompilationResult Compile(string code)
+        public CompilationResult Compile(CompileRequest request)
         {
-            if (string.IsNullOrWhiteSpace(code))
+            if (request == null)
+                throw new ArgumentNullException($"Argument {nameof(request)} cannot be null.");
+
+            if (string.IsNullOrWhiteSpace(request.Code))
                 throw new CompilationException("No source code was provided.");
 
             // Build a syntax tree of provided source code, this will allow CodeAnalysis to properly understand the code.
-            var tree = CSharpSyntaxTree.ParseText(code);
+            var tree = CSharpSyntaxTree.ParseText(request.Code);
 
             // We need to reference assemblies that the code relies on.
-            var references = MetadataProvider.GetCompilationMetadata();
-
+            var references = MetadataProvider.GetCompilationMetadata(request.Dependencies);
+            
             // Compile syntax tree into a new compilation of a DLL, since we have no need for an entry point.
             var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var compilationName = $"Assembly_{Guid.NewGuid()}";

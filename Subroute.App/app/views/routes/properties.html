@@ -22,7 +22,7 @@
         <button id="save-button" data-bind="click: saveChanges, loading: { trigger: saving, idle: 'fa-floppy-o' }"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save Changes</button>
         <!-- /ko -->
         <button id="compile-button" data-bind="click: compile, loading: { trigger: compiling, idle: 'fa-upload' }"><i class="fa fa-upload"></i>&nbsp;&nbsp;Compile</button>
-        <button id="publish-button" data-bind="click: publish, enable: !isNew(), loading: { trigger: isPublishing, idle: 'fa-cloud-upload' }"><i class="fa fa-cloud-upload"></i>&nbsp;&nbsp;Publish</button>
+        <button id="publish-button" data-bind="click: publish, loading: { trigger: isPublishing, idle: 'fa-cloud-upload' }, enable: !isNew()"><i class="fa fa-cloud-upload"></i>&nbsp;&nbsp;Publish</button>
     </div>
 
     <div class="toolbox-well">
@@ -48,7 +48,7 @@
             </li>
         </ul>
         <div class="no-packages" data-bind="visible: !hasPackages(), text: emptyPackageText">No packages have been added.</div>
-        <button id="add-package-button" data-bind="click: showNuget, enable: !isNew() && !savingRoutePackages(), loading: { trigger: savingRoutePackages, idle: 'fa-gift' }"><i class="fa fa-gift"></i>&nbsp;&nbsp;Add Package</button>
+        <button id="add-package-button" data-bind="click: showNuget, loading: { trigger: savingRoutePackages, idle: 'fa-gift' }, enable: canAddPackage"><i class="fa fa-gift"></i>&nbsp;&nbsp;Add Package</button>
     </div>
 
     <div class="toolbox-well">

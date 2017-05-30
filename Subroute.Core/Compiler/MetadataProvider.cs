@@ -13,17 +13,23 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json.Linq;
 using System.Web.Hosting;
+using Subroute.Core.Nuget;
 
 namespace Subroute.Core.Compiler
 {
     public interface IMetadataProvider
     {
-        MetadataReference[] GetCompilationMetadata();
+        MetadataReference[] GetCompilationMetadata(Dependency[] dependencies);
     }
 
     public class MetadataProvider : IMetadataProvider
     {
-        static MetadataReference[] MetadataCache = null;
+        private readonly INugetService _NugetService;
+
+        public MetadataProvider(INugetService nugetService)
+        {
+            _NugetService = nugetService;
+        }
 
         private IDictionary<string, string> GetDocumentationLookup()
         {
@@ -55,10 +61,17 @@ namespace Subroute.Core.Compiler
             return result;
         }
 
-        public MetadataReference[] GetCompilationMetadata()
+        public MetadataReference[] GetCompilationMetadata(Dependency[] dependencies)
         {
-            if (MetadataCache != null)
-                return MetadataCache;
+            // Ensure we never have a null reference for the dependency list.
+            if (dependencies == null)
+                dependencies = new Dependency[0];
+
+            // First we'll resolve all the nuget packages and their dependencies.
+            foreach (var dependency in dependencies.Where(d => d.Type == DependencyType.NuGet))
+            {
+
+            }
 
             var assemblies = new[]
             {
@@ -81,7 +94,7 @@ namespace Subroute.Core.Compiler
 
             var fileLookup = GetDocumentationLookup();
 
-            return MetadataCache = assemblies
+            return assemblies
                 .Select(a =>
                 {
                     // Locate the name of the assembly to determine what the documentation file name is.

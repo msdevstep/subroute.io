@@ -36,6 +36,10 @@
             return 'No packages have been added.';
         });
 
+        self.canAddPackage = ko.computed(function () {
+            return !self.isNew() && !self.savingRoutePackages();
+        });
+
         self.hasPackages = ko.computed(function () {
             if (!self.packages()) {
                 return false;
