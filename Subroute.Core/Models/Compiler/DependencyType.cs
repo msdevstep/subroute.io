@@ -1,4 +1,4 @@
-﻿namespace Subroute.Core.Compiler
+﻿namespace Subroute.Core.Models.Compiler
 {
     public enum DependencyType
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NuGet;
 using System.Linq;
+using Subroute.Core.Data;
 
 namespace Subroute.Core.Nuget
 {
@@ -39,18 +40,5 @@ namespace Subroute.Core.Nuget
             Language = p.Language,
             Authors = p.Authors
         };
-    }
-
-    public class NugetPackageComparer : IEqualityComparer<NugetPackage>
-    {
-        public bool Equals(NugetPackage x, NugetPackage y)
-        {
-            return x?.Id == y?.Id;
-        }
-
-        public int GetHashCode(NugetPackage obj)
-        {
-            return string.Concat(obj?.Id, obj?.Version).GetHashCode();
-        }
     }
 }

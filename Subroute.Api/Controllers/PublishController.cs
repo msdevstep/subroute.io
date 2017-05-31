@@ -8,6 +8,8 @@ using Subroute.Api.Models.Routes;
 using Subroute.Core.Compiler;
 using Subroute.Core.Data.Repositories;
 using Subroute.Core.Models.Routes;
+using Subroute.Core.Models.Compiler;
+using System.Linq;
 
 namespace Subroute.Api.Controllers
 {
@@ -36,9 +38,15 @@ namespace Subroute.Api.Controllers
             // Load route to get source code.
             var route = await _routeRepository.GetRouteByIdentifierAsync(identifier);
             var code = route.Code;
+            var source = new Source(code, route.RoutePackages.Select(p => new Dependency
+            {
+                Id = p.Id,
+                Version = p.Version,
+                Type = p.Type
+            }).ToArray());
 
             // Compile code and get assembly as byte array.
-            var compilationResult = _compilationService.Compile(code);
+            var compilationResult = _compilationService.Compile(source);
 
             // We'll save the assembly and mark the route as published if the compilation was successful.
             if (compilationResult.Success)

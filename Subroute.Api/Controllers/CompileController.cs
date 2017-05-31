@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Subroute.Core.Compiler;
+using Subroute.Api.Models.Compile;
 
 namespace Subroute.Api.Controllers
 {
@@ -29,11 +30,10 @@ namespace Subroute.Api.Controllers
         /// </summary>
         /// <returns>Returns 204 No Content or build errors.</returns>
         [Route("compile/v1"), AllowAnonymous]
-        public async Task<IHttpActionResult> PostCompileAsync()
+        public async Task<IHttpActionResult> PostCompileAsync(CompileRequest request)
         {
-            var code = await Request.Content.ReadAsStringAsync();
-
-            var compilationResult = _compilationService.Compile(code);
+            var source = new Source(request.Code, request.Dependencies);
+            var compilationResult = _compilationService.Compile(source);
 
             // Return an error response if compile was unsuccessful, otherwise the response was successful.
             return Content(compilationResult.Success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError, compilationResult);

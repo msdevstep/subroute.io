@@ -1,4 +1,6 @@
-﻿namespace Subroute.Core.Compiler
+﻿using Subroute.Core.Models.Compiler;
+
+namespace Subroute.Core.Compiler
 {
     public class CompilationResult
     {

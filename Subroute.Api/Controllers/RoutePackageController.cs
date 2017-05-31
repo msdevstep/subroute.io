@@ -12,6 +12,8 @@ using Subroute.Core.Extensions;
 using Subroute.Core.Models.Routes;
 using Subroute.Core.Nuget;
 using NuGet;
+using Subroute.Core.Compiler;
+using Subroute.Core.Models.Compiler;
 
 namespace Subroute.Api.Controllers
 {
@@ -20,12 +22,14 @@ namespace Subroute.Api.Controllers
         private readonly INugetService _nugetService;
         private readonly IRouteRepository _routeRepository;
         private readonly IRoutePackageRepository _routePackageRepository;
+        private readonly IMetadataProvider _metadataProvider;
 
-        public RoutePackageController(IRouteRepository routeRepository, IRoutePackageRepository routePackageRepository, INugetService nugetService)
+        public RoutePackageController(IRouteRepository routeRepository, IRoutePackageRepository routePackageRepository, INugetService nugetService, IMetadataProvider metadataProvider)
         {
             _nugetService = nugetService;
             _routeRepository = routeRepository;
             _routePackageRepository = routePackageRepository;
+            _metadataProvider = metadataProvider;
         }
 
         [Route("routes/v1/{identifier}/packages")]
@@ -96,6 +100,17 @@ namespace Subroute.Api.Controllers
                 // Complete the transaction scope to commit all operations.
                 ts.Complete();
             }
+
+            // Lets go ahead and pre-computed and download the selected packages. This way getting intellisense and compiling won't 
+            // take a long time the first time it has to download packages.
+            var dependencies = results.Select(r => new Dependency
+            {
+                Id = r.Id,
+                Version = r.Version,
+                Type = DependencyType.NuGet
+            }).ToArray();
+
+            _metadataProvider.ResolveReferences(dependencies);
 
             // Map the RoutePackage type to the outgoing RoutePackageResponse type.
             return results.Select(RoutePackageResponse.Map).OrderBy(s => s.Id).ToArray();

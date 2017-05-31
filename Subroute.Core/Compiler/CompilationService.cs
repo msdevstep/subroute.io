@@ -18,6 +18,7 @@ using Microsoft.CodeAnalysis.Recommendations;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json.Linq;
 using Subroute.Core.Exceptions;
+using Subroute.Core.Models.Compiler;
 using Subroute.Core.Extensions;
 using Microsoft.CodeAnalysis.Completion;
 using System.Collections.Concurrent;
@@ -26,8 +27,8 @@ namespace Subroute.Core.Compiler
 {
     public interface ICompilationService
     {
-        CompilationResult Compile(CompileRequest request);
-        Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, string code);
+        CompilationResult Compile(Source source);
+        Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, Source source);
     }
 
     public class CompilationService : ICompilationService
@@ -41,19 +42,20 @@ namespace Subroute.Core.Compiler
             MetadataProvider = metadataProvider;
         }
 
-        public CompilationResult Compile(CompileRequest request)
+        public CompilationResult Compile(Source source)
         {
-            if (request == null)
-                throw new ArgumentNullException($"Argument {nameof(request)} cannot be null.");
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
 
-            if (string.IsNullOrWhiteSpace(request.Code))
+            if (string.IsNullOrWhiteSpace(source.Code))
                 throw new CompilationException("No source code was provided.");
 
             // Build a syntax tree of provided source code, this will allow CodeAnalysis to properly understand the code.
-            var tree = CSharpSyntaxTree.ParseText(request.Code);
+            var tree = CSharpSyntaxTree.ParseText(source.Code);
 
-            // We need to reference assemblies that the code relies on.
-            var references = MetadataProvider.GetCompilationMetadata(request.Dependencies);
+            // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
+            // firm reference for each reference and any additional dependencies.
+            var references = MetadataProvider.ResolveReferences(source.Dependencies);
             
             // Compile syntax tree into a new compilation of a DLL, since we have no need for an entry point.
             var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -75,7 +77,7 @@ namespace Subroute.Core.Compiler
                         var startPostion = lineSpan.StartLinePosition;
                         var endPosition = lineSpan.EndLinePosition;
 
-                        return new Diagnostic
+                        return new Models.Compiler.Diagnostic
                         {
                             Severity = d.Severity,
                             Code = d.Id,
@@ -96,19 +98,25 @@ namespace Subroute.Core.Compiler
             }
         }
 
-        public async Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, string code)
+        public async Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, Source source)
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
             // Setup a workspace for this code file, since we aren't actively managing a project or solutions.
             var workspace = new AdhocWorkspace();
             var projectName = RandomString(6, "Project");
             var assemblyName = RandomString(6, "Assembly");
             var documentName = RandomString(6, "Document");
-            var references = MetadataProvider.GetCompilationMetadata();
+
+            // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
+            // firm reference for each reference and any additional dependencies.
+            var references = MetadataProvider.ResolveReferences(source.Dependencies);
 
             var document = workspace.CurrentSolution
                 .AddProject(projectName, assemblyName, LanguageNames.CSharp)
                 .WithMetadataReferences(references)
-                .AddDocument(documentName, SourceText.From(code));
+                .AddDocument(documentName, SourceText.From(source.Code));
         
             // Determine position of cursor so we know which symbols to recommend.
             var text = await document.GetTextAsync();

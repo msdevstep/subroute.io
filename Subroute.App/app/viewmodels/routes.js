@@ -315,6 +315,12 @@
 
         self.compile = function () {
             var requestUri = uriBuilder.getCompileUri();
+            var data = {
+                code: self.script(),
+                dependencies: ko.utils.arrayMap(self.packages(), function (package) {
+                    return { id: package.id, version: package.version, type: 'NuGet' }
+                })
+            };
 
             self.compiling(true);
             self.showNeutralMessage('Compiling...');
@@ -322,8 +328,8 @@
             return ajax.request({
                 url: requestUri,
                 type: 'POST',
-                data: self.script(),
-                contentType: 'text/plain'
+                data: ko.toJSON(data),
+                contentType: 'application/json'
             }).then(function (data) {
                 self.clearErrors();
 
@@ -639,12 +645,18 @@
 
         self.intellisense = function (innerEditor, session, pos, prefix, callback) {
             var uri = config.apiUrl + 'intellisense/v1?wordToComplete=' + prefix + '&character=' + pos.column + '&line=' + pos.row + '&wantSnippet=true&wantDocumentationForEveryCompletionResult=true&wantReturnType=true&wantKind=true&wantMethodHeader=true';
+            var data = {
+                    code: innerEditor.getValue(),
+                    dependencies: ko.utils.arrayMap(self.packages(), function (package) {
+                        return { id: package.id, version: package.version, type: 'NuGet' }
+                    })
+                };
 
             ajax.request({
                 url: uri,
                 type: 'POST',
-                data: innerEditor.getValue(),
-                contentType: 'text/plain'
+                data: ko.toJSON(data),
+                contentType: 'application/json'
             }).then(function (data) {
                 var index = 0;
                 var completions = ko.utils.arrayMap(data, function (item) {

@@ -729,6 +729,7 @@
     <Compile Include="Controllers\NugetController.cs" />
     <Compile Include="Controllers\RoutePackageController.cs" />
     <Compile Include="Controllers\RouteSettingController.cs" />
+    <Compile Include="Models\Compile\CompileRequest.cs" />
     <Compile Include="Models\Publish\PublishResponse.cs" />
     <Compile Include="Models\RoutePackages\RoutePackageRequest.cs" />
     <Compile Include="Models\RoutePackages\RoutePackageResponse.cs" />

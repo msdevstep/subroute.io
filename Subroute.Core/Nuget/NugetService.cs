@@ -1,7 +1,9 @@
 ﻿using NuGet;
 using Subroute.Core.Data;
 using Subroute.Core.Exceptions;
+using Subroute.Core.Models.Compiler;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace Subroute.Core.Nuget
@@ -17,29 +19,37 @@ namespace Subroute.Core.Nuget
             _PackageRepository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
         }
 
-        public NugetPackage DownloadPackage(string id, Version version)
+        public string DownloadPackage(NugetPackage package)
         {
+            // First we'll determine if the package has already been download. We only need to download the package
+            // once. Then every single subroute that references this package will already have it.
+            var folder = $"{package.Id}.{package.Version}";
+            var path = Path.Combine(Settings.NugetPackageDirectory, folder);
+
+            if (Directory.Exists(path))
+                return path;
+
             // Attempt to locate package by ID and Version in the nuget package repository.
-            var sourcePackage = _PackageRepository.FindPackage(id, new SemanticVersion(version));
+            var sourcePackage = _PackageRepository.FindPackage(package.Id, SemanticVersion.Parse(package.Version));
 
             // When no package was found, it could be a network error or the package was unlisted. Throw exception.
             if (sourcePackage == null)
-                throw new NotFoundException($"Unable to locate package. Package ID: {id}, Version: {version.ToString(3)}.");
+                throw new NotFoundException($"Unable to locate package. Package ID: {package.Id}, Version: {package.Version}.");
 
             // When the package is located, extract its contents into the standard local directory format.
-            sourcePackage.ExtractContents(new PhysicalFileSystem(Settings.NugetPackageDirectory), $"{id}.{version.ToString(3)}");
-            
+            sourcePackage.ExtractContents(new PhysicalFileSystem(Settings.NugetPackageDirectory), folder);
+
             // To simplify getting the package details, we'll return the mapped package details.
-            return NugetPackage.Map(sourcePackage);
+            return path;
         }
 
-        public NugetPackage[] ResolveDependencies(string id, SemanticVersion version)
+        public NugetPackage[] ResolveDependencies(Dependency dependency)
         {
             // Find the actual nuget package from the gallery to get its dependencies.
-            var package = _PackageRepository.FindPackage(id, version);
+            var package = _PackageRepository.FindPackage(dependency.Id, SemanticVersion.Parse(dependency.Version));
 
             if (package == null)
-                throw new NotFoundException($"Unable to locate package. Package ID: {id}, Version: {version.ToFullString()}.");
+                throw new NotFoundException($"Unable to locate package. Package ID: {dependency.Id}, Version: {dependency.Version}.");
 
             // Recursively locate any additional nuget dependencies for this package that their
             // packages, and combine into a single output array.

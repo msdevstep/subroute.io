@@ -14,17 +14,21 @@ using Microsoft.CodeAnalysis;
 using Newtonsoft.Json.Linq;
 using System.Web.Hosting;
 using Subroute.Core.Nuget;
+using Subroute.Core.Data;
+using Subroute.Core.Models.Compiler;
+using System.Reflection;
 
 namespace Subroute.Core.Compiler
 {
     public interface IMetadataProvider
     {
-        MetadataReference[] GetCompilationMetadata(Dependency[] dependencies);
+        MetadataReference[] ResolveReferences(Dependency[] dependencies);
     }
 
     public class MetadataProvider : IMetadataProvider
     {
         private readonly INugetService _NugetService;
+        private readonly NugetPackageComparer _NugetPackageComparer = new NugetPackageComparer();
 
         public MetadataProvider(INugetService nugetService)
         {
@@ -61,17 +65,24 @@ namespace Subroute.Core.Compiler
             return result;
         }
 
-        public MetadataReference[] GetCompilationMetadata(Dependency[] dependencies)
+        public MetadataReference[] ResolveReferences(Dependency[] dependencies)
         {
             // Ensure we never have a null reference for the dependency list.
             if (dependencies == null)
-                dependencies = new Dependency[0];
+                throw new ArgumentNullException(nameof(dependencies));
 
             // First we'll resolve all the nuget packages and their dependencies.
-            foreach (var dependency in dependencies.Where(d => d.Type == DependencyType.NuGet))
-            {
+            var nuget = dependencies
+                .Where(d => d.Type == DependencyType.NuGet)
+                .SelectMany(d => _NugetService.ResolveDependencies(d))
+                .Distinct(_NugetPackageComparer)
+                .ToArray();
 
-            }
+            // Get the folder location of each downloaded nuget package. We'll download and extract
+            // the package if it hasn't been downloaded yet.
+            var packageLocations = nuget
+                .Select(p => _NugetService.DownloadPackage(p))
+                .ToArray();
 
             var assemblies = new[]
             {
@@ -99,7 +110,7 @@ namespace Subroute.Core.Compiler
                 {
                     // Locate the name of the assembly to determine what the documentation file name is.
                     var assemblyName = a.GetName()?.Name;
-
+                    
                     // Attempt to locate an xml documentation file in the cache.
                     if (assemblyName != null && fileLookup.TryGetValue(assemblyName, out string docPath))
                         return MetadataReference.CreateFromFile(a.Location, documentation: XmlDocumentationProvider.CreateFromFile(docPath));

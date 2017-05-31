@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Subroute.Core.Models.Compiler;
+using Subroute.Core.Nuget;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,6 +13,7 @@ namespace Subroute.Core.Data
         [Key, Column(Order = 1)]
         public int RouteId { get; set; }
         public string Version { get; set; }
+        public DependencyType Type { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public string CreatedBy { get; set; }
         public DateTimeOffset UpdatedOn { get; set; }

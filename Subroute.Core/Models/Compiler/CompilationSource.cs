@@ -1,13 +1,15 @@
-﻿namespace Subroute.Core.Compiler
+﻿using Subroute.Core.Models.Compiler;
+
+namespace Subroute.Core.Compiler
 {
-    public class CompileRequest
+    public class Source
     {
-        public CompileRequest(string code)
+        public Source(string code)
         {
             Code = code;
         }
 
-        public CompileRequest(string code, Dependency[] dependencies)
+        public Source(string code, Dependency[] dependencies)
             : this(code)
         {
             Dependencies = dependencies;

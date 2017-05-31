@@ -23,11 +23,9 @@ namespace Subroute.Api.Controllers
         /// <param name="request">Cursor position and options of intellisense request.</param>
         /// <returns>Returns an array of available members and their types.</returns>
         [Route("intellisense/v1"), AllowAnonymous]
-        public async Task<CompletionResult[]> PostMembers([FromUri]CompletionRequest request)
+        public async Task<CompletionResult[]> PostMembers([FromUri]CompletionRequest request, Source source)
         {
-            var code = await Request.Content.ReadAsStringAsync();
-
-            return await _compilationService.GetCompletionsAsync(request, code);
+            return await _compilationService.GetCompletionsAsync(request, source);
         }
     }
 }
