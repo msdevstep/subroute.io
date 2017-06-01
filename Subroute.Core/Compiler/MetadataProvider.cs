@@ -29,7 +29,7 @@ namespace Subroute.Core.Compiler
     {
         private readonly INugetService _NugetService;
         private readonly NugetPackageComparer _NugetPackageComparer = new NugetPackageComparer();
-
+    
         public MetadataProvider(INugetService nugetService)
         {
             _NugetService = nugetService;
@@ -83,6 +83,7 @@ namespace Subroute.Core.Compiler
             var packageLocations = nuget
                 .Select(p => _NugetService.DownloadPackage(p))
                 .ToArray();
+            
 
             var assemblies = new[]
             {
@@ -119,6 +120,11 @@ namespace Subroute.Core.Compiler
                     return MetadataReference.CreateFromFile(a.Location);
                 })
                 .ToArray();
+        }
+
+        private MetadataReference[] ResolvePackageAssemblies(string packageDirectory)
+        {
+            return null;
         }
     }
 }

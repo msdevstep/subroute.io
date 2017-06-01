@@ -1,10 +1,13 @@
 ﻿using NuGet;
+using NuGet.Protocol;
 using Subroute.Core.Data;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Models.Compiler;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
+using static NuGet.Protocol.Core.Types.Repository;
 
 namespace Subroute.Core.Nuget
 {
@@ -31,7 +34,7 @@ namespace Subroute.Core.Nuget
 
             // Attempt to locate package by ID and Version in the nuget package repository.
             var sourcePackage = _PackageRepository.FindPackage(package.Id, SemanticVersion.Parse(package.Version));
-
+            
             // When no package was found, it could be a network error or the package was unlisted. Throw exception.
             if (sourcePackage == null)
                 throw new NotFoundException($"Unable to locate package. Package ID: {package.Id}, Version: {package.Version}.");
@@ -60,30 +63,35 @@ namespace Subroute.Core.Nuget
 
         private NugetPackage[] ResolveDependencies(IPackage package)
         {
-            // Find nuget only dependencies.
-            var dependencies = package.DependencySets
-                .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
-                .SelectMany(ds => ds.Dependencies)
-                .ToArray();
+            var walker = new DependentsWalker(_PackageRepository, new FrameworkName(".NETFramework", Version.Parse("4.6")));
+            walker.DependencyVersion = DependencyVersion.Highest;
+            walker.SkipPackageTargetCheck = true;
+            var dependencies = walker.GetDependents(package);
+            
+            //// Find nuget only dependencies.
+            //var dependencies = package.DependencySets
+            //    .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
+            //    .SelectMany(ds => ds.Dependencies)
+            //    .ToArray();
 
-            if (!dependencies.Any())
-                return new NugetPackage[0];
+            //if (!dependencies.Any())
+            //    return new NugetPackage[0];
 
-            // Find actual packages in nuget gallery by IVersionSpec.
-            var foundDependencies = dependencies
-                .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
-                .ToArray();
+            //// Find actual packages in nuget gallery by IVersionSpec.
+            //var foundDependencies = dependencies
+            //    .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
+            //    .ToArray();
 
-            // Determine which packages we could not locate.
-            var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
+            //// Determine which packages we could not locate.
+            //var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
 
-            if (missing.Any())
-                throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
+            //if (missing.Any())
+            //    throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
 
             // Determine if any of these dependencies have other nuget dependencies.
-            return foundDependencies
+            return dependencies
                 .Select(NugetPackage.Map)
-                .Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
+                //.Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
                 .ToArray();
         }
 
@@ -92,6 +100,9 @@ namespace Subroute.Core.Nuget
             // Lets apply a guard-rail to ensure the client doesn't request too much data.
             if (take.GetValueOrDefault() > 100 || !take.HasValue)
                 take = 100;
+
+            var core = new RepositoryFactory().GetCoreV3("", FeedType.HttpV3);
+            core.
 
             // Create source query to filter packages by keyword and target framework (include pre-releases).
             var query = _PackageRepository.Search(keyword, TargetFrameworks, true);
