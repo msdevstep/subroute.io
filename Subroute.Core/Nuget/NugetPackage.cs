@@ -23,22 +23,22 @@ namespace Subroute.Core.Nuget
         public IEnumerable<string> Owners { get; set; }
         public DateTimeOffset? PublishedOn { get; set; }
 
-        public static Func<IPackage, NugetPackage> Map => p => new NugetPackage
-        {
-            Id = p.Id,
-            Title = p.Title,
-            Summary = p.Summary,
-            Description = p.Description,
-            DownloadCount = p.DownloadCount,
-            IconUrl = p.IconUrl,
-            ProjectUrl = p.ProjectUrl,
-            LicenseUrl = p.LicenseUrl,
-            Tags = p.Tags,
-            Version = p.Version?.ToFullString(),
-            PublishedOn = p.Published,
-            Owners = p.Owners,
-            Language = p.Language,
-            Authors = p.Authors
-        };
+        //public static Func<IPackage, NugetPackage> Map => p => new NugetPackage
+        //{
+        //    Id = p.Id,
+        //    Title = p.Title,
+        //    Summary = p.Summary,
+        //    Description = p.Description,
+        //    DownloadCount = p.DownloadCount,
+        //    IconUrl = p.IconUrl,
+        //    ProjectUrl = p.ProjectUrl,
+        //    LicenseUrl = p.LicenseUrl,
+        //    Tags = p.Tags,
+        //    Version = p.Version?.ToFullString(),
+        //    PublishedOn = p.Published,
+        //    Owners = p.Owners,
+        //    Language = p.Language,
+        //    Authors = p.Authors
+        //};
     }
 }

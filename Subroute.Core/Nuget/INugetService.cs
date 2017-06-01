@@ -2,6 +2,7 @@
 using Subroute.Core.Data;
 using Subroute.Core.Models.Compiler;
 using System;
+using System.Threading.Tasks;
 
 namespace Subroute.Core.Nuget
 {
@@ -9,6 +10,6 @@ namespace Subroute.Core.Nuget
     {
         string DownloadPackage(NugetPackage package);
         NugetPackage[] ResolveDependencies(Dependency dependency);
-        PagedCollection<NugetPackage> SearchPackages(string keyword, int? skip = null, int? take = null);
+        Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string keyword, int? skip = null, int? take = null);
     }
 }

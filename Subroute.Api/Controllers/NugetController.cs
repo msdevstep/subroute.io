@@ -35,9 +35,9 @@ namespace Subroute.Api.Controllers
         /// <param name="take">Specifies the number of records to return in the results.</param>
         /// <returns>An array of <see cref="IPackage"/> representing a list of package results.</returns>
         [Route("nuget/v1")]
-        public PagedCollection<NugetPackage> GetSearchPackages(string keyword = null, int? skip = 0, int? take = 20)
+        public async Task<PagedCollection<NugetPackage>> GetSearchPackages(string keyword = null, int? skip = 0, int? take = 20)
         {
-            return _nugetService.SearchPackages(keyword, skip, take);
+            return await _nugetService.SearchPackagesAsync(keyword, skip, take);
         }
     }
 }
