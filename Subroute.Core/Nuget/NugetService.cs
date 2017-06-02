@@ -1,17 +1,8 @@
-﻿using NuGet;
-using NuGet.Protocol;
+﻿using NuGet.Configuration;
 using NuGet.Protocol.Core.Types;
-//using NuGet.Protocol.Core.v2;
-using NuGet.Common;
-using ServiceStack.Text;
 using Subroute.Core.Data;
-using Subroute.Core.Exceptions;
 using Subroute.Core.Models.Compiler;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using static NuGet.Protocol.Core.Types.Repository;
@@ -22,7 +13,7 @@ namespace Subroute.Core.Nuget
     {
         //private readonly IPackageRepository _PackageRepository = null;
 
-        public static string[] TargetFrameworks = new[] { ".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0" };
+        public static string[] TargetFrameworks = new[] {".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0"};
 
         public NugetService()
         {
@@ -77,7 +68,7 @@ namespace Subroute.Core.Nuget
         //    //walker.DependencyVersion = DependencyVersion.Highest;
         //    //walker.SkipPackageTargetCheck = true;
         //    //var dependencies = walker.GetDependents(package);
-            
+
         //    ////// Find nuget only dependencies.
         //    ////var dependencies = package.DependencySets
         //    ////    .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
@@ -105,77 +96,42 @@ namespace Subroute.Core.Nuget
         //    //    .ToArray();
         //}
 
-        public async Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string keyword, int? skip = null, int? take = null)
+        /// <summary>
+        /// Searches the NuGet gallery for package data and returns a page of data at a time.
+        /// </summary>
+        /// <param name="term">Search term used to filter the package result data.</param>
+        /// <param name="skip">Starting index of the page of data to return.</param>
+        /// <param name="take">Number of records to include in the result data.</param>
+        /// <returns>Returns an instance of <see cref="PagedCollection{NugetPackage}"/> containing paging data and package results.</returns>
+        public async Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string term, int? skip = null, int? take = null)
         {
             // Lets apply a guard-rail to ensure the client doesn't request too much data.
             if (take.GetValueOrDefault() > 100 || !take.HasValue)
                 take = 100;
+            
+            // Get an instance of the provider used to get package result data from the NuGet gallery.
+            var providers = Provider.GetPageableCoreV3().ToList();
+            var packageSource = new PackageSource(Settings.NugetPackageUri);
+            var sourceRepository = new SourceRepository(packageSource, providers);
+            var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResourceEnhancedV3>();
+            var searchFilter = new SearchFilter(false, SearchFilterType.IsLatestVersion);
+            var searchMetadata = await searchResource.SearchPageableAsync(term,
+                searchFilter,
+                skip.GetValueOrDefault(),
+                take.GetValueOrDefault(),
+                new TraceLogger(),
+                CancellationToken.None);
 
-            Logger logger = new Logger();
-            List<Lazy<INuGetResourceProvider>> providers = new List<Lazy<INuGetResourceProvider>>();
-            providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
-            //providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
-            NuGet.Configuration.PackageSource packageSource = new NuGet.Configuration.PackageSource("https://api.nuget.org/v3/index.json");
-            SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
-            PackageSearchResource searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>();
-            IEnumerable<IPackageSearchMetadata> searchMetadata = await searchResource.SearchAsync(keyword, new SearchFilter(false, SearchFilterType.IsLatestVersion), skip.GetValueOrDefault(), take.GetValueOrDefault(), logger, CancellationToken.None);
-            searchMetadata.Dump();
-
+            // Extract and return paging data and search results.
             return new PagedCollection<NugetPackage>
             {
-                Results = new NugetPackage[0]
+                Skip = skip.GetValueOrDefault(),
+                Take = take.GetValueOrDefault(),
+                TotalCount = searchMetadata.TotalCount,
+                Results = searchMetadata.Results
+                    .Select(m => NugetPackage.Map(m))
+                    .ToArray()
             };
         }
-
-        //public PagedCollection<NugetPackage> SearchPackages(string keyword, int? skip = null, int? take = null)
-        //{
-        //    // Lets apply a guard-rail to ensure the client doesn't request too much data.
-        //    if (take.GetValueOrDefault() > 100 || !take.HasValue)
-        //        take = 100;
-
-        //    var core = new RepositoryFactory().GetCoreV3("", FeedType.HttpV3);
-        //    core.
-
-        //    // Create source query to filter packages by keyword and target framework (include pre-releases).
-        //    var query = _PackageRepository.Search(keyword, TargetFrameworks, true);
-
-        //    // We'll use the PagedCollection class to return critical paging data back to the client.
-        //    // Before we apply paging we'll need to get a total count back from the package store.
-        //    // We will also apply the rest of the paging data for return to the client. In the event
-        //    // that we don't have a page size (take), we'll use the total count since everything
-        //    // will be returned.
-        //    var result = new PagedCollection<NugetPackage>()
-        //    {
-        //        TotalCount = query.Count(),
-        //        Skip = skip.GetValueOrDefault(),
-        //        Take = take.GetValueOrDefault()
-        //    };
-
-        //    // Materialize the data from the nuget package repository.
-        //    var packages = query
-        //        .Skip(skip.GetValueOrDefault())
-        //        .Take(take.GetValueOrDefault())
-        //        .ToArray();
-
-        //    // Make the actual request to the package store to get the current page of packages.
-        //    // Skip and take will always be applied since we don't want to return an unbounded result set.
-        //    // We'll be materializing the data, then projecting the data as a new type that is serializable.
-        //    result.Results = packages.Select(NugetPackage.Map).ToArray();
-            
-        //    return result;
-        //}
-    }
-
-    public class Logger : NuGet.Common.ILogger
-    {
-        public void LogDebug(string data) => $"DEBUG: {data}".Dump();
-        public void LogVerbose(string data) => $"VERBOSE: {data}".Dump();
-        public void LogInformation(string data) => $"INFORMATION: {data}".Dump();
-        public void LogMinimal(string data) => $"MINIMAL: {data}".Dump();
-        public void LogWarning(string data) => $"WARNING: {data}".Dump();
-        public void LogError(string data) => $"ERROR: {data}".Dump();
-        public void LogSummary(string data) => $"SUMMARY: {data}".Dump();
-        public void LogInformationSummary(string data) => $"SUMMARY: {data}".Dump();
-        public void LogErrorSummary(string data) => $"ERROR: {data}".Dump();
     }
 }

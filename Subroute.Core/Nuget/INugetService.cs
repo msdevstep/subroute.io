@@ -10,6 +10,6 @@ namespace Subroute.Core.Nuget
     {
         string DownloadPackage(NugetPackage package);
         NugetPackage[] ResolveDependencies(Dependency dependency);
-        Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string keyword, int? skip = null, int? take = null);
+        Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string term, int? skip = null, int? take = null);
     }
 }

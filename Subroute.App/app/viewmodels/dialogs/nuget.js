@@ -16,7 +16,7 @@
             if (!package.authors)
                 return 'By Unknown Author - Version: ' + package.version;
 
-            package.authorsDisplay = 'By ' + package.authors.join(', ') + ' - Version: ' + package.version;
+            package.authorsDisplay = 'By ' + package.authors + ' - Version: ' + package.version;
         };
 
         self.nextPageAvailable = ko.computed(function () {

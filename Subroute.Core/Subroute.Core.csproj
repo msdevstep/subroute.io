@@ -332,6 +332,11 @@
     <Compile Include="Nuget\NugetPackage.cs" />
     <Compile Include="Nuget\NugetPackageComparer.cs" />
     <Compile Include="Nuget\NugetService.cs" />
+    <Compile Include="Nuget\PackageSearchResourceEnhancedV3.cs" />
+    <Compile Include="Nuget\PackageSearchResourceEnhancedV3Provider.cs" />
+    <Compile Include="Nuget\PackageSearchResults.cs" />
+    <Compile Include="Nuget\RepositoryFactoryExtensionsV3.cs" />
+    <Compile Include="Nuget\TraceLogger.cs" />
     <Compile Include="Utilities\TraceUtility.cs" />
     <Compile Include="Marketing\Providers\MailChimpProvider.cs" />
     <Compile Include="Models\Intellisense\AutoCompleteOptions.cs" />
