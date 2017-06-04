@@ -1,4 +1,7 @@
 ﻿using NuGet.Configuration;
+using NuGet.Frameworks;
+using NuGet.PackageManagement;
+using NuGet.ProjectManagement;
 using NuGet.Protocol.Core.Types;
 using Subroute.Core.Data;
 using Subroute.Core.Models.Compiler;
@@ -6,6 +9,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static NuGet.Protocol.Core.Types.Repository;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using System;
+using System.Collections.Generic;
 
 namespace Subroute.Core.Nuget
 {
@@ -61,40 +68,52 @@ namespace Subroute.Core.Nuget
             //    .ToArray();
         }
 
-        //private NugetPackage[] ResolveDependencies(IPackage package)
-        //{
-        //    return null;
-        //    //var walker = new DependentsWalker(_PackageRepository, new FrameworkName(".NETFramework", Version.Parse("4.6")));
-        //    //walker.DependencyVersion = DependencyVersion.Highest;
-        //    //walker.SkipPackageTargetCheck = true;
-        //    //var dependencies = walker.GetDependents(package);
+        private async Task<NugetPackage[]> ResolveDependenciesAsync(IPackageSearchMetadata package)
+        {
+            // Get an instance of the provider used to get package result data from the NuGet gallery.
+            var providers = Provider.GetPageableCoreV3().ToList();
+            var packageSource = new PackageSource(Settings.NugetPackageUri);
+            var sourceRepository = new SourceRepository(packageSource, providers);
+            var packageMetadataResource = await sourceRepository.GetResourceAsync<PackageMetadataResource>();
+            var searchMetadata = await packageMetadataResource.GetMetadataAsync(package.Identity, new TraceLogger(), CancellationToken.None);
+            
+            var provider = providers.OfType<SourceRepositoryProvider>().FirstOrDefault();
+            var manager = new NuGetPackageManager(provider, null, Settings.NugetPackageDirectory);
 
-        //    ////// Find nuget only dependencies.
-        //    ////var dependencies = package.DependencySets
-        //    ////    .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
-        //    ////    .SelectMany(ds => ds.Dependencies)
-        //    ////    .ToArray();
+            manager.InstallPackageAsync(
 
-        //    ////if (!dependencies.Any())
-        //    ////    return new NugetPackage[0];
+            return null;
+            //var walker = new DependentsWalker(_PackageRepository, new FrameworkName(".NETFramework", Version.Parse("4.6")));
+            //walker.DependencyVersion = DependencyVersion.Highest;
+            //walker.SkipPackageTargetCheck = true;
+            //var dependencies = walker.GetDependents(package);
 
-        //    ////// Find actual packages in nuget gallery by IVersionSpec.
-        //    ////var foundDependencies = dependencies
-        //    ////    .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
-        //    ////    .ToArray();
+            ////// Find nuget only dependencies.
+            ////var dependencies = package.DependencySets
+            ////    .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
+            ////    .SelectMany(ds => ds.Dependencies)
+            ////    .ToArray();
 
-        //    ////// Determine which packages we could not locate.
-        //    ////var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
+            ////if (!dependencies.Any())
+            ////    return new NugetPackage[0];
 
-        //    ////if (missing.Any())
-        //    ////    throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
+            ////// Find actual packages in nuget gallery by IVersionSpec.
+            ////var foundDependencies = dependencies
+            ////    .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
+            ////    .ToArray();
 
-        //    //// Determine if any of these dependencies have other nuget dependencies.
-        //    //return dependencies
-        //    //    .Select(NugetPackage.Map)
-        //    //    //.Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
-        //    //    .ToArray();
-        //}
+            ////// Determine which packages we could not locate.
+            ////var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
+
+            ////if (missing.Any())
+            ////    throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
+
+            //// Determine if any of these dependencies have other nuget dependencies.
+            //return dependencies
+            //    .Select(NugetPackage.Map)
+            //    //.Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
+            //    .ToArray();
+        }
 
         /// <summary>
         /// Searches the NuGet gallery for package data and returns a page of data at a time.
@@ -122,6 +141,11 @@ namespace Subroute.Core.Nuget
                 new TraceLogger(),
                 CancellationToken.None);
 
+            var package = searchMetadata.Results.FirstOrDefault();
+
+            if (package != null)
+                await ResolveDependenciesAsync(package);
+
             // Extract and return paging data and search results.
             return new PagedCollection<NugetPackage>
             {
@@ -132,6 +156,24 @@ namespace Subroute.Core.Nuget
                     .Select(m => NugetPackage.Map(m))
                     .ToArray()
             };
+        }
+    }
+
+    public class Project : NuGetProject
+    {
+        public override Task<IEnumerable<PackageReference>> GetInstalledPackagesAsync(CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<bool> InstallPackageAsync(PackageIdentity packageIdentity, DownloadResourceResult downloadResourceResult, INuGetProjectContext nuGetProjectContext, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<bool> UninstallPackageAsync(PackageIdentity packageIdentity, INuGetProjectContext nuGetProjectContext, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
     }
 }
