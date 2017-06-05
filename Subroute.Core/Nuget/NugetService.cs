@@ -13,6 +13,8 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using NuGet.Versioning;
 
 namespace Subroute.Core.Nuget
 {
@@ -25,6 +27,17 @@ namespace Subroute.Core.Nuget
         public NugetService()
         {
             //_PackageRepository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
+        }
+
+        private NuGetFramework GetCurrentFramework()
+        {
+            string frameworkName = Assembly.GetExecutingAssembly().GetCustomAttributes(true)
+                .OfType<System.Runtime.Versioning.TargetFrameworkAttribute>()
+                .Select(x => x.FrameworkName)
+                .FirstOrDefault();
+            return frameworkName == null
+                ? NuGetFramework.AnyFramework
+                : NuGetFramework.ParseFrameworkName(frameworkName, new DefaultFrameworkNameProvider());
         }
 
         public string DownloadPackage(NugetPackage package)
@@ -76,11 +89,30 @@ namespace Subroute.Core.Nuget
             var sourceRepository = new SourceRepository(packageSource, providers);
             var packageMetadataResource = await sourceRepository.GetResourceAsync<PackageMetadataResource>();
             var searchMetadata = await packageMetadataResource.GetMetadataAsync(package.Identity, new TraceLogger(), CancellationToken.None);
-            
-            var provider = providers.OfType<SourceRepositoryProvider>().FirstOrDefault();
-            var manager = new NuGetPackageManager(provider, null, Settings.NugetPackageDirectory);
 
-            manager.InstallPackageAsync(
+            // Get an array of NuGet only depdencies.
+            var dependencies = searchMetadata
+                .DependencySets
+                .Where((ds, i) => ds.TargetFramework.IsAny && i == 0)
+                .SelectMany(ds => ds.Packages)
+                .ToArray();
+
+            var results = new List<NugetPackage>();
+
+            foreach (var dependency in dependencies)
+            {
+                var bestVersion = await GetHighestMatchingVersion(dependency.Id, dependency);
+                var dependencyPackage = await packageMetadataResource.GetMetadataAsync(new PackageIdentity(dependency.Id, bestVersion), new TraceLogger(), CancellationToken.None);
+
+                results.Add(NugetPackage.Map(dependencyPackage));
+
+                var dependencyPackages = await ResolveDependenciesAsync(dependencyPackage);
+                results.AddRange(dependencyPackages);
+            }
+
+            return results.ToArray();
+
+            //dependencyInfo.Where(di => di.)
 
             return null;
             //var walker = new DependentsWalker(_PackageRepository, new FrameworkName(".NETFramework", Version.Parse("4.6")));
@@ -113,6 +145,21 @@ namespace Subroute.Core.Nuget
             //    .Select(NugetPackage.Map)
             //    //.Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
             //    .ToArray();
+        }
+
+        private async Task<NuGetVersion> GetHighestMatchingVersion(string packageId, PackageDependency dependency)
+        {
+            var providers = Provider.GetPageableCoreV3().ToList();
+            var packageSource = new PackageSource(Settings.NugetPackageUri);
+            var sourceRepository = new SourceRepository(packageSource, providers);
+            var dependencyInfoResource = await sourceRepository.GetResourceAsync<DependencyInfoResource>();
+            var dependencyInfo = await dependencyInfoResource.ResolvePackages(packageId, GetCurrentFramework(), new TraceLogger(), CancellationToken.None);
+
+            return dependencyInfo
+                .Select(x => x.Version)
+                .Where(x => x != null && (dependency.VersionRange == null || dependency.VersionRange.Satisfies(x)))
+                .DefaultIfEmpty()
+                .Max();
         }
 
         /// <summary>
