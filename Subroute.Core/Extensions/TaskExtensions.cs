@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +12,11 @@ namespace Subroute.Core.Extensions
     /// </summary>
     public static class TaskExtensions
     {
+        public static async Task<IEnumerable<T1>> SelectManyAsync<T, T1>(this IEnumerable<T> enumeration, Func<T, Task<IEnumerable<T1>>> func)
+        {
+            return (await Task.WhenAll(enumeration.Select(func))).SelectMany(s => s);
+        }
+
         /// <summary>
         /// Block execution until the task has completed executing and a result is ready.
         /// </summary>
@@ -21,12 +28,13 @@ namespace Subroute.Core.Extensions
             // Return the default value for the specified type if no task was passed.
             if (task == null)
                 return default(TResult);
-
-            // Allow the task to run and block until the result is ready.
-            task.Wait();
+            
+            // Move the task to a new thread to prevent deadlocks with multiple awaits.
+            var innerTask = Task.Run(() => task);
+            innerTask.Wait();
 
             // We only care about the result, so forget the task and return the result.
-            return task.Result;
+            return innerTask.Result;
         }
 
         /// <summary>

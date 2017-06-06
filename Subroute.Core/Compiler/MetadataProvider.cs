@@ -17,6 +17,7 @@ using Subroute.Core.Nuget;
 using Subroute.Core.Data;
 using Subroute.Core.Models.Compiler;
 using System.Reflection;
+using Subroute.Core.Extensions;
 
 namespace Subroute.Core.Compiler
 {
@@ -74,7 +75,7 @@ namespace Subroute.Core.Compiler
             // First we'll resolve all the nuget packages and their dependencies.
             var nuget = dependencies
                 .Where(d => d.Type == DependencyType.NuGet)
-                .SelectMany(d => _NugetService.ResolveDependencies(d))
+                .SelectMany(d => _NugetService.ResolveDependenciesAsync(d).SynchronousResult())
                 .Distinct(_NugetPackageComparer)
                 .ToArray();
 

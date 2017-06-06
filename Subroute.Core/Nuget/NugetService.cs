@@ -14,20 +14,15 @@ using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using NuGet.Common;
 using NuGet.Versioning;
+using Subroute.Core.Exceptions;
 
 namespace Subroute.Core.Nuget
 {
     public class NugetService : INugetService
     {
-        //private readonly IPackageRepository _PackageRepository = null;
-
-        public static string[] TargetFrameworks = new[] {".NETFramework,Version=v4.5", ".NETFramework,Version=v4.0"};
-
-        public NugetService()
-        {
-            //_PackageRepository = PackageRepositoryFactory.Default.CreateRepository(Settings.NugetPackageUri);
-        }
+        private readonly ILogger _traceLogger = new TraceLogger();
 
         private NuGetFramework GetCurrentFramework()
         {
@@ -65,95 +60,72 @@ namespace Subroute.Core.Nuget
             return null;
         }
 
-        public NugetPackage[] ResolveDependencies(Dependency dependency)
+        public async Task<NugetPackage[]> ResolveDependenciesAsync(Dependency dependency)
         {
-            return null;
-            //// Find the actual nuget package from the gallery to get its dependencies.
-            //var package = _PackageRepository.FindPackage(dependency.Id, SemanticVersion.Parse(dependency.Version));
+            // Get an instance of the provider used to get package result data from the NuGet gallery.
+            var packageMetadataResource = await Provider.GetResourceAsync<PackageMetadataResource>();
+            var identity = new PackageIdentity(dependency.Id, new NuGetVersion(dependency.Version));
+            var packageMetadata = await packageMetadataResource.GetMetadataAsync(identity, _traceLogger, CancellationToken.None);
 
-            //if (package == null)
-            //    throw new NotFoundException($"Unable to locate package. Package ID: {dependency.Id}, Version: {dependency.Version}.");
+            if (packageMetadata == null)
+                throw new NotFoundException($"Unable to locate package. Package ID: {dependency.Id}, Version: {dependency.Version}.");
 
-            //// Recursively locate any additional nuget dependencies for this package that their
-            //// packages, and combine into a single output array.
-            //return new[] { NugetPackage.Map(package) }
-            //    .Concat(ResolveDependencies(package))
-            //    .ToArray();
+            // Recursively locate any additional nuget dependencies for this package that their
+            // packages, and combine into a single output array.
+            return new[] { NugetPackage.Map(packageMetadata) }
+                .Concat(await ResolveDependenciesAsync(packageMetadata))
+                .ToArray();
         }
 
         private async Task<NugetPackage[]> ResolveDependenciesAsync(IPackageSearchMetadata package)
         {
-            // Get an instance of the provider used to get package result data from the NuGet gallery.
-            var providers = Provider.GetPageableCoreV3().ToList();
-            var packageSource = new PackageSource(Settings.NugetPackageUri);
-            var sourceRepository = new SourceRepository(packageSource, providers);
-            var packageMetadataResource = await sourceRepository.GetResourceAsync<PackageMetadataResource>();
-            var searchMetadata = await packageMetadataResource.GetMetadataAsync(package.Identity, new TraceLogger(), CancellationToken.None);
-
-            // Get an array of NuGet only depdencies.
-            var dependencies = searchMetadata
+            // Dependency sets that have IsAny = true for TargetFramework are the NuGet package references.
+            // Isolate them so we can get their metadata and resolve any dependencies they may have.
+            var dependencies = package
                 .DependencySets
                 .Where((ds, i) => ds.TargetFramework.IsAny && i == 0)
-                .SelectMany(ds => ds.Packages)
-                .ToArray();
+                .SelectMany(ds => ds.Packages);
 
+            // An instance of PackageMetadataResource is needed to get the full package 
+            // metadata for each of the dependencies. Also create a NugetPackage list
+            // to keep track of all the dependencies we resolve.
+            var packageMetadataResource = await Provider.GetResourceAsync<PackageMetadataResource>();
             var results = new List<NugetPackage>();
 
+            // Iterate over each dependency to request full metadata for each one.
             foreach (var dependency in dependencies)
             {
-                var bestVersion = await GetHighestMatchingVersion(dependency.Id, dependency);
-                var dependencyPackage = await packageMetadataResource.GetMetadataAsync(new PackageIdentity(dependency.Id, bestVersion), new TraceLogger(), CancellationToken.None);
+                // We'll use the dependencies VersionSpec to find the highest matching
+                // version that will satisfy the dependency.
+                var bestVersion = await GetHighestMatchingVersion(dependency);
 
-                results.Add(NugetPackage.Map(dependencyPackage));
+                // Once we've identifies which package version we want to load, we'll
+                // need to load the full package metadata to convert to NugetPackage.
+                // First we create a new PackageIdentity that will hold the ID and
+                // Version that we intend to load. Then use the identity to load the
+                // full metadata for the package.
+                var dependencyIdentity = new PackageIdentity(dependency.Id, bestVersion);
+                var dependencyPackage = await packageMetadataResource.GetMetadataAsync(dependencyIdentity, _traceLogger, CancellationToken.None);
 
-                var dependencyPackages = await ResolveDependenciesAsync(dependencyPackage);
-                results.AddRange(dependencyPackages);
+                // In the case where we can't locate a dependency by its identity. We
+                // should fail the whole sequence, as most likely it will not build.
+                if (dependencyPackage == null)
+                    throw new NotFoundException($"Unable to locate package. Package ID: {dependencyIdentity.Id}, Version: {dependencyIdentity.Version}.");
+
+                // Get an enumerable of this current dependency and all of its dependencies.
+                var result = new [] { NugetPackage.Map(dependencyPackage) }.Concat(await ResolveDependenciesAsync(dependencyPackage));
+
+                // All the current dependency chain to the output results.
+                results.AddRange(result);
             }
 
             return results.ToArray();
-
-            //dependencyInfo.Where(di => di.)
-
-            return null;
-            //var walker = new DependentsWalker(_PackageRepository, new FrameworkName(".NETFramework", Version.Parse("4.6")));
-            //walker.DependencyVersion = DependencyVersion.Highest;
-            //walker.SkipPackageTargetCheck = true;
-            //var dependencies = walker.GetDependents(package);
-
-            ////// Find nuget only dependencies.
-            ////var dependencies = package.DependencySets
-            ////    .Where(ds => ds.TargetFramework == null && !ds.SupportedFrameworks.Any())
-            ////    .SelectMany(ds => ds.Dependencies)
-            ////    .ToArray();
-
-            ////if (!dependencies.Any())
-            ////    return new NugetPackage[0];
-
-            ////// Find actual packages in nuget gallery by IVersionSpec.
-            ////var foundDependencies = dependencies
-            ////    .Select(p => _PackageRepository.FindPackage(p.Id, p.VersionSpec, true, true))
-            ////    .ToArray();
-
-            ////// Determine which packages we could not locate.
-            ////var missing = dependencies.Where(d => !foundDependencies.Any(fd => fd.Id == d.Id)).ToArray();
-
-            ////if (missing.Any())
-            ////    throw new NotFoundException($"Unable to locate dependent packages: {string.Join(", ", missing.Select(m => m.Id))}");
-
-            //// Determine if any of these dependencies have other nuget dependencies.
-            //return dependencies
-            //    .Select(NugetPackage.Map)
-            //    //.Concat(foundDependencies.SelectMany(fd => ResolveDependencies(fd)))
-            //    .ToArray();
         }
 
-        private async Task<NuGetVersion> GetHighestMatchingVersion(string packageId, PackageDependency dependency)
+        private async Task<NuGetVersion> GetHighestMatchingVersion(PackageDependency dependency)
         {
-            var providers = Provider.GetPageableCoreV3().ToList();
-            var packageSource = new PackageSource(Settings.NugetPackageUri);
-            var sourceRepository = new SourceRepository(packageSource, providers);
-            var dependencyInfoResource = await sourceRepository.GetResourceAsync<DependencyInfoResource>();
-            var dependencyInfo = await dependencyInfoResource.ResolvePackages(packageId, GetCurrentFramework(), new TraceLogger(), CancellationToken.None);
+            var dependencyInfoResource = await Provider.GetResourceAsync<DependencyInfoResource>();
+            var dependencyInfo = await dependencyInfoResource.ResolvePackages(dependency.Id, GetCurrentFramework(), new TraceLogger(), CancellationToken.None);
 
             return dependencyInfo
                 .Select(x => x.Version)
@@ -176,10 +148,7 @@ namespace Subroute.Core.Nuget
                 take = 100;
             
             // Get an instance of the provider used to get package result data from the NuGet gallery.
-            var providers = Provider.GetPageableCoreV3().ToList();
-            var packageSource = new PackageSource(Settings.NugetPackageUri);
-            var sourceRepository = new SourceRepository(packageSource, providers);
-            var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResourceEnhancedV3>();
+            var searchResource = await Provider.GetResourceAsync<PackageSearchResourceEnhancedV3>();
             var searchFilter = new SearchFilter(false, SearchFilterType.IsLatestVersion);
             var searchMetadata = await searchResource.SearchPageableAsync(term,
                 searchFilter,
@@ -203,24 +172,6 @@ namespace Subroute.Core.Nuget
                     .Select(m => NugetPackage.Map(m))
                     .ToArray()
             };
-        }
-    }
-
-    public class Project : NuGetProject
-    {
-        public override Task<IEnumerable<PackageReference>> GetInstalledPackagesAsync(CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<bool> InstallPackageAsync(PackageIdentity packageIdentity, DownloadResourceResult downloadResourceResult, INuGetProjectContext nuGetProjectContext, CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<bool> UninstallPackageAsync(PackageIdentity packageIdentity, INuGetProjectContext nuGetProjectContext, CancellationToken token)
-        {
-            throw new NotImplementedException();
         }
     }
 }
