@@ -8,7 +8,7 @@ namespace Subroute.Core.Nuget
 {
     public interface INugetService
     {
-        string DownloadPackage(NugetPackage package);
+        Task DownloadPackageAsync(Dependency dependency);
         Task<NugetPackage[]> ResolveDependenciesAsync(Dependency dependency);
         Task<PagedCollection<NugetPackage>> SearchPackagesAsync(string term, int? skip = null, int? take = null);
     }

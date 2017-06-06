@@ -4,9 +4,11 @@ using NuGet;
 using System.Linq;
 using Subroute.Core.Extensions;
 using NuGet.Protocol.Core.Types;
+using System.Diagnostics;
 
 namespace Subroute.Core.Nuget
 {
+    [DebuggerDisplay("{Id,nq} {Version,nq}")]
     public class NugetPackage
     {
         public string Id { get; set; }

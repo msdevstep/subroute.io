@@ -18,6 +18,7 @@ using Subroute.Core.Data;
 using Subroute.Core.Models.Compiler;
 using System.Reflection;
 using Subroute.Core.Extensions;
+using System.Threading.Tasks;
 
 namespace Subroute.Core.Compiler
 {
@@ -72,20 +73,26 @@ namespace Subroute.Core.Compiler
             if (dependencies == null)
                 throw new ArgumentNullException(nameof(dependencies));
 
-            // First we'll resolve all the nuget packages and their dependencies.
-            var nuget = dependencies
-                .Where(d => d.Type == DependencyType.NuGet)
-                .SelectMany(d => _NugetService.ResolveDependenciesAsync(d).SynchronousResult())
-                .Distinct(_NugetPackageComparer)
-                .ToArray();
-
             // Get the folder location of each downloaded nuget package. We'll download and extract
             // the package if it hasn't been downloaded yet.
-            var packageLocations = nuget
-                .Select(p => _NugetService.DownloadPackage(p))
-                .ToArray();
-            
+            var depends = new List<NugetPackage>();
 
+            foreach (var dependency in dependencies)
+            {
+                var task = Task.Run(() => _NugetService.ResolveDependenciesAsync(dependency));
+                task.Wait();
+
+                depends.AddRange(task.Result);
+            }
+
+            foreach (var dependency in depends)
+            {
+                var de = new Dependency
+                { Id = dependency.Id, Version = dependency.Version };
+                var task = Task.Run(() => _NugetService.DownloadPackageAsync(de));
+                task.Wait();
+            }
+            
             var assemblies = new[]
             {
                 typeof (Uri).Assembly,

@@ -17,6 +17,8 @@ using System.Reflection;
 using NuGet.Common;
 using NuGet.Versioning;
 using Subroute.Core.Exceptions;
+using NuGet.Protocol;
+using System.Xml.Linq;
 
 namespace Subroute.Core.Nuget
 {
@@ -35,8 +37,26 @@ namespace Subroute.Core.Nuget
                 : NuGetFramework.ParseFrameworkName(frameworkName, new DefaultFrameworkNameProvider());
         }
 
-        public string DownloadPackage(NugetPackage package)
+        public async Task DownloadPackageAsync(Dependency dependency)
         {
+            var identity = new PackageIdentity(dependency.Id, new NuGetVersion(dependency.Version));
+            var project = new FolderNuGetProject(Settings.NugetPackageDirectory);
+            var settings = NuGet.Configuration.Settings.LoadDefaultSettings(Settings.NugetPackageDirectory);
+            var provider = new SourceRepositoryProvider(settings, Provider.GetCoreV3());
+            NuGetPackageManager packageManager = new NuGetPackageManager(provider, settings, Settings.NugetPackageDirectory)
+            {
+                PackagesFolderNuGetProject = project
+            };
+            bool allowPrereleaseVersions = true;
+            bool allowUnlisted = false;
+            ResolutionContext resolutionContext = new ResolutionContext(NuGet.Resolver.DependencyBehavior.Lowest, allowPrereleaseVersions, allowUnlisted, VersionConstraints.None);
+            INuGetProjectContext projectContext = new NuGetProjectContext();
+            IEnumerable<SourceRepository> sourceRepositories = provider.GetRepositories();
+            await packageManager.InstallPackageAsync(packageManager.PackagesFolderNuGetProject,
+                identity, resolutionContext, projectContext, sourceRepositories,
+                Array.Empty<SourceRepository>(),
+                CancellationToken.None);
+
             //// First we'll determine if the package has already been download. We only need to download the package
             //// once. Then every single subroute that references this package will already have it.
             //var folder = $"{package.Id}.{package.Version}";
@@ -57,7 +77,6 @@ namespace Subroute.Core.Nuget
 
             //// To simplify getting the package details, we'll return the mapped package details.
             //return path;
-            return null;
         }
 
         public async Task<NugetPackage[]> ResolveDependenciesAsync(Dependency dependency)
@@ -74,6 +93,7 @@ namespace Subroute.Core.Nuget
             // packages, and combine into a single output array.
             return new[] { NugetPackage.Map(packageMetadata) }
                 .Concat(await ResolveDependenciesAsync(packageMetadata))
+                .Distinct(new NugetPackageComparer())
                 .ToArray();
         }
 
@@ -99,7 +119,7 @@ namespace Subroute.Core.Nuget
                 // version that will satisfy the dependency.
                 var bestVersion = await GetHighestMatchingVersion(dependency);
 
-                // Once we've identifies which package version we want to load, we'll
+                // Once we've identified which package version we want to load, we'll
                 // need to load the full package metadata to convert to NugetPackage.
                 // First we create a new PackageIdentity that will hold the ID and
                 // Version that we intend to load. Then use the identity to load the
@@ -160,7 +180,14 @@ namespace Subroute.Core.Nuget
             var package = searchMetadata.Results.FirstOrDefault();
 
             if (package != null)
-                await ResolveDependenciesAsync(package);
+            {
+                var dependency = new Dependency
+                {
+                    Id = package.Identity.Id,
+                    Version = package.Identity.Version.ToFullString()
+                };
+                var dependents = await ResolveDependenciesAsync(dependency);
+            }
 
             // Extract and return paging data and search results.
             return new PagedCollection<NugetPackage>
