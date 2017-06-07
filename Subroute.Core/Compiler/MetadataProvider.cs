@@ -24,7 +24,7 @@ namespace Subroute.Core.Compiler
 {
     public interface IMetadataProvider
     {
-        MetadataReference[] ResolveReferences(Dependency[] dependencies);
+        Task<PortableExecutableReference[]> ResolveReferencesAsync(Dependency[] dependencies);
     }
 
     public class MetadataProvider : IMetadataProvider
@@ -67,31 +67,11 @@ namespace Subroute.Core.Compiler
             return result;
         }
 
-        public MetadataReference[] ResolveReferences(Dependency[] dependencies)
+        public async Task<PortableExecutableReference[]> ResolveReferencesAsync(Dependency[] dependencies)
         {
             // Ensure we never have a null reference for the dependency list.
             if (dependencies == null)
                 throw new ArgumentNullException(nameof(dependencies));
-
-            // Get the folder location of each downloaded nuget package. We'll download and extract
-            // the package if it hasn't been downloaded yet.
-            var depends = new List<NugetPackage>();
-
-            foreach (var dependency in dependencies)
-            {
-                var task = Task.Run(() => _NugetService.ResolveDependenciesAsync(dependency));
-                task.Wait();
-
-                depends.AddRange(task.Result);
-            }
-
-            foreach (var dependency in depends)
-            {
-                var de = new Dependency
-                { Id = dependency.Id, Version = dependency.Version };
-                var task = Task.Run(() => _NugetService.DownloadPackageAsync(de));
-                task.Wait();
-            }
             
             var assemblies = new[]
             {
@@ -114,7 +94,7 @@ namespace Subroute.Core.Compiler
 
             var fileLookup = GetDocumentationLookup();
 
-            return assemblies
+            var output = assemblies
                 .Select(a =>
                 {
                     // Locate the name of the assembly to determine what the documentation file name is.
@@ -127,7 +107,20 @@ namespace Subroute.Core.Compiler
                     // Otherwise we have no documentation file and we'll return it without a doc provider.
                     return MetadataReference.CreateFromFile(a.Location);
                 })
-                .ToArray();
+                .ToList();
+
+            foreach (var dependency in dependencies)
+            {
+                var references = await _NugetService.GetPackageReference(dependency);
+
+                foreach (var reference in references)
+                {
+                    var metadata = MetadataReference.CreateFromFile(reference.AssemblyPath, documentation: XmlDocumentationProvider.CreateFromFile(reference.DocumentationPath));
+                    output.Add(metadata);
+                }
+            }
+
+            return output.ToArray();
         }
 
         private MetadataReference[] ResolvePackageAssemblies(string packageDirectory)

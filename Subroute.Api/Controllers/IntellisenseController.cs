@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Web.Http;
+using Newtonsoft.Json;
 using Subroute.Core.Compiler;
 using Subroute.Core.Models.Intellisense;
 

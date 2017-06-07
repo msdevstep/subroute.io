@@ -46,7 +46,7 @@ namespace Subroute.Api.Controllers
             }).ToArray());
 
             // Compile code and get assembly as byte array.
-            var compilationResult = _compilationService.Compile(source);
+            var compilationResult = await _compilationService.CompileAsync(source);
 
             // We'll save the assembly and mark the route as published if the compilation was successful.
             if (compilationResult.Success)

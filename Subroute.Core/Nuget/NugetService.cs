@@ -1,5 +1,4 @@
-﻿using NuGet.Configuration;
-using NuGet.Frameworks;
+﻿using NuGet.Frameworks;
 using NuGet.PackageManagement;
 using NuGet.ProjectManagement;
 using NuGet.Protocol.Core.Types;
@@ -8,23 +7,37 @@ using Subroute.Core.Models.Compiler;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static NuGet.Protocol.Core.Types.Repository;
-using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Versioning;
 using Subroute.Core.Exceptions;
 using NuGet.Protocol;
-using System.Xml.Linq;
+using Subroute.Core.Extensions;
 
 namespace Subroute.Core.Nuget
 {
+    /// <summary>
+    /// Contains functionality for interacting with the NuGet package gallery.
+    /// </summary>
     public class NugetService : INugetService
     {
         private readonly ILogger _traceLogger = new TraceLogger();
+        private readonly FolderNuGetProject _packageFolder;
+        private readonly NuGetFramework _currentFramework;
+
+        /// <summary>
+        /// Constructs an instance of <see cref="NugetService"/> enabling access to the NuGet gallery.
+        /// </summary>
+        public NugetService()
+        {
+            _packageFolder = new FolderNuGetProject(Settings.NugetPackageDirectory);
+            _currentFramework = GetCurrentFramework();
+        }
 
         private NuGetFramework GetCurrentFramework()
         {
@@ -37,64 +50,16 @@ namespace Subroute.Core.Nuget
                 : NuGetFramework.ParseFrameworkName(frameworkName, new DefaultFrameworkNameProvider());
         }
 
-        public async Task DownloadPackageAsync(Dependency dependency)
+        private async Task<NuGetVersion> GetHighestMatchingVersion(PackageDependency dependency)
         {
-            var identity = new PackageIdentity(dependency.Id, new NuGetVersion(dependency.Version));
-            var project = new FolderNuGetProject(Settings.NugetPackageDirectory);
-            var settings = NuGet.Configuration.Settings.LoadDefaultSettings(Settings.NugetPackageDirectory);
-            var provider = new SourceRepositoryProvider(settings, Provider.GetCoreV3());
-            NuGetPackageManager packageManager = new NuGetPackageManager(provider, settings, Settings.NugetPackageDirectory)
-            {
-                PackagesFolderNuGetProject = project
-            };
-            bool allowPrereleaseVersions = true;
-            bool allowUnlisted = false;
-            ResolutionContext resolutionContext = new ResolutionContext(NuGet.Resolver.DependencyBehavior.Lowest, allowPrereleaseVersions, allowUnlisted, VersionConstraints.None);
-            INuGetProjectContext projectContext = new NuGetProjectContext();
-            IEnumerable<SourceRepository> sourceRepositories = provider.GetRepositories();
-            await packageManager.InstallPackageAsync(packageManager.PackagesFolderNuGetProject,
-                identity, resolutionContext, projectContext, sourceRepositories,
-                Array.Empty<SourceRepository>(),
-                CancellationToken.None);
+            var dependencyInfoResource = await Repository.Provider.GetResourceAsync<DependencyInfoResource>();
+            var dependencyInfo = await dependencyInfoResource.ResolvePackages(dependency.Id, _currentFramework, new TraceLogger(), CancellationToken.None);
 
-            //// First we'll determine if the package has already been download. We only need to download the package
-            //// once. Then every single subroute that references this package will already have it.
-            //var folder = $"{package.Id}.{package.Version}";
-            //var path = Path.Combine(Settings.NugetPackageDirectory, folder);
-
-            //if (Directory.Exists(path))
-            //    return path;
-
-            //// Attempt to locate package by ID and Version in the nuget package repository.
-            //var sourcePackage = _PackageRepository.FindPackage(package.Id, SemanticVersion.Parse(package.Version));
-
-            //// When no package was found, it could be a network error or the package was unlisted. Throw exception.
-            //if (sourcePackage == null)
-            //    throw new NotFoundException($"Unable to locate package. Package ID: {package.Id}, Version: {package.Version}.");
-
-            //// When the package is located, extract its contents into the standard local directory format.
-            //sourcePackage.ExtractContents(new PhysicalFileSystem(Settings.NugetPackageDirectory), folder);
-
-            //// To simplify getting the package details, we'll return the mapped package details.
-            //return path;
-        }
-
-        public async Task<NugetPackage[]> ResolveDependenciesAsync(Dependency dependency)
-        {
-            // Get an instance of the provider used to get package result data from the NuGet gallery.
-            var packageMetadataResource = await Provider.GetResourceAsync<PackageMetadataResource>();
-            var identity = new PackageIdentity(dependency.Id, new NuGetVersion(dependency.Version));
-            var packageMetadata = await packageMetadataResource.GetMetadataAsync(identity, _traceLogger, CancellationToken.None);
-
-            if (packageMetadata == null)
-                throw new NotFoundException($"Unable to locate package. Package ID: {dependency.Id}, Version: {dependency.Version}.");
-
-            // Recursively locate any additional nuget dependencies for this package that their
-            // packages, and combine into a single output array.
-            return new[] { NugetPackage.Map(packageMetadata) }
-                .Concat(await ResolveDependenciesAsync(packageMetadata))
-                .Distinct(new NugetPackageComparer())
-                .ToArray();
+            return dependencyInfo
+                .Select(x => x.Version)
+                .Where(x => x != null && (dependency.VersionRange == null || dependency.VersionRange.Satisfies(x)))
+                .DefaultIfEmpty()
+                .Max();
         }
 
         private async Task<NugetPackage[]> ResolveDependenciesAsync(IPackageSearchMetadata package)
@@ -109,7 +74,7 @@ namespace Subroute.Core.Nuget
             // An instance of PackageMetadataResource is needed to get the full package 
             // metadata for each of the dependencies. Also create a NugetPackage list
             // to keep track of all the dependencies we resolve.
-            var packageMetadataResource = await Provider.GetResourceAsync<PackageMetadataResource>();
+            var packageMetadataResource = await Repository.Provider.GetResourceAsync<PackageMetadataResource>();
             var results = new List<NugetPackage>();
 
             // Iterate over each dependency to request full metadata for each one.
@@ -142,16 +107,112 @@ namespace Subroute.Core.Nuget
             return results.ToArray();
         }
 
-        private async Task<NuGetVersion> GetHighestMatchingVersion(PackageDependency dependency)
+        public async Task<PackageReference[]> GetPackageReference(Dependency dependency)
         {
-            var dependencyInfoResource = await Provider.GetResourceAsync<DependencyInfoResource>();
-            var dependencyInfo = await dependencyInfoResource.ResolvePackages(dependency.Id, GetCurrentFramework(), new TraceLogger(), CancellationToken.None);
+            var identity = dependency.ToPackageIdentity();
+            var packageFilePath = _packageFolder.GetInstalledPackageFilePath(identity);
 
-            return dependencyInfo
-                .Select(x => x.Version)
-                .Where(x => x != null && (dependency.VersionRange == null || dependency.VersionRange.Satisfies(x)))
-                .DefaultIfEmpty()
-                .Max();
+            if (!packageFilePath.HasValue())
+                return new PackageReference[0];
+
+            var archiveReader = new PackageArchiveReader(packageFilePath, null, null);
+            var referenceGroup = GetMostCompatibleGroup(_currentFramework, archiveReader.GetReferenceItems());
+            var references = new List<PackageReference>();
+
+            if (referenceGroup != null)
+            {
+                foreach (var group in referenceGroup.Items)
+                {
+                    var qualified = _packageFolder.GetInstalledPath(identity);
+                    var combined = Path.Combine(qualified, group.Replace("/", "\\"));
+                    var directory = Path.GetDirectoryName(combined);
+                    var filename = Path.GetFileNameWithoutExtension(combined);
+                    var documentation = Path.Combine(directory, string.Concat(filename, ".xml"));
+                    var reference = new PackageReference
+                    {
+                        AssemblyPath = combined,
+                        DocumentationPath = File.Exists(documentation) ? documentation : null
+                    };
+
+                    references.Add(reference);
+                }
+            }
+
+            return references.ToArray();
+        }
+
+        /// <summary>
+        /// Downloads and extracts the specified dependency to the NuGet package folder.
+        /// </summary>
+        /// <param name="dependency">Dependency indicating the specific Id and Version of the package to download.</param>
+        public async Task DownloadPackageAsync(Dependency dependency)
+        {
+            // Use V3 providers to get an instance of the NuGetPackageManager. We'll use
+            // defaults for everything as we are doing a simple package download to a folder.
+            var identity = dependency.ToPackageIdentity();
+            var settings = NuGet.Configuration.Settings.LoadDefaultSettings(Settings.NugetPackageDirectory);
+            var provider = new SourceRepositoryProvider(settings, Repository.Provider.GetCoreV3());
+            var packageManager = new NuGetPackageManager(provider, settings, Settings.NugetPackageDirectory)
+            {
+                PackagesFolderNuGetProject = _packageFolder
+            };
+            
+            // We'll create an instance of ResolutionContext using the standard resolution behavior.
+            var resolutionContext = new ResolutionContext(NuGet.Resolver.DependencyBehavior.Lowest, true, true, VersionConstraints.None);
+            var projectContext = new NuGetProjectContext();
+            var sourceRepositories = provider.GetRepositories();
+
+            // Use the package manager to download an install the specified dependencies.
+            await packageManager.InstallPackageAsync(packageManager.PackagesFolderNuGetProject,
+                identity, resolutionContext, projectContext, sourceRepositories,
+                Array.Empty<SourceRepository>(),
+                CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Resolves all possible packages from the provided array of dependencies and
+        /// returns an array of packages with no duplicates.
+        /// </summary>
+        /// <param name="dependencies">Dependencies used to resolve packages.</param>
+        /// <returns>Array of <see cref="NugetPackage"/> containing all resolved dependencies.</returns>
+        public async Task<NugetPackage[]> ResolveAllDependenciesAsync(IEnumerable<Dependency> dependencies)
+        {
+            var packages = new List<NugetPackage>();
+
+            // Iterate over each provided dependencies to resolve all child dependenceis.
+            // Add all resolved packages to the result list to be deduplicated.
+            foreach (var dependency in dependencies)
+                packages.AddRange(await ResolveDependenciesAsync(dependency));
+
+            // Deduplicate package list using the NugetPackageComparer with compares
+            // each package using its Id and Version.
+            return packages
+                .Distinct(new NugetPackageComparer())
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Resolves all package dependencies for the specified dependency and returns
+        /// an array of packages with no duplicates.
+        /// </summary>
+        /// <param name="dependency">Dependency used to resolve packages.</param>
+        /// <returns>Array of <see cref="NugetPackage"/> containing all resolved dependencies.</returns>
+        public async Task<NugetPackage[]> ResolveDependenciesAsync(Dependency dependency)
+        {
+            // Get an instance of the provider used to get package result data from the NuGet gallery.
+            var packageMetadataResource = await Repository.Provider.GetResourceAsync<PackageMetadataResource>();
+            var identity = new PackageIdentity(dependency.Id, new NuGetVersion(dependency.Version));
+            var packageMetadata = await packageMetadataResource.GetMetadataAsync(identity, _traceLogger, CancellationToken.None);
+
+            if (packageMetadata == null)
+                throw new NotFoundException($"Unable to locate package. Package ID: {dependency.Id}, Version: {dependency.Version}.");
+
+            // Recursively locate any additional nuget dependencies for this package that their
+            // packages, and combine into a single output array.
+            return new[] { NugetPackage.Map(packageMetadata) }
+                .Concat(await ResolveDependenciesAsync(packageMetadata))
+                .Distinct(new NugetPackageComparer())
+                .ToArray();
         }
 
         /// <summary>
@@ -168,7 +229,7 @@ namespace Subroute.Core.Nuget
                 take = 100;
             
             // Get an instance of the provider used to get package result data from the NuGet gallery.
-            var searchResource = await Provider.GetResourceAsync<PackageSearchResourceEnhancedV3>();
+            var searchResource = await Repository.Provider.GetResourceAsync<PackageSearchResourceEnhancedV3>();
             var searchFilter = new SearchFilter(false, SearchFilterType.IsLatestVersion);
             var searchMetadata = await searchResource.SearchPageableAsync(term,
                 searchFilter,
@@ -200,5 +261,41 @@ namespace Subroute.Core.Nuget
                     .ToArray()
             };
         }
+
+        private static FrameworkSpecificGroup GetMostCompatibleGroup(NuGetFramework projectTargetFramework, IEnumerable<FrameworkSpecificGroup> itemGroups)
+        {
+            var reducer = new FrameworkReducer();
+            var mostCompatibleFramework = reducer.GetNearest(projectTargetFramework, itemGroups.Select(i => i.TargetFramework));
+
+            if (mostCompatibleFramework != null)
+            {
+                var mostCompatibleGroup = itemGroups.FirstOrDefault(i => i.TargetFramework.Equals(mostCompatibleFramework));
+
+                if (IsValid(mostCompatibleGroup))
+                {
+                    return mostCompatibleGroup;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsValid(FrameworkSpecificGroup frameworkSpecificGroup)
+        {
+            if (frameworkSpecificGroup != null)
+            {
+                return (frameworkSpecificGroup.HasEmptyFolder
+                        || frameworkSpecificGroup.Items.Any()
+                        || !frameworkSpecificGroup.TargetFramework.Equals(NuGetFramework.AnyFramework));
+            }
+
+            return false;
+        }
+    }
+
+    public class PackageReference
+    {
+        public string AssemblyPath { get; set; }
+        public string DocumentationPath { get; set; }
     }
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using Subroute.Core.Extensions;
 using NuGet.Protocol.Core.Types;
 using System.Diagnostics;
+using Subroute.Core.Data;
+using Subroute.Core.Models.Compiler;
 
 namespace Subroute.Core.Nuget
 {
@@ -24,6 +26,18 @@ namespace Subroute.Core.Nuget
         public string Owners { get; set; }
         public string Authors { get; set; }
         public DateTimeOffset? PublishedOn { get; set; }
+
+        public RoutePackage ToRoutePackage(int routeId, bool userSpecified = false)
+        {
+            return new RoutePackage
+            {
+                Type = DependencyType.NuGet,
+                Id = Id,
+                Version = Version,
+                RouteId = routeId,
+                UserSpecified = userSpecified
+            };
+        }
 
         public static Func<IPackageSearchMetadata, NugetPackage> Map => p => new NugetPackage
         {

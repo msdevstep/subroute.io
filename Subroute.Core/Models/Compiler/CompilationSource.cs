@@ -4,6 +4,11 @@ namespace Subroute.Core.Compiler
 {
     public class Source
     {
+        public Source()
+        {
+            
+        }
+
         public Source(string code)
         {
             Code = code;

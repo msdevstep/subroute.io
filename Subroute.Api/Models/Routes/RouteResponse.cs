@@ -60,7 +60,7 @@ namespace Subroute.Api.Models.Routes
                 UpdatedOn = rs.UpdatedOn,
                 UpdatedBy = rs.UpdatedBy
             }).ToArray(),
-            Packages = r.RoutePackages == null ? null : r.RoutePackages.Select(rs => new RoutePackageResponse
+            Packages = r.RoutePackages == null ? null : r.RoutePackages.Where(rp => rp.UserSpecified).Select(rs => new RoutePackageResponse
             {
                 Id = rs.Id,
                 Version = rs.Version,

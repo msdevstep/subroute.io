@@ -33,7 +33,7 @@ namespace Subroute.Api.Controllers
         public async Task<IHttpActionResult> PostCompileAsync(CompileRequest request)
         {
             var source = new Source(request.Code, request.Dependencies);
-            var compilationResult = _compilationService.Compile(source);
+            var compilationResult = await _compilationService.CompileAsync(source);
 
             // Return an error response if compile was unsuccessful, otherwise the response was successful.
             return Content(compilationResult.Success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError, compilationResult);

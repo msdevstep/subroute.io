@@ -645,7 +645,7 @@
 
         self.intellisense = function (innerEditor, session, pos, prefix, callback) {
             var uri = config.apiUrl + 'intellisense/v1?wordToComplete=' + prefix + '&character=' + pos.column + '&line=' + pos.row + '&wantSnippet=true&wantDocumentationForEveryCompletionResult=true&wantReturnType=true&wantKind=true&wantMethodHeader=true';
-            var data = {
+            var body = {
                     code: innerEditor.getValue(),
                     dependencies: ko.utils.arrayMap(self.packages(), function (package) {
                         return { id: package.id, version: package.version, type: 'NuGet' }
@@ -655,7 +655,7 @@
             ajax.request({
                 url: uri,
                 type: 'POST',
-                data: ko.toJSON(data),
+                data: ko.toJSON(body),
                 contentType: 'application/json'
             }).then(function (data) {
                 var index = 0;

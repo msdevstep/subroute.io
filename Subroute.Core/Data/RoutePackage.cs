@@ -14,6 +14,7 @@ namespace Subroute.Core.Data
         public int RouteId { get; set; }
         public string Version { get; set; }
         public DependencyType Type { get; set; }
+        public bool UserSpecified { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public string CreatedBy { get; set; }
         public DateTimeOffset UpdatedOn { get; set; }

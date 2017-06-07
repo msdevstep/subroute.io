@@ -11,7 +11,7 @@ namespace Subroute.Core.Data.Repositories
 {
     public interface IRoutePackageRepository
     {
-        Task<RoutePackage[]> GetRoutePackagesAsync(RouteIdentifier identifier);
+        Task<RoutePackage[]> GetRoutePackagesAsync(RouteIdentifier identifier, bool specified = false);
         Task<RoutePackage> GetRoutePackageByIdAsync(RouteIdentifier identifier, string id);
         Task<RoutePackage> CreateRoutePackageAsync(RoutePackage package);
         Task<RoutePackage> UpdateRoutePackageAsync(RoutePackage package);
@@ -25,8 +25,9 @@ namespace Subroute.Core.Data.Repositories
         /// Load all the route packages for the specified <see cref="RouteIdentifier"/>.
         /// </summary>
         /// <param name="identifier"><see cref="RouteIdentifier"/> for the requested route.</param>
+        /// <param name="specified">Indicates if the results should only include user specified packages.</param>
         /// <returns>Returns an array of <see cref="RoutePackage"/> objects for the specified route.</returns>
-        public async Task<RoutePackage[]> GetRoutePackagesAsync(RouteIdentifier identifier)
+        public async Task<RoutePackage[]> GetRoutePackagesAsync(RouteIdentifier identifier, bool specified = false)
         {
             using (var db = new SubrouteContext())
             {
@@ -40,6 +41,9 @@ namespace Subroute.Core.Data.Repositories
                 query = identifier.Type == RouteIdentifierType.Id
                     ? query.Where(r => r.RouteId == identifier.Id)
                     : query.Where(r => r.Route.Uri == identifier.Uri);
+
+                // Determine if we are including all results or just user specified.
+                query = specified ? query.Where(q => q.UserSpecified) : query;
 
                 // Materialize the results into memory.
                 return await query.ToArrayAsync();
@@ -117,6 +121,7 @@ namespace Subroute.Core.Data.Repositories
                     throw new NotFoundException($"No route package exists with ID '{package.Id}'.");
                 
                 existingPackage.Version = package.Version;
+                existingPackage.UserSpecified = package.UserSpecified;
                 existingPackage.UpdatedOn = DateTimeOffset.Now;
                 existingPackage.UpdatedBy = userId;
 

@@ -22,12 +22,13 @@ using Subroute.Core.Models.Compiler;
 using Subroute.Core.Extensions;
 using Microsoft.CodeAnalysis.Completion;
 using System.Collections.Concurrent;
+using Subroute.Core.Nuget;
 
 namespace Subroute.Core.Compiler
 {
     public interface ICompilationService
     {
-        CompilationResult Compile(Source source);
+        Task<CompilationResult> CompileAsync(Source source);
         Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, Source source);
     }
 
@@ -35,14 +36,14 @@ namespace Subroute.Core.Compiler
     {
         static IDictionary<string, string> DocumentationFileCache = new ConcurrentDictionary<string, string>();
 
-        private readonly IMetadataProvider MetadataProvider = null;
+        private readonly IMetadataProvider _metadataProvider = null;
 
         public CompilationService(IMetadataProvider metadataProvider)
         {
-            MetadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider;
         }
 
-        public CompilationResult Compile(Source source)
+        public async Task<CompilationResult> CompileAsync(Source source)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -55,7 +56,7 @@ namespace Subroute.Core.Compiler
 
             // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
             // firm reference for each reference and any additional dependencies.
-            var references = MetadataProvider.ResolveReferences(source.Dependencies);
+            var references = await _metadataProvider.ResolveReferencesAsync(source.Dependencies);
             
             // Compile syntax tree into a new compilation of a DLL, since we have no need for an entry point.
             var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -111,7 +112,7 @@ namespace Subroute.Core.Compiler
 
             // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
             // firm reference for each reference and any additional dependencies.
-            var references = MetadataProvider.ResolveReferences(source.Dependencies);
+            var references = await _metadataProvider.ResolveReferencesAsync(source.Dependencies);
 
             var document = workspace.CurrentSolution
                 .AddProject(projectName, assemblyName, LanguageNames.CSharp)
