@@ -30,10 +30,10 @@ namespace Subroute.Api.Controllers
         /// </summary>
         /// <returns>Returns 204 No Content or build errors.</returns>
         [Route("compile/v1"), AllowAnonymous]
-        public async Task<IHttpActionResult> PostCompileAsync(CompileRequest request)
+        public IHttpActionResult PostCompile(CompileRequest request)
         {
             var source = new Source(request.Code, request.Dependencies);
-            var compilationResult = await _compilationService.CompileAsync(source);
+            var compilationResult = _compilationService.Compile(source);
 
             // Return an error response if compile was unsuccessful, otherwise the response was successful.
             return Content(compilationResult.Success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError, compilationResult);

@@ -17,6 +17,11 @@ using Subroute.Core.Exceptions;
 using Subroute.Core.Execution;
 using Subroute.Core.Utilities;
 using RouteRequest = Subroute.Common.RouteRequest;
+using Subroute.Core.Compiler;
+using Autofac;
+using Subroute.Core.Models.Compiler;
+using Subroute.Core.Nuget;
+using Subroute.Core;
 
 namespace Subroute.Container
 {
@@ -63,6 +68,7 @@ namespace Subroute.Container
                 var request = await Program.RequestRepository.GetRequestByIdAsync(requestId).TraceTimeAsync("Load Request");
                 var route = request.Route;
                 var routeSettings = route.RouteSettings;
+                var routePackages = route.RoutePackages;
 
                 // Trace the incoming request URI.
                 Trace.TraceInformation("Trace 'Request Uri' - {0}", request.Uri);
@@ -95,6 +101,9 @@ namespace Subroute.Container
 
                         // Add the ability to use the XmlSerializer and the DataContractSerializer.
                         sandboxPermissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter));
+
+                        // Add permission to access the nuget package directory so that assemblies can be loaded.
+                        sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, Settings.NugetPackageDirectory));
                     });
 
                     // We'll create a new folder to hold an empty config file we create, and by
@@ -151,6 +160,20 @@ namespace Subroute.Container
                         Body = request.RequestPayload
                     });
 
+                    // We'll need an instance of the nuget service to download and prepare packages.
+                    var nugetService = Program.Container.Resolve<INugetService>();
+
+                    // Iterate over each route package and ensure it has been downloaded.
+                    foreach (var package in routePackages)
+                        await nugetService.DownloadPackageAsync(package);
+
+                    // Load all references to be loaded into the new app domain.
+                    var references = routePackages
+                        .Select(rp => Dependency.FromRoutePackage(rp))
+                        .SelectMany(d => nugetService.GetPackageReferences(d))
+                        .Select(pr => pr.AssemblyPath)
+                        .ToArray();
+
                     try
                     {
                         // The ExecutionSandbox we'll attempt to locate the best method to execute
@@ -158,7 +181,7 @@ namespace Subroute.Container
                         // will pass the ExecutionRequest we created above. In return, we receive
                         // an instance of ExecutionResponse that has been serialized like the request
                         // and deserialized in our full-trust host domain.
-                        var executionResponse = TraceUtility.TraceTime("Load and Execute Request", () => executionSandbox.Execute(route.Assembly, executionRequest));
+                        var executionResponse = TraceUtility.TraceTime("Load and Execute Request", () => executionSandbox.Execute(route.Assembly, references, executionRequest));
                         
                         // We'll use the data that comes back from the response to fill out the 
                         // remainder of the database request record which will return the status

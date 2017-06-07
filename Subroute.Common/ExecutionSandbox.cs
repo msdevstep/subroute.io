@@ -20,17 +20,21 @@ namespace Subroute.Common
         /// <param name="assemblyBytes">Byte array containing the assembly to be loaded.</param>
         /// <param name="request"><see cref="RouteRequest"/> object containing all data for the current request.</param>
         /// <returns><see cref="RouteResponse"/> object containing the response for the current request.</returns>
-        public RouteResponse Execute(byte[] assemblyBytes, RouteRequest request)
+        public RouteResponse Execute(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
         {
             // Run the private async method synchronously.
-            var task = ExecuteAsync(assemblyBytes, request);
+            var task = ExecuteAsync(assemblyBytes, dependencies, request);
             task.Wait();
 
             return task.Result;
         }
 
-        private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, RouteRequest request)
+        private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
         {
+            // Load all dependent assemblies.
+            foreach (var dependency in dependencies)
+                Assembly.LoadFile(dependency);
+
             var assembly = Assembly.Load(assemblyBytes);
             var baseController = typeof (BaseController);
             var classType = assembly.GetTypes().FirstOrDefault(t => t.InheritsFrom(baseController));

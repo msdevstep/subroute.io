@@ -26,6 +26,7 @@ namespace Subroute.Core.Data.Repositories
                 var request = await db.Requests
                     .Include(r => r.Route)
                     .Include(r => r.Route.RouteSettings)
+                    .Include(r => r.Route.RoutePackages)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(r => r.Id == id);
 
