@@ -22,6 +22,9 @@ using Subroute.Core.Models.Compiler;
 using Subroute.Core.Extensions;
 using Microsoft.CodeAnalysis.Completion;
 using System.Collections.Concurrent;
+using System.Composition.Hosting;
+using System.Reflection;
+using Microsoft.CodeAnalysis.Host.Mef;
 using Subroute.Core.Nuget;
 
 namespace Subroute.Core.Compiler
@@ -104,15 +107,29 @@ namespace Subroute.Core.Compiler
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            // Setup a workspace for this code file, since we aren't actively managing a project or solutions.
-            var workspace = new AdhocWorkspace();
-            var projectName = RandomString(6, "Project");
-            var assemblyName = RandomString(6, "Assembly");
-            var documentName = RandomString(6, "Document");
-
             // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
             // firm reference for each reference and any additional dependencies.
             var references = _metadataProvider.ResolveReferences(source.Dependencies);
+            var referenceAssemblies = references.Select(r => Assembly.LoadFrom(r.Display)).ToArray();
+
+            var compositionContext = new ContainerConfiguration()
+                .WithAssemblies(MefHostServices.DefaultAssemblies
+                    .Concat(new[]
+                    {
+                        // These assemblies are necessary to enable language services.
+                        Assembly.Load("Microsoft.CodeAnalysis.Features"),
+                        Assembly.Load("Microsoft.CodeAnalysis.CSharp.Features")
+                    })
+                    .Concat(referenceAssemblies))
+                .CreateContainer();
+
+            var host = MefHostServices.Create(compositionContext);
+
+            // Setup a workspace for this code file, since we aren't actively managing a project or solutions.
+            var workspace = new AdhocWorkspace(host);
+            var projectName = RandomString(6, "Project");
+            var assemblyName = RandomString(6, "Assembly");
+            var documentName = RandomString(6, "Document");
 
             var document = workspace.CurrentSolution
                 .AddProject(projectName, assemblyName, LanguageNames.CSharp)
@@ -267,6 +284,19 @@ namespace Subroute.Core.Compiler
               .Select(s => s[random.Next(s.Length)]).ToArray());
 
             return $"{prefix}_{randomString}";
+        }
+    }
+
+    public class MetadataReferenceEqualityComparer : IEqualityComparer<MetadataReference>
+    {
+        public bool Equals(MetadataReference x, MetadataReference y)
+        {
+            return Path.GetFileName(x.Display) == Path.GetFileName(y.Display);
+        }
+
+        public int GetHashCode(MetadataReference obj)
+        {
+            return 0;
         }
     }
 }

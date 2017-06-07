@@ -128,11 +128,38 @@ namespace Subroute.Container
                     
                     // We'll add one last permission to allow the user access to their own private folder.
                     TraceUtility.TraceTime("Add Permission to Read App.Config File", () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory })));
+                    
+                    // We'll need an instance of the nuget service to download and prepare packages.
+                    var nugetService = Program.Container.Resolve<INugetService>();
+
+                    // Iterate over each route package and ensure it has been downloaded.
+                    foreach (var package in routePackages)
+                        await nugetService.DownloadPackageAsync(package);
+
+                    // Load all references to be loaded into the new app domain.
+                    var references = routePackages
+                        .Select(rp => Dependency.FromRoutePackage(rp))
+                        .SelectMany(d => nugetService.GetPackageReferences(d))
+                        .Select(pr => pr.AssemblyPath)
+                        .ToArray();
 
                     TraceUtility.TraceTime("Create AppDomain", () =>
                     {
-                        var appDomainSetup = new AppDomainSetup { ApplicationBase = assemblyPath, ConfigurationFile = userConfigFilePath };
+                        var appDomainSetup = new AppDomainSetup { ApplicationBase = assemblyPath, ConfigurationFile = userConfigFilePath, PrivateBinPath = Settings.NugetPackageDirectory };
                         sandboxDomain = AppDomain.CreateDomain("Sandboxed", ev, appDomainSetup, sandboxPermissionSet);
+
+                        // To properly load assemblies into the dynamic partial trust assembly, we have to override
+                        // the AssemblyResolve method which is only called when an assembly load attempt is made
+                        // and fails. To get access to the list of references, we have to expose them as a public
+                        // field so it can be serialized to cross the app domain barrier. This is a hacky way to 
+                        // do it, but I don't see any better options.
+                        sandboxDomain.AssemblyResolve += (sender, args) =>
+                        {
+                            var name = new AssemblyName(args.Name);
+                            var path = ExecutionSandbox.References.FirstOrDefault(r => Path.GetFileNameWithoutExtension(r) == name.Name);
+
+                            return path == null ? null : Assembly.LoadFrom(path);
+                        };
                     });
 
                     // The ExecutionSandbox is a MarshalByRef type that allows us to dynamically
@@ -159,20 +186,6 @@ namespace Subroute.Container
                         Headers = HeaderHelpers.DeserializeHeaders(request.RequestHeaders),
                         Body = request.RequestPayload
                     });
-
-                    // We'll need an instance of the nuget service to download and prepare packages.
-                    var nugetService = Program.Container.Resolve<INugetService>();
-
-                    // Iterate over each route package and ensure it has been downloaded.
-                    foreach (var package in routePackages)
-                        await nugetService.DownloadPackageAsync(package);
-
-                    // Load all references to be loaded into the new app domain.
-                    var references = routePackages
-                        .Select(rp => Dependency.FromRoutePackage(rp))
-                        .SelectMany(d => nugetService.GetPackageReferences(d))
-                        .Select(pr => pr.AssemblyPath)
-                        .ToArray();
 
                     try
                     {

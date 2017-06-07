@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -14,6 +15,8 @@ namespace Subroute.Common
     /// </summary>
     public class ExecutionSandbox : MarshalByRefObject
     {
+        public static string[] References;
+
         /// <summary>
         /// Loads the assembly from the byte array and executes the best matched method based on the incoming request.
         /// </summary>
@@ -22,6 +25,8 @@ namespace Subroute.Common
         /// <returns><see cref="RouteResponse"/> object containing the response for the current request.</returns>
         public RouteResponse Execute(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
         {
+            References = dependencies;
+
             // Run the private async method synchronously.
             var task = ExecuteAsync(assemblyBytes, dependencies, request);
             task.Wait();
@@ -31,10 +36,6 @@ namespace Subroute.Common
 
         private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
         {
-            // Load all dependent assemblies.
-            foreach (var dependency in dependencies)
-                Assembly.LoadFile(dependency);
-
             var assembly = Assembly.Load(assemblyBytes);
             var baseController = typeof (BaseController);
             var classType = assembly.GetTypes().FirstOrDefault(t => t.InheritsFrom(baseController));
