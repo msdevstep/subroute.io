@@ -18,6 +18,8 @@ using NuGet.Versioning;
 using Subroute.Core.Exceptions;
 using NuGet.Protocol;
 using Subroute.Core.Extensions;
+using Microsoft.CodeAnalysis;
+using PackageReference = Subroute.Core.Models.Compiler.PackageReference;
 
 namespace Subroute.Core.Nuget
 {
@@ -107,7 +109,13 @@ namespace Subroute.Core.Nuget
             return results.ToArray();
         }
 
-        public async Task<PackageReference[]> GetPackageReference(Dependency dependency)
+        /// <summary>
+        /// Locates the best framework folder match for the current framework and returns the assemblies
+        /// and documentation files contained within the package.
+        /// </summary>
+        /// <param name="dependency">Dependency to be located in the packages folder.</param>
+        /// <returns>Returns an array of <see cref="PackageReference"/> containing the located files.</returns>
+        public PackageReference[] GetPackageReferences(Dependency dependency)
         {
             var identity = dependency.ToPackageIdentity();
             var packageFilePath = _packageFolder.GetInstalledPackageFilePath(identity);
@@ -142,6 +150,17 @@ namespace Subroute.Core.Nuget
         }
 
         /// <summary>
+        /// Downloads and extracts the specified package to the NuGet package folder.
+        /// </summary>
+        /// <param name="package">Package indicating the specific Id and Version of the dependency to download.</param>
+        public async Task DownloadPackageAsync(RoutePackage package)
+        {
+            var dependency = Dependency.FromRoutePackage(package);
+
+            await DownloadPackageAsync(dependency);
+        }
+
+        /// <summary>
         /// Downloads and extracts the specified dependency to the NuGet package folder.
         /// </summary>
         /// <param name="dependency">Dependency indicating the specific Id and Version of the package to download.</param>
@@ -156,6 +175,10 @@ namespace Subroute.Core.Nuget
             {
                 PackagesFolderNuGetProject = _packageFolder
             };
+
+            // When the package already exists in the package folder, there is nothing to do.
+            if (packageManager.PackageExistsInPackagesFolder(identity))
+                return;
             
             // We'll create an instance of ResolutionContext using the standard resolution behavior.
             var resolutionContext = new ResolutionContext(NuGet.Resolver.DependencyBehavior.Lowest, true, true, VersionConstraints.None);
@@ -291,11 +314,5 @@ namespace Subroute.Core.Nuget
 
             return false;
         }
-    }
-
-    public class PackageReference
-    {
-        public string AssemblyPath { get; set; }
-        public string DocumentationPath { get; set; }
     }
 }

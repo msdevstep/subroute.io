@@ -366,6 +366,7 @@
     <Compile Include="Nuget\NugetPackageComparer.cs" />
     <Compile Include="Nuget\NuGetProjectContext.cs" />
     <Compile Include="Nuget\NugetService.cs" />
+    <Compile Include="Models\Compiler\PackageReference.cs" />
     <Compile Include="Nuget\PackageSearchResourceEnhancedV3.cs" />
     <Compile Include="Nuget\PackageSearchResourceEnhancedV3Provider.cs" />
     <Compile Include="Nuget\PackageSearchResults.cs" />

@@ -52,8 +52,7 @@ namespace Subroute.Api.Controllers
             var route = await EnsureAuthorizedRouteAccessAsync(identifier);
 
             // Ensure all provided packages are valid.
-            var missing = packages.FirstOrDefault(p => !p.Id.HasValue() || !p.Version.HasValue());
-            if (missing != null)
+            if (packages.Any(p => !p.Id.HasValue() || !p.Version.HasValue()))
                 throw new BadRequestException($"Please ensure each route package has a valid 'id' and 'version'.");
 
             // Expand all package dependencies so we have every dependency that the code needs to properly compile.
@@ -99,13 +98,8 @@ namespace Subroute.Api.Controllers
 
             // Download all packages and their dependencies so they are ready to go for
             // intellisense or compilation.
-            foreach (var result in results)
-                await _nugetService.DownloadPackageAsync(new Dependency
-                {
-                    Id = result.Id,
-                    Version = result.Version,
-                    Type = DependencyType.NuGet
-                });
+            foreach (var package in results)
+                await _nugetService.DownloadPackageAsync(package);
 
             return results.Select(RoutePackageResponse.Map).OrderBy(s => s.Id).ToArray();
         }

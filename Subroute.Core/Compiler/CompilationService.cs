@@ -28,7 +28,7 @@ namespace Subroute.Core.Compiler
 {
     public interface ICompilationService
     {
-        Task<CompilationResult> CompileAsync(Source source);
+        CompilationResult Compile(Source source);
         Task<CompletionResult[]> GetCompletionsAsync(CompletionRequest request, Source source);
     }
 
@@ -43,7 +43,7 @@ namespace Subroute.Core.Compiler
             _metadataProvider = metadataProvider;
         }
 
-        public async Task<CompilationResult> CompileAsync(Source source)
+        public CompilationResult Compile(Source source)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -56,7 +56,7 @@ namespace Subroute.Core.Compiler
 
             // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
             // firm reference for each reference and any additional dependencies.
-            var references = await _metadataProvider.ResolveReferencesAsync(source.Dependencies);
+            var references = _metadataProvider.ResolveReferences(source.Dependencies);
             
             // Compile syntax tree into a new compilation of a DLL, since we have no need for an entry point.
             var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -112,7 +112,7 @@ namespace Subroute.Core.Compiler
 
             // We need to ensure all dependencies have been downloaded and located. ResolveReferences() gets a
             // firm reference for each reference and any additional dependencies.
-            var references = await _metadataProvider.ResolveReferencesAsync(source.Dependencies);
+            var references = _metadataProvider.ResolveReferences(source.Dependencies);
 
             var document = workspace.CurrentSolution
                 .AddProject(projectName, assemblyName, LanguageNames.CSharp)
