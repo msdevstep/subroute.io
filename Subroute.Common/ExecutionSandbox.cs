@@ -15,7 +15,16 @@ namespace Subroute.Common
     /// </summary>
     public class ExecutionSandbox : MarshalByRefObject
     {
-        public static string[] References;
+        /// <summary>
+        /// Contains a string array of all package dependency path to be used by
+        /// AssemblyResolve to load the assembly into the correct load context.
+        /// </summary>
+        public static string[] References = null;
+
+        public void SetReferences(string[] references)
+        {
+            References = references;
+        }
 
         /// <summary>
         /// Loads the assembly from the byte array and executes the best matched method based on the incoming request.
@@ -23,18 +32,16 @@ namespace Subroute.Common
         /// <param name="assemblyBytes">Byte array containing the assembly to be loaded.</param>
         /// <param name="request"><see cref="RouteRequest"/> object containing all data for the current request.</param>
         /// <returns><see cref="RouteResponse"/> object containing the response for the current request.</returns>
-        public RouteResponse Execute(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
+        public RouteResponse Execute(byte[] assemblyBytes, RouteRequest request)
         {
-            References = dependencies;
-
             // Run the private async method synchronously.
-            var task = ExecuteAsync(assemblyBytes, dependencies, request);
+            var task = ExecuteAsync(assemblyBytes, request);
             task.Wait();
 
             return task.Result;
         }
 
-        private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, string[] dependencies, RouteRequest request)
+        private async Task<RouteResponse> ExecuteAsync(byte[] assemblyBytes, RouteRequest request)
         {
             var assembly = Assembly.Load(assemblyBytes);
             var baseController = typeof (BaseController);

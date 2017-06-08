@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -16,12 +17,11 @@ using Subroute.Common;
 using Subroute.Core.Exceptions;
 using Subroute.Core.Execution;
 using Subroute.Core.Utilities;
-using RouteRequest = Subroute.Common.RouteRequest;
-using Subroute.Core.Compiler;
 using Autofac;
 using Subroute.Core.Models.Compiler;
 using Subroute.Core.Nuget;
 using Subroute.Core;
+using Subroute.Core.Data;
 
 namespace Subroute.Container
 {
@@ -40,11 +40,7 @@ namespace Subroute.Container
         /// <returns>Empty task with async context.</returns>
         public static async Task ExecuteAsync([ServiceBusTrigger("%Subroute.ServiceBus.RequestTopicName%", "%Subroute.ServiceBus.RequestSubscriptionName%")]BrokeredMessage message, [ServiceBus("%Subroute.ServiceBus.ResponseTopicName%")] ICollector<BrokeredMessage> response)
         {
-            var stopwatch = Stopwatch.StartNew();
-            await ExecuteInternalAsync(message, response);
-            stopwatch.Stop();
-
-            Trace.TraceInformation($"Trace 'Total Execution' - Elapsed {stopwatch.ElapsedMilliseconds}");
+            await ExecuteInternalAsync(message, response).TraceTimeAsync("Total Execution");
         }
 
         private static async Task ExecuteInternalAsync(BrokeredMessage message, ICollector<BrokeredMessage> response)
@@ -67,8 +63,8 @@ namespace Subroute.Container
                 // to reduce the number of SQL calls we make.
                 var request = await Program.RequestRepository.GetRequestByIdAsync(requestId).TraceTimeAsync("Load Request");
                 var route = request.Route;
-                var routeSettings = route.RouteSettings;
-                var routePackages = route.RoutePackages;
+                var routeSettings = route.RouteSettings.ToArray();
+                var routePackages = route.RoutePackages.ToArray();
 
                 // Trace the incoming request URI.
                 Trace.TraceInformation("Trace 'Request Uri' - {0}", request.Uri);
@@ -77,9 +73,11 @@ namespace Subroute.Container
                 {
                     var ev = new Evidence();
                     ev.AddHostEvidence(new Zone(SecurityZone.Internet));
+
                     var assemblyType = typeof(ExecutionSandbox);
                     var assemblyPath = Path.GetDirectoryName(assemblyType.Assembly.Location);
-                    var sandboxPermissionSet = TraceUtility.TraceTime("Create Sandbox Permission Set", () => SecurityManager.GetStandardSandbox(ev));
+                    var sandboxPermissionSet = TraceUtility.TraceTime("Create Sandbox Permission Set", 
+                        () => SecurityManager.GetStandardSandbox(ev));
 
                     // Exit with an error code if for some reason we can't get the sandbox permission set.
                     if (sandboxPermissionSet == null)
@@ -115,77 +113,63 @@ namespace Subroute.Container
                     // We must ensure that we have at least the root configuration XML tag in
                     // the configuration file we create or various dependencies will fail
                     // such as XmlSerializer and DataContractSerializer.
-                    var tempDirectory = Path.GetTempPath();
-                    var userConfigDirectory = Path.Combine(tempDirectory, route.Uri);
-                    var userConfigFilePath = Path.Combine(userConfigDirectory, "app.config");
-                    TraceUtility.TraceTime("Create Sandbox Directory", () => Directory.CreateDirectory(userConfigDirectory));
+                    var directories = TraceUtility.TraceTime("Setup Filesystem", 
+                        () => SetupFilesystem(route, routeSettings));
 
-                    var configFile = TraceUtility.TraceTime("Generate App.Config File", () => routeSettings.Aggregate(@"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration><appSettings>",
-                        (current, setting) => current + $"<add key=\"{setting.Name}\" value=\"{setting.Value}\" />{Environment.NewLine}",
-                        result => $"{result}</appSettings></configuration>"));
-
-                    TraceUtility.TraceTime("Write App.Config to Disk", () => File.WriteAllText(userConfigFilePath, configFile));
-                    
                     // We'll add one last permission to allow the user access to their own private folder.
-                    TraceUtility.TraceTime("Add Permission to Read App.Config File", () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { userConfigDirectory })));
-                    
-                    // We'll need an instance of the nuget service to download and prepare packages.
-                    var nugetService = Program.Container.Resolve<INugetService>();
-
-                    // Iterate over each route package and ensure it has been downloaded.
-                    foreach (var package in routePackages)
-                        await nugetService.DownloadPackageAsync(package);
-
-                    // Load all references to be loaded into the new app domain.
-                    var references = routePackages
-                        .Select(rp => Dependency.FromRoutePackage(rp))
-                        .SelectMany(d => nugetService.GetPackageReferences(d))
-                        .Select(pr => pr.AssemblyPath)
-                        .ToArray();
+                    TraceUtility.TraceTime("Set Permission to Read Directory", 
+                        () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { directories.RootDirectory })));
 
                     TraceUtility.TraceTime("Create AppDomain", () =>
                     {
-                        var appDomainSetup = new AppDomainSetup { ApplicationBase = assemblyPath, ConfigurationFile = userConfigFilePath, PrivateBinPath = Settings.NugetPackageDirectory };
+                        var appDomainSetup = new AppDomainSetup { ApplicationBase = assemblyPath, ConfigurationFile = directories.ConfigFile };
                         sandboxDomain = AppDomain.CreateDomain("Sandboxed", ev, appDomainSetup, sandboxPermissionSet);
-
-                        // To properly load assemblies into the dynamic partial trust assembly, we have to override
-                        // the AssemblyResolve method which is only called when an assembly load attempt is made
-                        // and fails. To get access to the list of references, we have to expose them as a public
-                        // field so it can be serialized to cross the app domain barrier. This is a hacky way to 
-                        // do it, but I don't see any better options.
-                        sandboxDomain.AssemblyResolve += (sender, args) =>
-                        {
-                            var name = new AssemblyName(args.Name);
-                            var path = ExecutionSandbox.References.FirstOrDefault(r => Path.GetFileNameWithoutExtension(r) == name.Name);
-
-                            return path == null ? null : Assembly.LoadFrom(path);
-                        };
                     });
 
                     // The ExecutionSandbox is a MarshalByRef type that allows us to dynamically
                     // load their assemblies via a byte array and execute methods inside of
                     // their app domain from our full-trust app domain. It's the bridge that
                     // crosses the app domain boundary.
-                    var executionSandbox = TraceUtility.TraceTime("Create ExecutionSandbox Instance", () => (ExecutionSandbox)sandboxDomain.CreateInstance(
+                    var executionSandbox = TraceUtility.TraceTime("Create ExecutionSandbox Instance", 
+                        () => (ExecutionSandbox)sandboxDomain.CreateInstance(
                         assemblyType.Assembly.FullName,
                         assemblyType.FullName,
                         false,
                         BindingFlags.Public | BindingFlags.Instance,
                         null, null, null, null)
                         .Unwrap());
-                    
+
+                    // Prepare packages by locating the proper assemblies for the current framework and ensure
+                    // they have been downloaded to the packages folder and return their paths.
+                    executionSandbox.SetReferences(await PreparePackagesAsync(routePackages).TraceTimeAsync("Prepare Packages"));
+
+                    // To properly load assemblies into the dynamic partial trust assembly, we have to override
+                    // the AssemblyResolve method which is only called when an assembly load attempt is made
+                    // and fails. We can't use a closure here because to do that, the entire class ExecutionMethods
+                    // would have to be serailized across the app domain boundry. So we'll add a string array property
+                    // to the ExecutionSandbox class so we can access the references from in the app domain boundry.
+                    // Just remember this event is executed inside the partial trust domain.
+                    sandboxDomain.AssemblyResolve += (sender, args) =>
+                    {
+                        var name = new AssemblyName(args.Name);
+                        var path = ExecutionSandbox.References.FirstOrDefault(r => Path.GetFileNameWithoutExtension(r) == name.Name);
+
+                        return path == null ? null : Assembly.LoadFrom(path);
+                    };
+
                     // Build the ExecutionRequest object that represents the incoming request
                     // which holds the payload, headers, method, etc. The class is serialized
                     // so it can cross the app domain boundary. So it's serialized in our 
                     // full-trust host app domain, and deserialized and reinstantiated in
                     // the sandbox app domain.
                     var uri = new Uri(request.Uri, UriKind.Absolute);
-                    var executionRequest = TraceUtility.TraceTime("Create RouteRequest Instance", () => new RouteRequest(uri, request.Method)
-                    {
-                        IpAddress = request.IpAddress,
-                        Headers = HeaderHelpers.DeserializeHeaders(request.RequestHeaders),
-                        Body = request.RequestPayload
-                    });
+                    var executionRequest = TraceUtility.TraceTime("Create RouteRequest Instance", 
+                        () => new RouteRequest(uri, request.Method)
+                        {
+                            IpAddress = request.IpAddress,
+                            Headers = HeaderHelpers.DeserializeHeaders(request.RequestHeaders),
+                            Body = request.RequestPayload
+                        });
 
                     try
                     {
@@ -194,8 +178,9 @@ namespace Subroute.Container
                         // will pass the ExecutionRequest we created above. In return, we receive
                         // an instance of ExecutionResponse that has been serialized like the request
                         // and deserialized in our full-trust host domain.
-                        var executionResponse = TraceUtility.TraceTime("Load and Execute Request", () => executionSandbox.Execute(route.Assembly, references, executionRequest));
-                        
+                        var executionResponse = TraceUtility.TraceTime("Load and Execute Request", 
+                            () => executionSandbox.Execute(route.Assembly, executionRequest));
+
                         // We'll use the data that comes back from the response to fill out the 
                         // remainder of the database request record which will return the status
                         // code, message, payload, and headers. Then we update the database.
@@ -210,7 +195,7 @@ namespace Subroute.Container
                         // We'll pass back a small bit of data indiciating to the subscribers of
                         // the response topic listening for our specific correlation ID that indicates
                         // the route code was executed successfully and to handle it as such.
-                        responseMessage.Properties["Result"] = (int) ExecutionResult.Success;
+                        responseMessage.Properties["Result"] = (int)ExecutionResult.Success;
                         responseMessage.Properties["Message"] = "Completed Successfully";
 
                         // Create the response message and send it on its way.
@@ -332,8 +317,49 @@ namespace Subroute.Container
             {
                 // Unload the users app domain to recover all memory used by it.
                 if (sandboxDomain != null)
-                    TraceUtility.TraceTime("Unload AppDomain", () => AppDomain.Unload(sandboxDomain));
+                    TraceUtility.TraceTime("Unload AppDomain", 
+                        () => AppDomain.Unload(sandboxDomain));
             }
+        }
+
+        private static ExecutionDirectories SetupFilesystem(Route route, RouteSetting[] settings)
+        {
+            var tempDirectory = Path.GetTempPath();
+            var userConfigDirectory = Path.Combine(tempDirectory, route.Uri);
+            var userConfigFilePath = Path.Combine(userConfigDirectory, "app.config");
+
+            Directory.CreateDirectory(userConfigDirectory);
+            
+            var configFile = settings.Aggregate(@"<?xml version=""1.0"" encoding=""utf-8"" ?><configuration><appSettings>",
+                (current, setting) => current + $"<add key=\"{setting.Name}\" value=\"{setting.Value}\" />{Environment.NewLine}",
+                result => $"{result}</appSettings></configuration>");
+
+            File.WriteAllText(userConfigFilePath, configFile);
+
+            return new ExecutionDirectories
+            {
+                ConfigFile = userConfigFilePath,
+                RootDirectory = userConfigDirectory
+            };
+        }
+
+        private static async Task<string[]> PreparePackagesAsync(RoutePackage[] routePackages)
+        {
+            // We'll need an instance of the nuget service to download and prepare packages.
+            var nugetService = Program.Container.Resolve<INugetService>();
+
+            // Iterate over each route package and ensure it has been downloaded.
+            foreach (var package in routePackages)
+                await nugetService.DownloadPackageAsync(package);
+
+            // Load all references to be loaded into the new app domain.
+            var references = routePackages
+                .Select(Dependency.FromRoutePackage)
+                .SelectMany(d => nugetService.GetPackageReferences(d))
+                .Select(pr => pr.AssemblyPath)
+                .ToArray();
+
+            return references;
         }
 
         private static string GetPermissionErrorMessage(SecurityException exception)
