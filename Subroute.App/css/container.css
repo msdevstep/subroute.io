@@ -1021,6 +1021,12 @@ ul.sub-nav li button i.fa-flip-horizontal {
   background-color: #fff;
   z-index: 70;
 }
+#scripts #error-list .intellisense-status {
+  margin-left: 14px;
+}
+#scripts #error-list .intellisense-status i {
+  margin-right: 6px;
+}
 #scripts #error-list.has-diagnostics #error-status {
   cursor: pointer;
 }

@@ -14,7 +14,10 @@
     <button class="route-sidebar-toggle" data-bind="toggle: toolboxVisible, css: { 'toolbox-visible': toolboxVisible }"></button>
     <pre id="editor" data-bind="ace: { value: script, syntax: 'csharp', save: saveChanges, compile: compile, run: publishAndRun, publish: publish, intellisense: intellisense }, css: { 'has-suggestions': showSuggestionInfo, 'toolbox-visible': toolboxVisible }"></pre>
     <div id="error-list" data-bind="css: { 'has-diagnostics': diagnosticsCount() > 0 }">
-        <button id="error-status" data-bind="toggle: diagnosticsVisible, css: statusClass"><i class="fa fa-fw" data-bind="visible: diagnosticsCount() > 0, css: { 'fa-caret-up': !diagnosticsVisible() && diagnosticsCount() !== 0, 'fa-caret-down': diagnosticsVisible() && diagnosticsCount() !== 0 }"></i> <span data-bind="text: statusMessage"></span><span class="maker">Made with <i class="fa fa-heart-o"></i> by <a href="http://dylanvester.com" target="_blank">Dylan Vester</a> - Fork me on <a href="https://github.com/msdevstep/subroute.io" target="_blank">GitHub</a> <i class="fa fa-hand-spock-o"></i></span></button>
+        <button id="error-status" data-bind="toggle: diagnosticsVisible, css: statusClass"><i class="fa fa-fw" data-bind="visible: diagnosticsCount() > 0, css: { 'fa-caret-up': !diagnosticsVisible() && diagnosticsCount() !== 0, 'fa-caret-down': diagnosticsVisible() && diagnosticsCount() !== 0 }"></i> <span data-bind="text: statusMessage"></span>
+            <span class="intellisense-status pull-right" data-bind="visible: !intellisenseLoading()"><i class="fa fa-clock-o"></i><span>Intellisense Idle</span></span>
+            <span class="intellisense-status pull-right" data-bind="visible: intellisenseLoading"><i class="fa fa-refresh fa-spin"></i><span>Intellisense Loading...</span></span>
+            <span class="maker">Made with <i class="fa fa-heart-o"></i> by <a href="http://dylanvester.com" target="_blank">Dylan Vester</a> - Fork me on <a href="https://github.com/msdevstep/subroute.io" target="_blank">GitHub</a> <i class="fa fa-hand-spock-o"></i></span></button>
         <div id="error-list-contents" data-bind="visible: diagnosticsVisible() && diagnosticsCount() > 0, direction: 'down'">
             <table>
                 <thead>

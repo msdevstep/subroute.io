@@ -40,7 +40,7 @@ define(['require', 'config', 'durandal/system', 'durandal/app', 'durandal/viewLo
 
     requirejs.config({
         urlArgs: 'v=' + config.cacheVersion
-    })
+    });
 
     // Setup global authentication
     $.ajaxSetup({

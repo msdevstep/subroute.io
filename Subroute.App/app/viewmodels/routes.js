@@ -27,6 +27,7 @@
         self.auth = authentication;
         self.config = config;
         self.toolboxVisible = ko.observable(true);
+        self.intellisenseLoading = ko.observable(false);
 
         self.emptyPackageText = ko.computed(function () {
             if (self.isNew()) {
@@ -643,14 +644,19 @@
             return true;
         };
 
+        self.intellisenseCallback = null;
+        self.intellisenseRequest = null;
+        
         self.intellisense = function (innerEditor, session, pos, prefix, callback) {
+            self.intellisenseLoading(true);
+
             var uri = config.apiUrl + 'intellisense/v1?wordToComplete=' + prefix + '&character=' + pos.column + '&line=' + pos.row + '&wantSnippet=true&wantDocumentationForEveryCompletionResult=true&wantReturnType=true&wantKind=true&wantMethodHeader=true';
             var body = {
-                    code: innerEditor.getValue(),
-                    dependencies: ko.utils.arrayMap(self.packages(), function (package) {
-                        return { id: package.id, version: package.version, type: 'NuGet' }
-                    })
-                };
+                code: innerEditor.getValue(),
+                dependencies: ko.utils.arrayMap(self.packages(), function (package) {
+                    return { id: package.id, version: package.version, type: 'NuGet' }
+                })
+            };
 
             ajax.request({
                 url: uri,
@@ -677,7 +683,10 @@
                     }
                 });
                 callback(null, completions);
-            });
+                })
+             .always(function () {
+                self.intellisenseLoading(false);
+             });
         };
 
         self.requests = ko.observableArray([]);

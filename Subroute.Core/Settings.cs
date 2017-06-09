@@ -29,8 +29,11 @@ namespace Subroute.Core
         public static string AppInsightsInstrumentationKey => GetSetting<string>("Subroute.AppInsights.InstrumentationKey");
         public static string DocumentationPath => GetSetting<string>("Subroute.Documentation.Path");
         public static string NugetPackageUri => GetSetting<string>("Subroute.Nuget.PackageUri");
-        public static string NugetPackageDirectory => GetSetting<string>("Subroute.Nuget.PackageDirectory");
-        public static string NugetMaxSupportedVersion => GetSetting<string>("Subroute.Nuget.MaxSupportedVersion");
+        public static string NugetPackageDirectory
+        {
+            get => GetSetting<string>("Subroute.Nuget.PackageDirectory");
+            set => SetSetting("Subroute.Nuget.PackageDirectory", value);
+        }
 
         /// <summary>
         /// Get a strongly-typed setting value from the active environments configuration provider.
@@ -51,6 +54,17 @@ namespace Subroute.Core
             SettingsCache.Add(name, typedValue);
 
             return typedValue;
+        }
+
+        /// <summary>
+        /// Overrides the setting value read from the config file with a new value.
+        /// </summary>
+        /// <typeparam name="T">Inferred type of the setting.</typeparam>
+        /// <param name="name">Name used to refer to a setting.</param>
+        /// <param name="value">New value to override setting value with.</param>
+        public static void SetSetting<T>(string name, T value)
+        {
+            SettingsCache[name] = value;
         }
     }
 }

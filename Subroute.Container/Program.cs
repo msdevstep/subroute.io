@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Autofac;
 using Microsoft.Azure.WebJobs;
@@ -51,6 +52,9 @@ namespace Subroute.Container
 
                 SubrouteContext.InitializeMetadata();
             });
+
+            // Override the nuget package directory with one related to the current execution directory.
+            Settings.NugetPackageDirectory = Path.Combine(Environment.CurrentDirectory, "packages-container");
 
             var jobHostConfig = new JobHostConfiguration
             {

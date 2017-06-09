@@ -83,6 +83,18 @@ namespace Subroute.Container
                     if (sandboxPermissionSet == null)
                         throw new EntryPointException("Unable to load the sandbox environment, please contact Subroute.io for help with this error.");
 
+                    // We'll create a new folder to hold an empty config file we create, and by
+                    // doing this, it prevents the user from gaining access to our configuration
+                    // file and the settings within, such as connection strings, infrastructure
+                    // and other sensitive information we don't want them to have. Plus it will
+                    // allow us to change any configuration settings that are specific to their
+                    // application domain, such as default settings and other infrastructure.
+                    // We must ensure that we have at least the root configuration XML tag in
+                    // the configuration file we create or various dependencies will fail
+                    // such as XmlSerializer and DataContractSerializer.
+                    var directories = TraceUtility.TraceTime("Setup Filesystem",
+                        () => SetupFilesystem(route, routeSettings));
+
                     TraceUtility.TraceTime("Reconfigure Appropriate Permission Sets", () =>
                     {
                         // Remove access to UI components since we are in a headless environment.
@@ -102,23 +114,10 @@ namespace Subroute.Container
 
                         // Add permission to access the nuget package directory so that assemblies can be loaded.
                         sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, Settings.NugetPackageDirectory));
+
+                        // Add permission to read execution temp directory.
+                        sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] {directories.RootDirectory}));
                     });
-
-                    // We'll create a new folder to hold an empty config file we create, and by
-                    // doing this, it prevents the user from gaining access to our configuration
-                    // file and the settings within, such as connection strings, infrastructure
-                    // and other sensitive information we don't want them to have. Plus it will
-                    // allow us to change any configuration settings that are specific to their
-                    // application domain, such as default settings and other infrastructure.
-                    // We must ensure that we have at least the root configuration XML tag in
-                    // the configuration file we create or various dependencies will fail
-                    // such as XmlSerializer and DataContractSerializer.
-                    var directories = TraceUtility.TraceTime("Setup Filesystem", 
-                        () => SetupFilesystem(route, routeSettings));
-
-                    // We'll add one last permission to allow the user access to their own private folder.
-                    TraceUtility.TraceTime("Set Permission to Read Directory", 
-                        () => sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] { directories.RootDirectory })));
 
                     TraceUtility.TraceTime("Create AppDomain", () =>
                     {

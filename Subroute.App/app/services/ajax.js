@@ -4,10 +4,15 @@
 
         self.lock = new window.Auth0Lock('NuIcxXuxDMf2xZkP0kTX0aa28RyoFvAJ', 'subroute.auth0.com');
 
-        self.request = function (options) {
+        self.request = function (options, xhrCallback) {
             var deferred = $.Deferred();
 
-            $.ajax(options).fail(function (err) {
+            var xhr = $.ajax(options);
+
+            if (xhrCallback)
+                xhrCallback(xhr);
+
+            xhr.fail(function (err) {
                 // Attempt to get a new token using the refresh token if the call was unauthorized.
                 if (err.status === 401) {
                     // Determine if we have a refresh token in local storage, if we don't then
