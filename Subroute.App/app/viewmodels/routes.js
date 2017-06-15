@@ -437,7 +437,7 @@
                 // For new routes, or if the route uri has changed
                 // then navigate to the new edit page.
                 if (self.isNew() || self.uri() !== self.savedUri()) {
-                    router.navigate('#routes/edit/' + self.uri());
+                    router.navigate('/routes/edit/' + self.uri());
                 }
 
                 self.updatePageData(data);
@@ -548,9 +548,9 @@
         self.canActivate = function (action, uri) {
             if (!action) {
                 if (config.enableSuggestions) {
-                    return { redirect: '#routes/suggest' }
+                    return { redirect: '/routes/suggest' }
                 };
-                return { redirect: '#routes/new' }
+                return { redirect: '/routes/new' }
             };
 
             self.uri.subscribe(function (value) {

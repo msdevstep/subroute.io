@@ -304,15 +304,14 @@
     <Reference Include="System.Xml.XPath.XDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Compiler\CompilationService.cs" />
     <Compile Include="Compiler\CompilationResult.cs" />
+    <Compile Include="Compression\CompressedContent.cs" />
+    <Compile Include="Compression\CompressionHandler.cs" />
     <Compile Include="Models\Compiler\CompilationSource.cs" />
     <Compile Include="Compiler\CompletionRequest.cs" />
     <Compile Include="Compiler\CompletionResult.cs" />

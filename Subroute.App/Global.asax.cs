@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Http;
+using System.Web.Routing;
 using Subroute.App.Properties;
 
 namespace Subroute.App
@@ -28,6 +29,9 @@ namespace Subroute.App
             // then finish  initialization of our WebApi configuration.
             GlobalConfiguration.Configuration.MapHttpAttributeRoutes();
             GlobalConfiguration.Configuration.EnsureInitialized();
+
+            // Configure MVC route for default page.
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
     }
 }

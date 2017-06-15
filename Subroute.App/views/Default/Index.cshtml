@@ -1,0 +1,141 @@
+﻿@using System.Configuration
+@inherits System.Web.Mvc.WebViewPage
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subroute - Online Webhook/Microservice IDE for .NET</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="LINQPad for Web Services with Online C#.NET IDE and Imagination Factory for Microservices, Webhooks, Slackbots, and Beyond!">
+    <meta name="keywords" content="microservices,webhooks,slackbots,microservice,webhook,slackbot,web,service,csharp,c#,dotnet,.net,compiler,intellisense,autocomplete,hosting,roslyn,code,analysis,codeanalysis">
+    <meta name="author" content="Dylan Vester">
+    <link rel="apple-touch-icon" sizes="57x57" href="~/img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="~/img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="~/img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="~/img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="~/img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="~/img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="~/img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="~/img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="~/img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/img/favicon-16x16.png">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="~/img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <script type="text/javascript">
+        if (window.location.protocol !== "https:")
+            window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+    </script>
+    <script src="//cdn.auth0.com/js/lock-8.2.min.js"></script>
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/lib/qtip2/jquery.qtip.css" />
+    <link rel="stylesheet" href="~/lib/durandal/css/durandal.css" />
+    <link rel="stylesheet" href="~/lib/highlightjs/styles/default.css">
+    <link rel="stylesheet" href="~/lib/highlightjs/styles/vs.css">
+
+    <!-- Update this before deployment to match configuration cache version -->
+    <link rel="stylesheet" href="~/css/container.css?v=@ConfigurationManager.AppSettings["Client.CacheVersion"]" />
+</head>
+<body>
+<script src="~/lib/requirejs/require.js" data-main="/app/main"></script>
+<script type="text/javascript">
+    var lock = new Auth0Lock('NuIcxXuxDMf2xZkP0kTX0aa28RyoFvAJ', 'subroute.auth0.com');
+    var hash = lock.parseHash(window.location.hash);
+    if (hash) {
+        if (hash.error) {
+            console.log("There was an error logging in", hash.error);
+            alert('There was an error: ' + hash.error + '\n' + hash.error_description);
+        } else {
+            //save the token in the session:
+            localStorage.setItem('id_token', hash.id_token);
+            localStorage.setItem('refresh_token', hash.refresh_token);
+
+            // Redirect to the default hash now that we've set the auth token.
+            if (hash.state) {
+                window.location = hash.state;
+            }
+        };
+    };
+</script>
+
+<div id="applicationHost" class="clearfix">
+    <div class="pre-loading-container">
+        <span class="pre-loading">
+            <i class="fa fa-refresh fa-spin"></i> Loading Online C# IDE for Webhooks and Microservices&hellip;
+        </span>
+    </div>
+</div>
+
+<style>
+    .ace_error {
+        display: inline-block;
+        position: absolute;
+        background: url(/img/wavy_error.gif) bottom repeat-x;
+    }
+
+    .ace_warning {
+        display: inline-block;
+        position: absolute;
+        background: url(/img/wavy_warning.png) bottom repeat-x;
+    }
+</style>
+
+<script>
+    // Include the UserVoice JavaScript SDK (only needed once on a page)
+    UserVoice = window.UserVoice || []; (function () { var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true; uv.src = '//widget.uservoice.com/TtkTiGYmsXPAWrvLuLqWA.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s) })();
+
+    //
+    // UserVoice Javascript SDK developer documentation:
+    // https://www.uservoice.com/o/javascript-sdk
+    //
+
+    // Set colors
+    UserVoice.push(['set', {
+        accent_color: '#448dd6',
+        trigger_color: 'white',
+        trigger_background_color: '#e23a39'
+    }]);
+
+    // Identify the user and pass traits
+    // To enable, replace sample data with actual user traits and uncomment the line
+    UserVoice.push(['identify', {
+        //email:      'john.doe@example.com', // User’s email address
+        //name:       'John Doe', // User’s real name
+        //created_at: 1364406966, // Unix timestamp for the date the user signed up
+        //id:         123, // Optional: Unique id of the user (if set, this should not change)
+        //type:       'Owner', // Optional: segment your users by type
+        //account: {
+        //  id:           123, // Optional: associate multiple users with a single account
+        //  name:         'Acme, Co.', // Account name
+        //  created_at:   1364406966, // Unix timestamp for the date the account was created
+        //  monthly_rate: 9.99, // Decimal; monthly rate of the account
+        //  ltv:          1495.00, // Decimal; lifetime value of the account
+        //  plan:         'Enhanced' // Plan name for the account
+        //}
+    }]);
+
+    // Add default trigger to the bottom-right corner of the window:
+    //UserVoice.push(['addTrigger', { trigger_position: 'bottom-left' }]);
+
+    // Or, use your own custom trigger:
+    //UserVoice.push(['addTrigger', '#uservoice']);
+
+    // Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
+    //UserVoice.push(['autoprompt', {}]);
+</script>
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-74992300-1', 'auto');
+    ga('send', 'pageview');
+</script>
+</body>
+</html>

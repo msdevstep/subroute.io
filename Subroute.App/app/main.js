@@ -86,9 +86,9 @@ define(['require', 'config', 'durandal/system', 'durandal/app', 'durandal/viewLo
     // Wireup to the router navigation event to update google analytics for every navigation.
     router.on('router:navigation:complete', function (instance, instruction) {
         if (instruction.queryString) {
-            ga('set', 'page', '#' + instruction.fragment + '?' + instruction.queryString);
+            ga('set', 'page', instruction.fragment + '?' + instruction.queryString);
         } else {
-            ga('set', 'page', '#' + instruction.fragment);
+            ga('set', 'page', instruction.fragment);
         }
         ga('send', 'pageview');
     });

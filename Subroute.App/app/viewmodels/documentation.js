@@ -15,7 +15,7 @@
                 scrollTop: 0
             }, 1000);
 
-            history.replaceState(undefined, undefined, "#documentation");
+            history.replaceState(undefined, undefined, "/documentation");
         };
 
         self.scrollToAnchor = function (anchor) {
@@ -31,7 +31,7 @@
                 scrollTop: element.offset().top - 70
             }, 1000);
 
-            history.replaceState(undefined, undefined, "#documentation/" + anchor);
+            history.replaceState(undefined, undefined, "/documentation/" + anchor);
         };
 
         self.enableScrollLinks = function () {

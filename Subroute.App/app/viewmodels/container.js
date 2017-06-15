@@ -7,7 +7,7 @@
         { route: 'gallery', moduleId: 'gallery', title: 'Gallery', nav: true }
     ]).buildNavigationModel();
 
-    rootRouter.activate();
+    rootRouter.activate({ pushState: true, hashChange: true });
 
     return new function () {
         var self = this;

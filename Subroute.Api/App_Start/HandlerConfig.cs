@@ -1,11 +1,8 @@
-using System.Configuration;
-using System.Security.Claims;
 using System.Web.Configuration;
 using System.Web.Http;
-using Autofac.Integration.WebApi;
 using Subroute.Api;
-using Subroute.Api.Filters;
 using Subroute.Api.Handlers;
+using Subroute.Core.Compression;
 using Subroute.Core.Tracing;
 using WebActivatorEx;
 
@@ -24,9 +21,10 @@ namespace Subroute.Api
             var clientId = WebConfigurationManager.AppSettings["auth0:ClientId"];
             var clientSecret = WebConfigurationManager.AppSettings["auth0:ClientSecret"];
             
+            configuration.MessageHandlers.Add(new CompressionHandler());
             configuration.MessageHandlers.Add(new TracingHandler());
             configuration.MessageHandlers.Add(new SecureHandler());
-            configuration.MessageHandlers.Add(new JsonWebTokenValidationHandler()
+            configuration.MessageHandlers.Add(new JsonWebTokenValidationHandler
             {
                 Audience = clientId,
                 SymmetricKey = clientSecret

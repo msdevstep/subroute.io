@@ -1,7 +1,7 @@
 ﻿<div id="container">
     <header data-bind="click: hideActiveElements">
         <h1>
-            <a href="#"><img src="img/android-icon-144x144.png" title="Subroute.io" alt="Subroute.io Logo" /></a>
+            <a href="/"><img src="/img/android-icon-144x144.png" title="Subroute.io" alt="Subroute.io Logo" /></a>
             <span class="logo" data-bind="hidden: apiUriVisible, html: activeScriptName, click: showFullUri, clickBubble: false"></span>
             <span data-bind="visible: apiUriVisible, html: activeApiScriptName, click: selectApiUri, clickBubble: false"></span>
         </h1>
@@ -17,19 +17,19 @@
             <button class="ephasis" title="Toggle Menu" data-bind="toggle: expanded"><span class="icon"><i class="fa fa-bars" data-bind="css: { 'fa-bars': !expanded(), 'fa-close fa-lg': expanded }"></i></span></button>
         </li>
         <li>
-            <a href="#routes/new" title="Create Route"><span class="icon"><i class="fa fa-plus fa-lg"></i></span>Create Route</a>
+            <a href="/routes/new" title="Create Route"><span class="icon"><i class="fa fa-plus fa-lg"></i></span>Create Route</a>
         </li>
         <li data-bind="visible: config.enableSuggestions">
-            <a href="#routes/suggest" title="Suggest Example Route" data-bind="click: showNextSuggestion"><span class="icon"><i class="fa fa-random fa-lg"></i></span>Suggest Example Route</a>
+            <a href="/routes/suggest" title="Suggest Example Route" data-bind="click: showNextSuggestion"><span class="icon"><i class="fa fa-random fa-lg"></i></span>Suggest Example Route</a>
         </li>
         <li>
             <button title="My Routes" data-bind="click: showRoutes, loading: { trigger: routesLoading, idle: 'fa-th-list' }"><span class="icon"><i class="fa fa-th-list fa-lg"></i></span>My Routes</button>
         </li>
         <li data-bind="visible: config.enableDocumentation">
-            <a href="#documentation" title="Documentation"><span class="icon"><i class="fa fa-map-signs fa-lg"></i></span>Documentation</a>
+            <a href="/documentation" title="Documentation"><span class="icon"><i class="fa fa-map-signs fa-lg"></i></span>Documentation</a>
         </li>
         <li data-bind="visible: config.enableGallery">
-            <a href="#gallery" title="Gallery"><span class="icon"><i class="fa fa-map-o"></i></span>Gallery</a>
+            <a href="/gallery" title="Gallery"><span class="icon"><i class="fa fa-map-o"></i></span>Gallery</a>
         </li>
         <li>
             <button id="uservoice" title="Post an Idea"><span class="icon"><i class="fa fa-lightbulb-o fa-lg"></i></span>Post an Idea</button>

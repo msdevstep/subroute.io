@@ -6,7 +6,7 @@
         self.config = config;
 
         self.showLogin = function () {
-            auth.login();
+            auth.login(window.location.pathname);
         };
 
         self.logout = function () {

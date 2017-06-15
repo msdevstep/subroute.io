@@ -20,6 +20,8 @@
         self.lock = new window.Auth0Lock('NuIcxXuxDMf2xZkP0kTX0aa28RyoFvAJ', 'subroute.auth0.com');
         self.login = function (callbackHash) {
             var options = {
+                responseType: 'token',
+                callbackURL: window.location.protocol + '//' + window.location.hostname,
                 authParams: {
                     scope: 'openid profile offline_access',
                     state: callbackHash
