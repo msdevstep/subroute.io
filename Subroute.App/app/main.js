@@ -32,7 +32,7 @@
         }
     },
     /* This will only apply for early loaded scripts, since this functionality is overwritten after it's loaded with more stable caching. */
-    urlArgs: 'v=' + Math.floor(Date.now() / 1000)
+    urlArgs: 'v=' + CacheVersion
 });
 
 define(['require', 'config', 'durandal/system', 'durandal/app', 'durandal/viewLocator', 'jquery', 'knockout', 'validation', 'services/authentication', 'plugins/router'], function (require, config, system, app, viewLocator, $, ko, val, auth, router) {

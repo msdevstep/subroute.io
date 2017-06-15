@@ -980,6 +980,8 @@
     <Content Include="lib\highlightjs\package.json" />
     <Content Include="lib\highlightjs\README.md" />
     <None Include="Properties\PublishProfiles\subroute - Web Deploy.pubxml" />
+    <Content Include="robots.txt" />
+    <Content Include="sitemap.xml" />
     <Content Include="views\Default\Index.cshtml" />
     <None Include="Web.Cloud.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -996,7 +998,6 @@
     <Content Include="css\container.min.css">
       <DependentUpon>container.css</DependentUpon>
     </Content>
-    <Content Include="index.html" />
     <EmbeddedResource Include="res\BlankRoute.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

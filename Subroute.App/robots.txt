@@ -1,0 +1,2 @@
+﻿User-agent: *
+Sitemap: https://subroute.io/sitemap.xml
