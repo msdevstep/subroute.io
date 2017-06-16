@@ -13,7 +13,9 @@
     "font-awesome": "4.6.1",
     "remarkable": "1.7.1",
     "highlightjs": "9.10.0",
-    "moment": "2.18.1"
+    "moment": "2.18.1",
+    "enlighterjs": "2.11.0",
+    "mootools": "1.6.0"
   },
   "resolutions": {
     "requirejs-text": "2.0.14",

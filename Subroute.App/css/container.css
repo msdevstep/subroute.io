@@ -1440,6 +1440,17 @@ ul.sub-nav li button i.fa-flip-horizontal {
   padding: 20px;
   border-right: 1px solid #ccc;
 }
+#doc-content #documentation-content #documentation-well {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
 #doc-content #documentation-content .ace_editor {
   border: 1px solid #aaa;
   margin-bottom: 20px;
@@ -1457,8 +1468,7 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-content #documentation-content code {
   font-size: 1em;
   font-weight: normal;
-  padding: 1px 3px;
-  background-color: #fff;
+  padding: 0;
   border: none;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -1470,13 +1480,12 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-content #documentation-content pre {
   display: block;
   overflow-x: auto;
-  padding: 0.5em;
+  padding: 0;
   color: #000;
-  background: #fff;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -1484,12 +1493,12 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-content #documentation-content pre code {
   font-size: 1em;
   font-weight: normal;
-  padding: 0;
-  background-color: inherit;
-  border: none;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;

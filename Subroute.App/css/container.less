@@ -1599,6 +1599,13 @@ ul.sub-nav {
         padding: 20px;
         border-right: 1px solid #ccc;
 
+        #documentation-well {
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            .border-radius(5px);
+        }
+
         .ace_editor {
             border: 1px solid #aaa;
             margin-bottom: 20px;
@@ -1617,8 +1624,7 @@ ul.sub-nav {
         code {
             font-size: 1em;
             font-weight: normal;
-            padding: 1px 3px;
-            background-color: #fff;
+            padding: 0;
             border: none;
             .border-radius(0);
         }
@@ -1626,19 +1632,18 @@ ul.sub-nav {
         pre {
             display: block;
             overflow-x: auto;
-            padding: 0.5em;
+            padding: 0;
             color: #000;
-            background: #fff;
-            border: 1px solid #ccc;
-            .border-radius(5px);
+            border: none;
+            .border-radius(0);
 
             code {
                 font-size: 1em;
                 font-weight: normal;
-                padding: 0;
-                background-color: inherit;
-                border: none;
-                .border-radius(0);
+                padding: 12px;
+                border: 1px solid #ccc;
+                background-color: #fafafa;
+                .border-radius(5px);
             }
         }
 

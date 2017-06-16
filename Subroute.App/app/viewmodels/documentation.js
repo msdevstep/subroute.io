@@ -1,4 +1,4 @@
-﻿define(['knockout', 'remarkable', 'highlight', 'jquery', 'durandal/app'], function (ko, remarkable, hljs, $, app) {
+﻿define(['knockout', 'remarkable', 'highlight', 'jquery', 'durandal/app', 'enlighter'], function (ko, remarkable, hljs, $, app, enlighter) {
     return function () {
         var self = this;
 
@@ -22,7 +22,7 @@
             if (!anchor)
                 return;
 
-            var element = $('#documentation-content').find('#' + anchor);
+            var element = $('#documentation-well').find('#' + anchor);
 
             if (element.length === 0)
                 return;
@@ -63,7 +63,7 @@
                 html: true,                 // Enable HTML tags in source
                 xhtmlOut: false,            // Use '/' to close single tags (<br />)
                 breaks: false,              // Convert '\n' in paragraphs into <br>
-                langPrefix: 'language-',    // CSS language prefix for fenced blocks
+                langPrefix: 'hljs language-',    // CSS language prefix for fenced blocks
                 linkify: true,              // Autoconvert URL-like texts to links
                 linkTarget: '_blank',       // Set target to open link in
 
@@ -76,31 +76,42 @@
 
                 // Highlighter function. Should return escaped HTML,
                 // or '' if input not changed
-                highlight: function (str, lang) {
-                    if (lang && hljs.getLanguage(lang)) {
-                        try {
-                            return hljs.highlight(lang, str).value;
-                        } catch (__) { }
-                    }
+                //highlight: function (str, lang) {
+                //    if (lang && hljs.getLanguage(lang)) {
+                //        try {
+                //            return hljs.highlight(lang, str).value;
+                //        } catch (__) { }
+                //    }
 
-                    try {
-                        return hljs.highlightAuto(str).value;
-                    } catch (__) { }
+                //    try {
+                //        return hljs.highlightAuto(str).value;
+                //    } catch (__) { }
 
-                    return ''; // use external default escaping
-                }
+                //    return ''; // use external default escaping
+                //}
             });
 
             var source = $('#source');
-            var destination = $('#documentation-content');
+            var destination = $('#documentation-well');
             var unformatted = self.markdown();
             var html = md.render(unformatted);
-            var decoded = self.decodeHtml(html);
 
             source.remove();
-            destination.html(decoded)
+            destination.html(html);
             self.scrollToAnchor(self.anchor);
             self.enableScrollLinks();
+
+            EnlighterJS.Util.Init('pre code', null, {
+                language: 'csharp',
+                theme: 'Enlighter',
+                infoButton: false
+            });
+
+            // Fix all the inline code examples
+            $("code").not("pre code").each(function(index, element) {
+                var ele = $(element);
+                ele.html(ele.text());
+            });
         };
     };
 });

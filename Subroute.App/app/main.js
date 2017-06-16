@@ -18,7 +18,9 @@
         'qtip': '../lib/qtip2/jquery.qtip.min',
         'modes': '../modes',
         'highlight': '../lib/highlightjs/highlight.pack',
-        'remarkable': '../lib/remarkable/dist/remarkable'
+        'remarkable': '../lib/remarkable/dist/remarkable',
+        'enlighter': '../lib/enlighterjs/build/enlighterjs',
+        'mootools': '../lib/mootools/dist/mootools-core'
     },
     shim: {
         'base64': {
@@ -29,6 +31,9 @@
         },
         'ace/ext-language_tools': {
             deps: ['ace/ace']
+        },
+        'enlighter' : {
+            deps: ['mootools']
         }
     },
     /* This will only apply for early loaded scripts, since this functionality is overwritten after it's loaded with more stable caching. */
