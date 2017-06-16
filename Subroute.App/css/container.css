@@ -1,5 +1,7 @@
 ﻿@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,600italic);
 @import url(https://fonts.googleapis.com/css?family=Lato:100,300,700,400,700italic);
+@import url(https://fonts.googleapis.com/css?family=Cutive+Mono|Roboto+Mono:400,700,400italic,500,500italic,700italic|Ubuntu+Mono:400,700,400italic,700italic|Droid+Sans+Mono|Source+Code+Pro:400,600|Inconsolata:400,700);
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro');
 body {
   font-family: 'Lato', sans-serif;
   background-color: #e6e6e6;
@@ -1454,6 +1456,9 @@ ul.sub-nav li button i.fa-flip-horizontal {
 #doc-content #documentation-content .ace_editor {
   border: 1px solid #aaa;
   margin-bottom: 20px;
+}
+#doc-content #documentation-content .EnlighterJS {
+  font-family: 'Consolas', "Source Code Pro", 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 #doc-content #documentation-content span.scroll-top,
 #doc-content #documentation-content span.scroll-link {
