@@ -1,25 +1,24 @@
-﻿using NuGet.Frameworks;
-using NuGet.PackageManagement;
-using NuGet.ProjectManagement;
-using NuGet.Protocol.Core.Types;
-using Subroute.Core.Data;
+﻿using Subroute.Core.Data;
 using Subroute.Core.Models.Compiler;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using NuGet.Common;
-using NuGet.Packaging;
-using NuGet.Versioning;
 using Subroute.Core.Exceptions;
-using NuGet.Protocol;
 using Subroute.Core.Extensions;
 using Microsoft.CodeAnalysis;
 using PackageReference = Subroute.Core.Models.Compiler.PackageReference;
+using NuGet.Common;
+using NuGet.ProjectManagement;
+using NuGet.Frameworks;
+using NuGet.Packaging.Core;
+using NuGet.Versioning;
+using NuGet.Protocol.Core.Types;
+using NuGet.Packaging;
+using NuGet.PackageManagement;
 
 namespace Subroute.Core.Nuget
 {
@@ -170,7 +169,8 @@ namespace Subroute.Core.Nuget
             // defaults for everything as we are doing a simple package download to a folder.
             var identity = dependency.ToPackageIdentity();
             var settings = NuGet.Configuration.Settings.LoadDefaultSettings(Settings.NugetPackageDirectory);
-            var provider = new SourceRepositoryProvider(settings, Repository.Provider.GetCoreV3());
+            var cores = Repository.Provider.GetPageableCoreV3().Select(p => new Lazy<INuGetResourceProvider>(() => p));
+            var provider = new SourceRepositoryProvider(settings, cores);
             var packageManager = new NuGetPackageManager(provider, settings, Settings.NugetPackageDirectory)
             {
                 PackagesFolderNuGetProject = _packageFolder
