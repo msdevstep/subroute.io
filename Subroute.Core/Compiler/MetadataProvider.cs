@@ -17,6 +17,7 @@ using Subroute.Core.Nuget;
 using Subroute.Core.Models.Compiler;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Drawing;
 
 namespace Subroute.Core.Compiler
 {
@@ -105,7 +106,8 @@ namespace Subroute.Core.Compiler
                 typeof (BasicHttpBinding).Assembly,
                 typeof (DataSet).Assembly,
                 typeof (DataRowExtensions).Assembly,
-                typeof (Geography).Assembly
+                typeof (Geography).Assembly,
+                typeof (Size).Assembly
             };
 
             // Pull in cache containing a list of documentation files to make finding an assemblies associated

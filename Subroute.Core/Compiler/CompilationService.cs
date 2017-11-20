@@ -112,19 +112,6 @@ namespace Subroute.Core.Compiler
             var references = _metadataProvider.ResolveReferences(source.Dependencies);
             var referenceAssemblies = references.Select(r => Assembly.LoadFrom(r.Display)).ToArray();
 
-            //var compositionContext = new ContainerConfiguration()
-            //    .WithAssemblies(MefHostServices.DefaultAssemblies
-            //        .Concat(new[]
-            //        {
-            //            // These assemblies are necessary to enable language services.
-            //            Assembly.Load("Microsoft.CodeAnalysis.Features"),
-            //            Assembly.Load("Microsoft.CodeAnalysis.CSharp.Features")
-            //        })
-            //        .Concat(referenceAssemblies))
-            //    .CreateContainer();
-
-            //var host = MefHostServices.Create(compositionContext);
-
             // Setup a workspace for this code file, since we aren't actively managing a project or solutions.
             var workspace = new AdhocWorkspace();
             var projectName = RandomString(6, "Project");

@@ -1209,10 +1209,10 @@
     <Content Include="lib\mootools\package.yml" />
     <Content Include="lib\mootools\prepare-release" />
     <Content Include="lib\mootools\README.md" />
-    <None Include="Properties\PublishProfiles\subroute - Web Deploy.pubxml" />
     <Content Include="robots.txt" />
     <Content Include="sitemap.xml" />
     <Content Include="views\Default\Index.cshtml" />
+    <None Include="Properties\PublishProfiles\Cloud Deploy.pubxml" />
     <None Include="Web.Cloud.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

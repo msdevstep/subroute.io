@@ -153,7 +153,7 @@
                         case "csharp":
                             session.setMode('modes/csharp');
                             editor.setOption("scrollPastEnd", true);
-                            editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: false });
+                            editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
 
                             if (options.intellisense) {
                                 var intellisense = {
