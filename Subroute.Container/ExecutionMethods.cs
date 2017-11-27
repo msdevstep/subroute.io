@@ -110,13 +110,14 @@ namespace Subroute.Container
                         sandboxPermissionSet.AddPermission(new WebPermission(PermissionState.Unrestricted));
 
                         // Add the ability to use the XmlSerializer and the DataContractSerializer.
-                        sandboxPermissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter));
+                        // Also allows unmanaged code to be executed for drawing operations such as image resize and formatting.
+                        sandboxPermissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.SerializationFormatter | SecurityPermissionFlag.UnmanagedCode));
 
                         // Add permission to access the nuget package directory so that assemblies can be loaded.
                         sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, Settings.NugetPackageDirectory));
 
                         // Add permission to read execution temp directory.
-                        sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] {directories.RootDirectory}));
+                        sandboxPermissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, new[] {directories.RootDirectory, @"D:\GitHub\subroute.io\Subroute.Container\App_code\" }));
                     });
 
                     TraceUtility.TraceTime("Create AppDomain", () =>
@@ -211,7 +212,7 @@ namespace Subroute.Container
                         // These exceptions can occur when query string parsing fails, and since the
                         // user's code doesn't have access to the core exceptions, we'll need to wrap
                         // it instead manually.
-                        if (invokationException.InnerException is Common.BadRequestException badRequestException)
+                        if (invokationException.InnerException is BadRequestException badRequestException)
                             throw new Core.Exceptions.BadRequestException(badRequestException.Message, badRequestException);
 
                         // Otherwise it is most likely a custom user exception.
@@ -231,7 +232,7 @@ namespace Subroute.Container
                         // the user doesn't have permission to execute a particular block of code.
                         throw new RoutePermissionException(GetPermissionErrorMessage(securityException), securityException);
                     }
-                    catch (Common.BadRequestException badRequestException)
+                    catch (BadRequestException badRequestException)
                     {
                         // These exceptions can occur when query string parsing fails, and since the
                         // user's code doesn't have access to the core exceptions, we'll need to wrap

@@ -1,3 +1,4 @@
+using Subroute.Common.Extensions;
 using System.Linq;
 using System.Net;
 
@@ -27,6 +28,24 @@ namespace Subroute.Common
         /// Gets all the values for a query string key.
         /// </summary>
         public string[] Values { get; }
+
+        /// <summary>
+        /// Attempts to cast, convert, or otherwise coerce the first query string value as the specified type.
+        /// </summary>
+        /// <typeparam name="T">Expected result type to return the first query string value as.</typeparam>
+        /// <param name="defaultValue">Value to return if the value cannot be made into the result type.</param>
+        /// <returns>First query string value as the specified type.</returns>
+        public T As<T>(T defaultValue = default(T))
+        {
+            try
+            {
+                return (T)typeof(T).Coerce(FirstValue);
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
 
         /// <summary>
         /// Implicitly returns the first value for a query string key.

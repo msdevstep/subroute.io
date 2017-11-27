@@ -78,7 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BadRequestException.cs" />
+    <Compile Include="Exceptions\BadRequestException.cs" />
     <Compile Include="BaseController.cs" />
     <Compile Include="EntryPointException.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
@@ -104,6 +104,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="RequestFormatters\XmlRequestFormatter.cs" />
     <Compile Include="ResponseFormatters\XmlResponseFormatter.cs" />
+    <Compile Include="Exceptions\SubrouteException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Subroute.Common;
+using Subroute.Common.Exceptions;
 
 namespace Subroute.Core.Compression
 {

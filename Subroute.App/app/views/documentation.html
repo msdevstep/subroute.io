@@ -59,6 +59,146 @@ that make working with your desired format easier. Support for wire formats is a
 + *Stream* - Supported (Converted to Byte Array)    
 
 <span class="scroll-top">Back to Top</span>
+    
+## NuGet Examples
+### <a id="Crop-Picture"></a>Crop Picture (ImageProcessor)
+One really powerful example of what Subroute.io can do for you is a subroute that can manipulate images (in this case cropping an image). 
+We are able to do this with the support of the **ImageProcessor** NuGet package. Because Subroute.io is able to reference any publicly available 
+NuGet package, there are nearly an unlimited number of ways your subroute can be extended.
+
+Take a look at the following example of how to crop an image using the ImageProcessor NuGet package.
+
+**Don't forget to reference the ImageProcessor NuGet package for this subroute to work.**
+
+``` csharp
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Subroute.Common;
+using Subroute.Common.Exceptions;
+using System.IO;
+using ImageProcessor;
+using ImageProcessor.Imaging.Formats;
+using System.Drawing;
+
+namespace Subroute.Container
+{
+	public class RouteMethods : BaseController
+	{
+		public async Task<RouteResponse> GetAsync(RouteRequest request)
+		{
+		    if (!request.QueryString.TryGetValue("url", out QueryStringValue value))
+		        throw new BadRequestException("You must provide a 'url' query string parameter of the image to download.");
+		    
+		    var top = 0;
+		    if (request.QueryString.TryGetValue("top", out QueryStringValue queryTop))
+		        top = queryTop.As(0);
+		    
+		    var left = 0;
+		    if (request.QueryString.TryGetValue("left", out QueryStringValue queryLeft))
+		        left = queryLeft.As(0);
+		    
+		    var width = 0;
+		    if (request.QueryString.TryGetValue("width", out QueryStringValue queryWidth))
+		        width = queryWidth.As(0);
+		    
+		    var height = 0;
+		    if (request.QueryString.TryGetValue("height", out QueryStringValue queryHeight))
+		        height = queryHeight.As(0);
+            
+            try
+            {
+    		    var webClient = new WebClient();
+                var imageBytes = webClient.DownloadData(value);
+                var quality = 100;
+                var point = new Point(top, left);
+                var size = new Size(width, height);
+            
+                using (var inStream = new MemoryStream(imageBytes))
+                {
+                    using (var outStream = new MemoryStream())
+                    {
+                        using (var imageFactory = new ImageFactory(true))
+                        {
+                            // Load, crop, set the format and quality and save an image.
+                            imageFactory.Load(inStream)
+                                        .Crop(new Rectangle(point, size))
+                                        .Format(new JpegFormat())
+                                        .Save(outStream);
+                        }
+                        
+                        return Stream(HttpStatusCode.OK, outStream, "image/jpeg");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new SubrouteException(ex.Message);
+            }
+		}
+	}
+}
+```    
+**Figure 15. Crop Picture (ImageProcessor) - [Try it Now](https://api.subroute.io/v1/example-crop-image?url=https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-565445.jpg&top=0&left=1000&width=900&height=1080)**
+
+<span class="scroll-top">Back to Top</span>
+                             
+### <a id="Web-Spider"></a>Web Spider (HtmlAgilityPack)
+Another example of importing functionality using NuGet packages is using the HtmlAgilityPack NuGet package to find all anchor tags on a specified
+website. Call this route by passing a `url` query string parameter containing the website you want to crawl. The subroute code will then load in
+the HtmlAgilityPack to search for all anchor tags in the downloaded HTML and the results will be returned in the response.
+
+**Don't forget to reference the HtmlAgilityPack NuGet package for this subroute to work.**
+
+``` csharp
+using System;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Subroute.Common;
+using HtmlAgilityPack;
+
+namespace Subroute.Container
+{
+    /// &lt;summary&gt;
+    /// Use the HtmlAgilityPack to find all links for a provided web resource.
+    /// Don't forget to reference the NuGet package 'HtmlAgilityPack'.
+    /// &lt;/summary&gt;
+	public class RouteMethods : BaseController
+	{
+		public async Task&lt;RouteResponse&gt; GetAsync(RouteRequest request)
+		{
+		    // Ensure that a 'url' parameter was passed containing a URL to load.
+		    if (!request.QueryString.TryGetValue("url", out QueryStringValue url))
+		        throw new BadRequestException("Request does not contain a 'url' query string parameter.");
+		    
+		    // We'll use the HtmlWeb class to do the actual web request.
+		    // All the results will be aggregated using a StringBuilder.
+            var hw = new HtmlWeb();
+            var doc = hw.Load(url);
+            var sb = new StringBuilder();
+            
+            // Iterate over all links in the document that have an 'href' attribute.
+            foreach(var link in doc.DocumentNode.SelectNodes("//a[@href]"))
+            {
+                // Extract the links inner text and the href value.
+                var text = link.InnerText;
+                var href = link.Attributes["href"].Value;
+                
+                // Combine them into a single line and append to the StringBuilder.
+                sb.AppendFormat("{0} - {1}\n", text.Replace("\n", ""), href);
+            }
+		    
+		    // Send back a plain-text response containing the contents of the string builder.
+			return String(HttpStatusCode.OK, sb.ToString());
+		}
+	}
+}
+```    
+**Figure 15. Web Spider (HtmlAgilityPack) - [Try it Now](https://api.subroute.io/v1/example-web-spider?url=https://craigslist.org)**
+
+<span class="scroll-top">Back to Top</span>
 
 ## Working with Requests
 ### <a id="Query-String"></a>Query String
@@ -631,6 +771,12 @@ namespace Subroute.Container
             <li><span data-bind="click: scrollToAnchor('What-Is-Subroute')">What is Subroute.io?</span></li>
             <li><span data-bind="click: scrollToAnchor('Writing-Your-First-Route')">Writing your First Route</span></li>
             <li><span data-bind="click: scrollToAnchor('Supported-Wire-Formats')">Supported Wire Formats</span></li>
+        </ul>
+
+        <h4>Example Code</h4>
+        <ul>
+            <li><span data-bind="click: scrollToAnchor('Crop-Picture')">Crop Picture (ImageProcessor)</span></li>
+            <li><span data-bind="click: scrollToAnchor('Web-Spider')">Web Spider (HtmlAgilityPack)</span></li>
         </ul>
 
         <h4>Working with Requests</h4>
